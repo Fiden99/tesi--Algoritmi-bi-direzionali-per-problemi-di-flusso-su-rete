@@ -1,0 +1,20 @@
+appunti tesi 
+
+linguaggio di programmazione 
+C++ --> object
+
+ricerca  bibliogragica
+reoptimization, combinatorial optimization,
+
+ricalcolo label --> come e quando ricalcolarle
+
+--------------------------------------------------------------
+
+possibili argomenti che potrebbero essere utili
+
+meet in the middle (MM) --> algoritmo che fa incontrare le due searcha a metà --> (serve euristica)
+
+Front-to-front GPU bidirectional search (FFGBS) --> CPU+GPU, parebbe senza euristica
+
+se dovessi avere euristica, quale potrebbe essere?
+
