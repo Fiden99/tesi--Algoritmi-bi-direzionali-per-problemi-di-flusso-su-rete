@@ -30,10 +30,16 @@
 
 ### capire come ricalcolare le label
 
+### algoritmi push-relabel
+
+#### capire come funzionano
+
+#### capire se potrebbero essere utili alla causa
+
 ## possibili librerie utilizzabili
 ### simil C/ per C
 
-#### [paper su maxflow bidirezionale](https://dl.acm.org/doi/pdf/10.1145/1989493.1989511)
+#### [paper su maxflow parallelo](https://dl.acm.org/doi/pdf/10.1145/1989493.1989511)
 
 ### per C++
 
