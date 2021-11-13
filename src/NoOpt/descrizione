@@ -1,3 +1,5 @@
-algoritmo che per ogni nodo "malato", ricomincia da capo col ricalcolo delle label
+algoritmo di edmond karp che per ogni iterazione fa una nuova BFS
 
-viene usato un grafo non bidirezionale, con i nodi che puntano solo da x a y e non ho un riferimento per tornare indietro
+il grafo ha solo nodi monodirezionali, ma viene salvato all'interno dei nodi
+(in maniera sbagliata, andarebbe salvata a parte, all'interno di BfsNoOpt, rendendo il metodo non statico)
+il nodo precedentemente utilizzato per far sì che la sappia la via fatta dall'algoritmo che dovrò fare Ford-Fulkenson
