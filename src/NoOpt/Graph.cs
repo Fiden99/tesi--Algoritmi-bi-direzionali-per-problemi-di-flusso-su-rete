@@ -43,7 +43,8 @@ namespace BFS
         {
             foreach( Node x in this.Nodes)
             {
-                x.initLabel(0);
+                if (x.valid == false)
+                    x.initLabel(0);
                 x.setInFlow(0);
                 x.setPreviousNode(null);
             }
