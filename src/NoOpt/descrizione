@@ -1,0 +1,3 @@
+algoritmo che per ogni nodo "malato", ricomincia da capo col ricalcolo delle label
+
+viene usato un grafo non bidirezionale, con i nodi che puntano solo da x a y e non ho un riferimento per tornare indietro
