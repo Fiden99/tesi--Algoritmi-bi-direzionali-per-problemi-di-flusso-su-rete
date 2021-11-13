@@ -23,7 +23,6 @@ namespace BFS
             grafo.resetLabel();
             var coda = new Queue<Node>();
             coda.Enqueue(grafo.Source);
-            //TODO inserire un metodo per far sì che ogni 
             while (coda.Count > 0)
             {
                 var element = coda.Dequeue();
@@ -69,7 +68,6 @@ namespace BFS
                 if (f==0)
                     break;
                 fmax += f;
-                //TODO capire come mai non funziona
                 Node mom = t;
                 while (mom != s)
                 {

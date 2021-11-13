@@ -97,7 +97,6 @@ namespace BFS
                 throw new ArgumentException("nodo non trovato");
             int f = edge.flow + flow;
             int c = edge.capacity - flow;
-            //TODO capire come risolvere il problema di overflow
             if (f < 0 || c < 0 )
                 throw new ArgumentException("valore di flusso non valido");
             this.inFlow += flow;
