@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -24,8 +25,8 @@ namespace LastLevelOpt
         public Graph(params Node[] nodes)
         {
             this.labeledNode = new List<HashSet<Node>>();
-            foreach (var n in nodes)
-                this.labeledNode[0].Add(n);//TODO capire se c'è modo più veloce
+            this.labeledNode.Add(new HashSet<Node>(nodes));
+
         }
         public void addNode(Node node)
         {
@@ -37,8 +38,10 @@ namespace LastLevelOpt
             get
             {
                 Node sink = this.invalidNode.SingleOrDefault(x => x is SinkNode);
-                if (sink == null)
-                    this.labeledNode.Last().Single(x => x is SinkNode);
+                if (sink is null)
+                    sink = this.labeledNode.Last().SingleOrDefault(x => x is SinkNode);
+                if (sink is null)
+                    throw new InvalidOperationException();
                 return sink;
             }
         }
