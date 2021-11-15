@@ -108,21 +108,10 @@ namespace NoOpt
             this.inFlow = x;
         }
 
-        #if DEBUG
-
-        public void removeNext (MonoEdge edge)
-        {
-            if (!this.next.Contains(edge))
-                throw new ArgumentException();
-            this.next.Remove(edge);
-        }
         public void setPreviousNode(Node n)
         {
             this.previousNode = n;
         }
-        #endif
-
-
 
     }
 }

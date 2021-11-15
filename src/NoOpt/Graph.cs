@@ -6,7 +6,7 @@ namespace NoOpt
 {
     public class Graph
     {
-        public HashSet<Node> Nodes {get;}
+        public HashSet<Node> Nodes {get; private set;}
         
         public Graph()
         {
@@ -40,23 +40,6 @@ namespace NoOpt
             }
             this.Nodes.SingleOrDefault( x => x is SourceNode).setInFlow(int.MaxValue);
                 
-        }
-        #if DEBUG
-
-        public void removeNode(Node node)
-        {
-            if(!this.Nodes.Contains(node))
-                throw new ArgumentException();
-            this.Nodes.Remove(node);
-        }
-
-
-
-        #endif
-
-        
-
-
-
+        }   
     }
 }
