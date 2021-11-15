@@ -1,0 +1,3 @@
+miglioria della BFS per l'algoritmo di Edmond-Karp
+
+la BFS parte dalla label n-1, dove n è il valore della label dove un nodo è diventato malato/non valido
