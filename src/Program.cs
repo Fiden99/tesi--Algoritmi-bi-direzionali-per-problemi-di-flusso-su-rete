@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace BFS
+namespace NoOpt
 {
     public class Program
     {
@@ -21,7 +21,7 @@ namespace BFS
 
         static void Main(string[] args)
         {
-            int fmax = 0;
+            int fMax = 0;
             //aggiunti i nodi del grafo
             SinkNode t = new SinkNode("t");
             Node n6 = new Node("6", (t, 10));
@@ -35,11 +35,12 @@ namespace BFS
             Graph residualGraph = new Graph();
             while (true)
             {
-                int f = BFS.BfsNoOpt.doBfs(grafo);
-                Console.WriteLine("in while," + f + "," + fmax);
+                //ricordati di cambiarlo quando testi un nuovo programma
+                int f = NoOpt.BfsNoOpt.doBfs(grafo);
+                Console.WriteLine("in while," + f + "," + fMax);
                 if (f == 0)
                     break;
-                fmax += f;
+                fMax += f;
                 Node mom = t;
                 while (mom != s)
                 {
@@ -51,7 +52,7 @@ namespace BFS
             }
 
             stampaGrafo(grafo);
-            Console.WriteLine("flusso totale inviato = " + fmax);
+            Console.WriteLine("flusso totale inviato = " + fMax);
         }
 
     }

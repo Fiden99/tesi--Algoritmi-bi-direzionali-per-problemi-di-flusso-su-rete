@@ -1,6 +1,6 @@
 using System.Linq;
 
-namespace BFS
+namespace NoOpt
 {
     public class SourceNode : Node
     {

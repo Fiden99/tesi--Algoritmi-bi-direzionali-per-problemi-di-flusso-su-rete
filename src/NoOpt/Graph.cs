@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace BFS
+namespace NoOpt
 {
     public class Graph
     {
@@ -29,16 +29,6 @@ namespace BFS
         public Node Source => Nodes.Single(x => x is SourceNode);
         public Node Sink => Nodes.Single(x => x is SinkNode);
 
-        #if DEBUG
-
-        public void removeNode(Node node)
-        {
-            if(!this.Nodes.Contains(node))
-                throw new ArgumentException();
-            this.Nodes.Remove(node);
-        }
-
-
         public void resetLabel()
         {
             foreach( Node x in this.Nodes)
@@ -51,6 +41,16 @@ namespace BFS
             this.Nodes.SingleOrDefault( x => x is SourceNode).setInFlow(int.MaxValue);
                 
         }
+        #if DEBUG
+
+        public void removeNode(Node node)
+        {
+            if(!this.Nodes.Contains(node))
+                throw new ArgumentException();
+            this.Nodes.Remove(node);
+        }
+
+
 
         #endif
 

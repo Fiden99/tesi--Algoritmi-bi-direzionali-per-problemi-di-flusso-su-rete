@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace BFS
+namespace NoOpt
 {
     public class BfsNoOpt
     {

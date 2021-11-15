@@ -1,4 +1,4 @@
-namespace BFS
+namespace NoOpt
 {
     public class SinkNode : Node
     {
