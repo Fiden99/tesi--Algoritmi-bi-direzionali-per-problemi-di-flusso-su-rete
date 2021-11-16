@@ -57,8 +57,7 @@ namespace LastLevelOpt
             {
             }
         }
-
-        public void ChangeLabel(Node node, int to)
+/*        public void ChangeLabel(Node node, int to)
         {
             bool removed = false;
             foreach(var set in this.labeledNode)
@@ -77,6 +76,17 @@ namespace LastLevelOpt
                 throw new ArgumentException();
             node.SetLabel(to);
 
+        }
+*/
+        public void ChangeLabel(Node node, int to)
+        {
+            if (!this.labeledNode[node.label].Remove(node))
+                throw new ArgumentException();
+            while(this.labeledNode.Count <= to)
+                this.labeledNode.Add(new HashSet<Node>());
+            if (!this.labeledNode[to].Add(node))
+                throw new ArgumentException();
+            node.SetLabel(to);
         }
         public void ChangeLabel (Node node, int from, int to)
         {
@@ -117,6 +127,17 @@ namespace LastLevelOpt
             if (!this.invalidNode.Add(node))
                 throw new ArgumentException();
             node.setValid(false);
+        }
+        public void RepairNode(Node node, int to)
+        {
+                    
+            if (!this.invalidNode.Remove(node))
+                throw new ArgumentException();
+            while(this.labeledNode.Count <= to)
+                this.labeledNode.Add(new HashSet<Node>());
+            if(!this.labeledNode[to].Add(node))
+                throw new ArgumentException();
+            node.SetLabel(to);
         }
 
 
