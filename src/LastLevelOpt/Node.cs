@@ -31,6 +31,8 @@ namespace LastLevelOpt
  
     public class Node
     {
+        public bool valid {get; private set;}
+        public int label {get;private set;}
         public string name {get; private set;}
         public int inFlow {get;private set;}
         public List<BiEdge> edges {get;private set;}
@@ -42,6 +44,8 @@ namespace LastLevelOpt
             this.edges = new List<BiEdge>();
             this.inFlow = 0;
             this.previousNode = null;
+            this.label = 0;
+            this.valid = true;
         }
 
         public void addEdge(Node node, int cap)
@@ -50,6 +54,11 @@ namespace LastLevelOpt
             this.edges.Add(edge);
             node.addEdge(edge);
 
+        }
+        public void addEdge(params (Node,int)[] edges)
+        {
+            foreach (var x in edges)
+                addEdge(x.Item1,x.Item2);
         }
         public void addEdge(BiEdge edge)
         {
@@ -82,6 +91,14 @@ namespace LastLevelOpt
             this.inFlow += flow;
             edge.setCapacity(c);
             edge.setFlow(f);
+        }
+        public void SetLabel(int label)
+        {
+            this.label = label;
+        }
+        public void setValid(bool valid)
+        {
+            this.valid = valid;
         }
         
 

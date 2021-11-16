@@ -32,12 +32,10 @@ namespace NoOpt
             Node s = new SourceNode("s", (n2, 10), (n3, 30), (n4, 30));
 
             Graph grafo = new Graph(s, n2, n3, n4, n5, n6, t);
-            Graph residualGraph = new Graph();
             while (true)
             {
                 //ricordati di cambiarlo quando testi un nuovo programma
                 int f = NoOpt.BfsNoOpt.doBfs(grafo);
-                Console.WriteLine("in while," + f + "," + fMax);
                 if (f == 0)
                     break;
                 fMax += f;
@@ -47,7 +45,6 @@ namespace NoOpt
                     mom.previousNode.addFlow(f, mom);
                     mom = mom.previousNode;
                 }
-                ;
 
             }
 
