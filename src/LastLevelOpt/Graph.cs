@@ -9,8 +9,6 @@ namespace LastLevelOpt
         public List<HashSet<Node>> labeledNode {get; private set;} 
         public HashSet<Node> invalidNode {get; private set;}
 
-        //TODO capire se prima iterazione vanno inseriti in labeledNode o in invalidNode
-        //considero a inserirli tutti in labeledNode
         public Graph()
         {
             this.labeledNode = new List<HashSet<Node>>();
@@ -37,7 +35,6 @@ namespace LastLevelOpt
             this.labeledNode[0].Add(node);
         }
         public Node Source => labeledNode.First().SingleOrDefault( x => x is SourceNode);
-        //TODO da capire come fare il source, cioè non deve essere una funzione
         public Node Sink {
             get
             {
@@ -50,12 +47,32 @@ namespace LastLevelOpt
             }
         }
 
-        //TODO capire cosa deve fare 
         public void ResetLabel(int label)
         {   
-            for (int i = label; i<labeledNode.Count ; i++)
+            //TODO capire se devo usare il minore stretto o il minore uguale
+            for (int i = label; i<this.labeledNode.Count ; i++)
             {
+                foreach(var n in this.labeledNode[i])
+                    {
+                        
+                        if (n is SourceNode)
+                            n.setInFlow(int.MaxValue- n.edges.Sum(x => x.capacity));
+                        else
+                        {
+                        //TODO capire se cambiare la label in 0 potrebbe essere utile o meno
+                        n.SetLabel(0);
+                        n.setPreviousNode(null);
+                        n.setInFlow(0);
+                        }
+                    }
             }
+        }
+        public void ResetLabel(Node n)
+        {
+            n.SetLabel(0);
+            n.setPreviousNode(null);
+            n.setInFlow(0);
+
         }
 /*        public void ChangeLabel(Node node, int to)
         {
