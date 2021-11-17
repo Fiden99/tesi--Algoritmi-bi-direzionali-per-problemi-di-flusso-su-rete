@@ -1,6 +1,7 @@
-namespace LastLevelOpt
+namespace BFS.LastLevelOpt
 {
     public class SinkNode : Node
     {
-        public SinkNode(string name) : base(name){}    }
+        public SinkNode(string name) : base(name) { }
+    }
 }

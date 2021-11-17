@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace LastLevelOpt
+namespace BFS.LastLevelOpt
 {
     public class Graph
     {

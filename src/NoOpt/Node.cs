@@ -3,20 +3,20 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace NoOpt
+namespace BFS.NoOpt
 {
     public class MonoEdge
     {
-        public Node nextNode{get;}
-        public int flow {get; private set;}
-        public int capacity {get; private set;}
+        public Node nextNode { get; }
+        public int flow { get; private set; }
+        public int capacity { get; private set; }
         public MonoEdge(Node next, int cap)
         {
             this.flow = 0;
             this.nextNode = next;
             this.capacity = cap;
         }
-        
+
         public void setFlow(int flow)
         {
             this.flow = flow;
@@ -31,14 +31,14 @@ namespace NoOpt
 
     public class Node
     {
-        public int inFlow {get; protected set;}
-        public uint label{get; private set;}
-        public List<MonoEdge> next {get; private set;}
+        public int inFlow { get; protected set; }
+        public uint label { get; private set; }
+        public List<MonoEdge> next { get; private set; }
 
-        public bool valid{get; private set;}
+        public bool valid { get; private set; }
 
-        public string name {get; private set;}
-        public Node previousNode {get; private set;}
+        public string name { get; private set; }
+        public Node previousNode { get; private set; }
 
         public Node(string name)
         {
@@ -49,7 +49,7 @@ namespace NoOpt
             this.inFlow = 0;
             this.previousNode = null;
         }
-        public Node(string name, params (Node,int)[] next)
+        public Node(string name, params (Node, int)[] next)
         {
             this.name = name;
             this.valid = true;
@@ -60,7 +60,7 @@ namespace NoOpt
 
 
         }
-        public Node(string name,params MonoEdge[] next )
+        public Node(string name, params MonoEdge[] next)
         {
             valid = true;
             this.label = 0;
@@ -70,7 +70,7 @@ namespace NoOpt
             this.previousNode = null;
         }
 
-        public void addNext(Node node,int cap) => this.next.Add(new MonoEdge(node, cap));
+        public void addNext(Node node, int cap) => this.next.Add(new MonoEdge(node, cap));
 
         public void addNext(MonoEdge edge) => this.next.Add(edge);
 
@@ -93,11 +93,11 @@ namespace NoOpt
         public void addFlow(int flow, Node n)
         {
             MonoEdge edge = this.next.SingleOrDefault(x => x.nextNode == n);
-            if (edge== null)
+            if (edge == null)
                 throw new ArgumentException("nodo non trovato");
             int f = edge.flow + flow;
             int c = edge.capacity - flow;
-            if (f < 0 || c < 0 )
+            if (f < 0 || c < 0)
                 throw new ArgumentException("valore di flusso non valido");
             this.inFlow += flow;
             edge.setFlow(f);

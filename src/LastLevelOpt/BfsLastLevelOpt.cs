@@ -2,10 +2,11 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using BFS.Abstractions;
 //TODO capire se nella bfs privata e in quella pubblica è possibile riciclare il codice dentro una funzione 
-namespace LastLevelOpt
+namespace BFS.LastLevelOpt
 {
-    public class BfsLastLevelOpt
+    public class BfsLastLevelOpt : IBFS
     {
         private static bool Repair(Graph grafo, Node node)
         {
@@ -98,6 +99,53 @@ namespace LastLevelOpt
 
 
             return 0;
+        }
+
+        public static void PrintGraph(Graph grafo)
+        {
+            foreach (var set in grafo.labeledNode.Append(grafo.invalidNode))
+            {
+                foreach (var node in set)
+                {
+                    Console.Write("node " + node.name + " label = " + node.label);
+                    foreach (var x in node.edges.Where(x => x.previousNode == node))
+                        Console.Write(" to " + x.nextNode.name + ", f = " + x.flow + ", c  = " + x.capacity + ";");
+                    Console.WriteLine();
+                }
+            }
+        }
+        public void Execute()
+        {
+            int fMax = 0;
+            SinkNode t = new SinkNode("t");
+            Node n6 = new Node("6");
+            n6.addEdge(t, 10);
+            Node n5 = new Node("5");
+            n5.addEdge((t, 35), (n6, 10));
+            Node n4 = new Node("4");
+            n4.addEdge(n6, 25);
+            Node n3 = new Node("3");
+            n3.addEdge((n4, 15), (n5, 15), (n6, 10));
+            Node n2 = new Node("2");
+            n2.addEdge((n5, 35), (n3, 10));
+            SourceNode s = new SourceNode("s");
+            s.addEdge((n2, 10), (n3, 30), (n4, 30));
+            Graph grafo = new Graph(s, n2, n3, n4, n5, n6, t);
+            while (true)
+            {
+                int f = BfsLastLevelOpt.doBfs(grafo);
+                if (f == 0)
+                    break;
+                fMax += f;
+                Node mom = t;
+                while (mom != s)
+                {
+                    mom.previousNode.addFlow(f, mom);
+                    mom = mom.previousNode;
+                }
+            }
+            PrintGraph(grafo);
+            Console.WriteLine("flusso inviato = " + fMax);
         }
     }
 }

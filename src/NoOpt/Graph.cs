@@ -2,19 +2,19 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace NoOpt
+namespace BFS.NoOpt
 {
     public class Graph
     {
-        public HashSet<Node> Nodes {get; private set;}
-        
+        public HashSet<Node> Nodes { get; private set; }
+
         public Graph()
         {
             this.Nodes = new HashSet<Node>();
         }
         public Graph(Node node)
         {
-            this.Nodes = new HashSet<Node>(new Node[]{ node});
+            this.Nodes = new HashSet<Node>(new Node[] { node });
         }
         public Graph(params Node[] nodes)
         {
@@ -22,7 +22,7 @@ namespace NoOpt
         }
 
         public void AddNode(Node node)
-        {  
+        {
             this.Nodes.Add(node);
         }
 
@@ -31,15 +31,15 @@ namespace NoOpt
 
         public void resetLabel()
         {
-            foreach( Node x in this.Nodes)
+            foreach (Node x in this.Nodes)
             {
                 if (x.valid == false)
                     x.initLabel(0);
                 x.setInFlow(0);
                 x.setPreviousNode(null);
             }
-            this.Nodes.SingleOrDefault( x => x is SourceNode).setInFlow(int.MaxValue);
-                
-        }   
+            this.Nodes.SingleOrDefault(x => x is SourceNode).setInFlow(int.MaxValue);
+
+        }
     }
 }
