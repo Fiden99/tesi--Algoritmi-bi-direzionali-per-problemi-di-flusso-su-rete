@@ -50,7 +50,6 @@ namespace BFS.LastLevelOpt
 
         public void ResetLabel(int label)
         {
-            //TODO capire se devo usare il minore stretto o il minore uguale
             foreach (var set in labeledNode)
             {
                 foreach (var n in set)

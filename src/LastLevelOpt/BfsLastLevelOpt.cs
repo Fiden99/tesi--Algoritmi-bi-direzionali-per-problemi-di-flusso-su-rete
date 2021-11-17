@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using BFS.Abstractions;
-//TODO capire se nella bfs privata e in quella pubblica è possibile riciclare il codice dentro una funzione 
 namespace BFS.LastLevelOpt
 {
     public class BfsLastLevelOpt : IBFS
@@ -11,7 +10,6 @@ namespace BFS.LastLevelOpt
         private static bool Repair(Graph grafo, Node node)
         {
             bool changed = false;
-            //TODO capire se lo devi considerare anche come previous node
             foreach (var e in node.edges.Where(x => x.nextNode == node))
             {
                 if (e.capacity > 0)
@@ -21,7 +19,6 @@ namespace BFS.LastLevelOpt
                         grafo.RepairNode(node, e.previousNode.label + 1);
                         changed = true;
                     }
-                    //TODO capire se devo controllare anche changed o meno (probabilmente no, ma lo tengo comunque per sicurezza)
                     else if (changed && e.previousNode.label < node.label)
                         grafo.ChangeLabel(node, e.previousNode.label + 1);
                 }
@@ -41,7 +38,6 @@ namespace BFS.LastLevelOpt
             else
             {
                 Node x = grafo.invalidNode.MinBy(x => x.label);
-                //TODO capire come inserire sia i nodi che precedono x sia i nodi con label x 
                 coda = new Queue<Node>(x.edges.Where(e => e.nextNode == x).Select(x => x.previousNode).Union(grafo.labeledNode[x.label]));
                 grafo.ResetLabel(x);
                 grafo.ResetLabel(x.label + 1);
@@ -60,7 +56,6 @@ namespace BFS.LastLevelOpt
                         grafo.InvalidNode(n);
                         if (!Repair(grafo, n))
                             continue;
-                        //TODO controllare che vada bene questo metodo per riparare i nodi
                     }
                     if (n.previousNode == null && edge.capacity > 0)
                     {
@@ -78,7 +73,6 @@ namespace BFS.LastLevelOpt
 
             return 0;
         }
-        //TODO capire se ho un nodo malato se devo fare le stesso operazione oppure no
         private static int doBfs(Graph grafo, Node node)
         {
             HashSet<Node> set = grafo.labeledNode[node.label - 1];
