@@ -8,5 +8,8 @@
         "**/Thumbs.db": true,
         "**/obj/": true,
         "**/bin/": true,
-    }
+    },
+    "cSpell.words": [
+        "noopt"
+    ]
 }
