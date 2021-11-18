@@ -30,6 +30,7 @@ namespace BFS.LastLevelOpt
             this.invalidNode = new HashSet<Node>();
 
         }
+        //metodo che consente in fase iniziale di inserire un nodo all'interno del grafo
         public void AddNode(Node node)
         {
             this.labeledNode[0].Add(node);
@@ -50,50 +51,26 @@ namespace BFS.LastLevelOpt
 
         public void ResetLabel(int label)
         {
-            foreach (var set in labeledNode)
+            for (int i = label; i < labeledNode.Count; i++)
             {
-                foreach (var n in set)
+                foreach (var n in labeledNode[i])
                 {
 
                     if (n is SourceNode)
                         n.setInFlow(int.MaxValue - n.edges.Sum(x => x.capacity));
                     else
-                    {
-                        //n.SetLabel(0);
-                        n.setPreviousNode(null);
+
                         n.setInFlow(0);
-                    }
+                    n.setPreviousNode(null);
                 }
             }
         }
         public void ResetLabel(Node n)
         {
-            //n.SetLabel(0);
             n.setPreviousNode(null);
             n.setInFlow(0);
 
         }
-        /*        public void ChangeLabel(Node node, int to)
-                {
-                    bool removed = false;
-                    foreach(var set in this.labeledNode)
-                    {
-                        if( set.Remove(node))
-                        {
-                            removed = true;
-                            break;
-                        }
-                    }
-                    if (!removed)
-                        throw new ArgumentException();
-                    while(this.labeledNode.Count <= to)
-                        this.labeledNode.Add(new HashSet<Node>());
-                    if(!this.labeledNode[to].Add(node))
-                        throw new ArgumentException();
-                    node.SetLabel(to);
-
-                }
-        */
         public void ChangeLabel(Node node, int to)
         {
             if (node.label == to)
@@ -106,12 +83,12 @@ namespace BFS.LastLevelOpt
                 throw new ArgumentException();
             node.SetLabel(to);
         }
+
         public void ChangeLabel(Node node, int from, int to)
         {
 
             if (node.label != from && !this.labeledNode[from].Remove(node))
                 throw new ArgumentException();
-            // capire come mai non mi viene rimossa dentro l'if
             this.labeledNode[from].Remove(node);
             while (this.labeledNode.Count <= to)
                 this.labeledNode.Add(new HashSet<Node>());

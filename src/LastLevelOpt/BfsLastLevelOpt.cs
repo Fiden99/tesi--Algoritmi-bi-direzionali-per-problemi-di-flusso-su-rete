@@ -37,8 +37,12 @@ namespace BFS.LastLevelOpt
             }
             else
             {
+                //TODO controllare se qui c'è errore --> prende prima il 5 rispetto al 6, ma con inFlow pari a 0, quindi il 6 non viene usato
                 Node x = grafo.invalidNode.MinBy(x => x.label);
-                coda = new Queue<Node>(x.edges.Where(e => e.nextNode == x).Select(x => x.previousNode).Union(grafo.labeledNode[x.label]));
+                //inserisce tutti i nodi prima del primo nodo malato
+                //coda = new Queue<Node>(x.edges.Where(e => e.nextNode == x).Select(x => x.previousNode));
+                //inserisce tutti i nodi di label >x
+                coda = new Queue<Node>(grafo.labeledNode[x.label]);
                 grafo.ResetLabel(x);
                 grafo.ResetLabel(x.label + 1);
 
@@ -51,9 +55,10 @@ namespace BFS.LastLevelOpt
                     Node n = edge.nextNode;
                     if (edge.capacity < 0)
                         throw new InvalidOperationException();
-                    if (edge.capacity == 0 && !grafo.invalidNode.Contains(n))
+                    if (edge.capacity == 0)
                     {
-                        grafo.InvalidNode(n);
+                        if (!grafo.invalidNode.Contains(n))
+                            grafo.InvalidNode(n);
                         if (!Repair(grafo, n))
                             continue;
                     }
@@ -66,32 +71,9 @@ namespace BFS.LastLevelOpt
                             return n.inFlow;
                         else
                             coda.Enqueue(n);
-
                     }
                 }
             }
-
-            return 0;
-        }
-        private static int doBfs(Graph grafo, Node node)
-        {
-            HashSet<Node> set = grafo.labeledNode[node.label - 1];
-            grafo.ResetLabel(node.label + 1);
-            grafo.ResetLabel(node);
-            var coda = new Queue<Node>(grafo.labeledNode[node.label]);
-            while (coda.Count > 0)
-            {
-                var element = coda.Dequeue();
-                foreach (var edge in element.edges)
-                {
-                    if (edge.capacity < 0)
-                        throw new InvalidOperationException();
-
-                }
-
-            }
-
-
             return 0;
         }
 
