@@ -37,11 +37,7 @@ namespace BFS.LastLevelOpt
             }
             else
             {
-                //TODO controllare se qui c'è errore --> prende prima il 5 rispetto al 6, ma con inFlow pari a 0, quindi il 6 non viene usato
                 Node x = grafo.invalidNode.MinBy(x => x.label);
-                //inserisce tutti i nodi prima del primo nodo malato
-                //coda = new Queue<Node>(x.edges.Where(e => e.nextNode == x).Select(x => x.previousNode));
-                //inserisce tutti i nodi di label >x
                 coda = new Queue<Node>(grafo.labeledNode[x.label]);
                 grafo.ResetLabel(x);
                 grafo.ResetLabel(x.label + 1);
