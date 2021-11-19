@@ -3,6 +3,7 @@ using System.Linq;
 using BFS.Abstractions;
 using BFS.LastLevelOpt;
 using BFS.NoOpt;
+using BFS.SickPropagation;
 
 namespace BFS
 {
@@ -21,7 +22,7 @@ namespace BFS
             {
                 "noopt" => new BfsNoOpt(),
                 "last" => new BfsLastLevelOpt(),
-                "sick" => throw new NotImplementedException(),
+                "sick" => new BfsSinkPropagation(),
                 _ => throw new NotImplementedException()
             };
 
