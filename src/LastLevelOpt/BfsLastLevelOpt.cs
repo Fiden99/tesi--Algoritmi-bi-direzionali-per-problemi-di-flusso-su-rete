@@ -46,7 +46,7 @@ namespace BFS.LastLevelOpt
             while (coda.Count > 0)
             {
                 var element = coda.Dequeue();
-                foreach (BiEdge edge in element.edges)
+                foreach (BiEdge edge in element.edges.Where(x => x.previousNode == element))
                 {
                     Node n = edge.nextNode;
                     if (edge.capacity < 0)
