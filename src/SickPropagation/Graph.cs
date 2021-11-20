@@ -66,10 +66,10 @@ namespace BFS.SickPropagation
         public void Reset(Node n)
         {
             n.setPreviousNode(null);
-            if (n is not SourceNode)
-                n.setInFlow(0);
-            else
+            if (n is SourceNode)
                 n.setInFlow(int.MaxValue - n.edges.Sum(x => x.capacity));
+            else
+                n.setInFlow(0);
         }
         public void ChangeLabel(Node node, int to)
         {

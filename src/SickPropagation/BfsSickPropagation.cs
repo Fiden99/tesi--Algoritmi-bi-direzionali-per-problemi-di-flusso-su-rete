@@ -8,7 +8,6 @@ using BFS.LastLevelOpt;
 namespace BFS.SickPropagation
 
 {
-    //TODO da capire come mai il nodo 2 non risulta tra gli invalidNode
     public class BfsSickPropagation : IBFS
     {
         private static bool Repair(Graph grafo, Node node)
@@ -37,7 +36,6 @@ namespace BFS.SickPropagation
             }
             else
             {
-                //TODO correggere errore qui presente
                 var min = grafo.invalidNodes.Min(x => x.label);
                 coda = new Queue<Node>(grafo.labeledNodes[min]);
                 grafo.Reset(min + 1);
@@ -60,20 +58,22 @@ namespace BFS.SickPropagation
                             grafo.InvalidNode(n);
                             while (malati.Count > 0)
                             {
-                                foreach (var x in malati.Dequeue().edges.Where(x => x.nextNode != null).Select(x => x.nextNode))
+                                Node z = malati.Dequeue();
+                                foreach (var x in z.edges.Where(x => x.nextNode != z).Select(x => x.nextNode))
                                 {
                                     if (!Repair(grafo, x))
                                     {
                                         grafo.Reset(x);
                                         grafo.InvalidNode(x);
+                                        malati.Enqueue(x);
                                     }
-                                    if (x is SinkNode)
+                                    else if (x is SinkNode)
                                         break;
                                 }
                             }
                         }
                     }
-                    if (n.previousNode == null && edge.capacity > 0)
+                    if (n.valid == true && edge.capacity > 0 && (n.label == 0 || n.label > element.label))
                     {
                         n.setPreviousNode(element);
                         grafo.ChangeLabel(n, element.label + 1);
@@ -104,7 +104,7 @@ namespace BFS.SickPropagation
                 Console.WriteLine("nodi malati : ");
             foreach (var node in grafo.invalidNodes)
             {
-                Console.Write("node " + node.name + " label = " + node.label);
+                Console.Write("node " + node.name);
                 foreach (var x in node.edges.Where(x => x.previousNode == node))
                     Console.Write(" to " + x.nextNode.name + ", f = " + x.flow + ", c  = " + x.capacity + ";");
                 Console.WriteLine();
