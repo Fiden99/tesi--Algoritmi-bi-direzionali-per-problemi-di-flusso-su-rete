@@ -22,7 +22,7 @@ namespace BFS
             {
                 "noopt" => new BfsNoOpt(),
                 "last" => new BfsLastLevelOpt(),
-                "sick" => new BfsSinkPropagation(),
+                "sick" => new BfsSickPropagation(),
                 _ => throw new NotImplementedException()
             };
 
