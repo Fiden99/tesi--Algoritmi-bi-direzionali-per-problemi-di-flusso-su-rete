@@ -29,7 +29,7 @@ namespace BFS.LastLevelOpt
     }
 
 
-    public class Node : IEquatable<Node>
+    public class Node
     {
         public bool valid { get; private set; }
         public int label { get; private set; }
@@ -81,6 +81,8 @@ namespace BFS.LastLevelOpt
 
         public void addFlow(int flow, Node n)
         {
+            //TODO da valutare se il nodo deve essere solo next o va bene anche previous
+            //TODO da capire se in caso di previous node si debba aggiungere la capacità e non il flusso
             BiEdge edge = this.edges.SingleOrDefault(x => x.nextNode == n || x.previousNode == n);
             if (edge is null)
                 throw new ArgumentException("nodo non trovato");
@@ -88,7 +90,7 @@ namespace BFS.LastLevelOpt
             int c = edge.capacity - flow;
             if (f < 0 || c < 0)
                 throw new ArgumentException("valore di flusso non valido");
-            this.inFlow += flow;
+            this.inFlow = f;
             edge.setCapacity(c);
             edge.setFlow(f);
         }
@@ -101,14 +103,5 @@ namespace BFS.LastLevelOpt
             this.valid = valid;
         }
 
-        public bool Equals(Node other)
-        {
-            return name == other.name;
-        }
-
-        public override int GetHashCode()
-        {
-            return name.GetHashCode();
-        }
     }
 }
