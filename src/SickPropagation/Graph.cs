@@ -8,25 +8,26 @@ namespace BFS.SickPropagation
     public class Graph
     {
         public List<HashSet<Node>> labeledNodes { get; private set; }
-        public Queue<Node> invalidNodes { get; private set; }
+        //TODO da capire se si può tenere invalidNodes come lista o meno
+        public List<Node> invalidNodes { get; private set; }
 
         public Graph()
         {
             this.labeledNodes = new List<HashSet<Node>>();
             this.labeledNodes.Add(new HashSet<Node>());
-            this.invalidNodes = new Queue<Node>();
+            this.invalidNodes = new List<Node>();
         }
         public Graph(Node node)
         {
             this.labeledNodes = new List<HashSet<Node>>();
             this.labeledNodes.Add(new HashSet<Node>(new Node[] { node }));
-            this.invalidNodes = new Queue<Node>();
+            this.invalidNodes = new List<Node>();
         }
         public Graph(params Node[] nodes)
         {
             this.labeledNodes = new List<HashSet<Node>>();
             this.labeledNodes.Add(new HashSet<Node>(nodes));
-            this.invalidNodes = new Queue<Node>();
+            this.invalidNodes = new List<Node>();
         }
         //metodo che consente in fase iniziale di inserire un nodo all'interno del grafo
         public void AddNode(Node node)
@@ -93,7 +94,7 @@ namespace BFS.SickPropagation
                 throw new ArgumentException();
             if (this.invalidNodes.Contains(node))
                 throw new ArgumentException();
-            this.invalidNodes.Enqueue(node);
+            this.invalidNodes.Add(node);
             node.setValid(false);
         }
 
