@@ -35,7 +35,7 @@ namespace BFS.LastLevelOpt
         {
             this.labeledNode[0].Add(node);
         }
-        public Node Source => labeledNode.First().SingleOrDefault(x => x is SourceNode);
+        public Node Source => labeledNode.First().Single(x => x is SourceNode);
         public Node Sink
         {
             get

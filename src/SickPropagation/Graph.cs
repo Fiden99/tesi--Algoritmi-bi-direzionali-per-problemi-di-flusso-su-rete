@@ -34,7 +34,7 @@ namespace BFS.SickPropagation
         {
             this.labeledNodes[0].Add(node);
         }
-        public Node Source => labeledNodes[0].SingleOrDefault(x => x is SourceNode);
+        public Node Source => labeledNodes[0].Single(x => x is SourceNode);
         public Node Sink
         {
             get
