@@ -34,7 +34,7 @@ namespace BFS.LastLevelOpt
         public bool valid { get; private set; }
         public int label { get; private set; }
         public string name { get; private set; }
-        public int inFlow { get; private set; }
+        public int inFlow { get; protected set; }
         public List<BiEdge> edges { get; private set; }
         public Node previousNode { get; private set; }
 
@@ -48,7 +48,7 @@ namespace BFS.LastLevelOpt
             this.valid = true;
         }
 
-        public void addEdge(Node node, int cap)
+        public virtual void addEdge(Node node, int cap)
         {
             BiEdge edge = new BiEdge(this, node, cap);
             this.edges.Add(edge);
@@ -60,7 +60,7 @@ namespace BFS.LastLevelOpt
             foreach (var x in edges)
                 addEdge(x.Item1, x.Item2);
         }
-        public void addEdge(BiEdge edge)
+        public virtual void addEdge(BiEdge edge)
         {
             this.edges.Add(edge);
         }
