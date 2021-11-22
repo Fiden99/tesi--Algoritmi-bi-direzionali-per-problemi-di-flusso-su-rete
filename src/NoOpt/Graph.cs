@@ -38,7 +38,7 @@ namespace BFS.NoOpt
                 x.setInFlow(0);
                 x.setPreviousNode(null);
             }
-            this.Nodes.SingleOrDefault(x => x is SourceNode).setInFlow(int.MaxValue);
+            this.Nodes.Single(x => x is SourceNode).setInFlow(int.MaxValue);
 
         }
     }
