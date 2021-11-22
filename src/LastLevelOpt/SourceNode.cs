@@ -11,15 +11,13 @@ namespace BFS.LastLevelOpt
 
         public override void addEdge(Node node, int cap)
         {
-            BiEdge edge = new BiEdge(this, node, cap);
-            this.edges.Add(edge);
-            node.addEdge(edge);
+            base.addEdge(node, cap);
             this.inFlow = this.inFlow - cap;
         }
 
         public override void addEdge(BiEdge edge)
         {
-            this.edges.Add(edge);
+            base.addEdge(edge);
             this.inFlow = this.inFlow - edge.capacity;
         }
     }
