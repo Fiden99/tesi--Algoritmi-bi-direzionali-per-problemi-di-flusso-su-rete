@@ -83,14 +83,14 @@ namespace BFS.LastLevelOpt
         {
             //TODO da valutare se il nodo deve essere solo next o va bene anche previous
             //TODO da capire se in caso di previous node si debba aggiungere la capacità e non il flusso
-            BiEdge edge = this.edges.SingleOrDefault(x => x.nextNode == n || x.previousNode == n);
+            BiEdge edge = this.edges.SingleOrDefault(x => x.nextNode == n);
             if (edge is null)
                 throw new ArgumentException("nodo non trovato");
             int f = edge.flow + flow;
             int c = edge.capacity - flow;
             if (f < 0 || c < 0)
                 throw new ArgumentException("valore di flusso non valido");
-            this.inFlow = f;
+            n.inFlow = f;
             edge.setCapacity(c);
             edge.setFlow(f);
         }

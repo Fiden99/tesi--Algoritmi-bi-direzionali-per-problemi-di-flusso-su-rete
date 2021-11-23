@@ -57,7 +57,7 @@ namespace BFS.LastLevelOpt
                 {//TODO da capire se posso tenere inFlow di sourceNode int.MaxValue o devo eliminare togliere per forza la capacità degli archi che partono da lui
 
                     if (n is SourceNode)
-                        n.setInFlow(int.MaxValue - n.edges.Sum(x => x.capacity));
+                        n.setInFlow(int.MaxValue);
                     else
 
                         n.setInFlow(0);
