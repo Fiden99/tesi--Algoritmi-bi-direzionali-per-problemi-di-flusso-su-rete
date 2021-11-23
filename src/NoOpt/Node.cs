@@ -92,14 +92,12 @@ namespace BFS.NoOpt
         //permette di modificare il flusso, se il flusso ha valore negativo aumento la capacità
         public void addFlow(int flow, Node n)
         {
-            MonoEdge edge = this.next.SingleOrDefault(x => x.nextNode == n);
-            if (edge == null)
-                throw new ArgumentException("nodo non trovato");
+            MonoEdge edge = this.next.Single(x => x.nextNode == n);
             int f = edge.flow + flow;
             int c = edge.capacity - flow;
             if (f < 0 || c < 0)
                 throw new ArgumentException("valore di flusso non valido");
-            this.inFlow += flow;
+            //TODO da capire a chi devo dare l'InFlow, se al successivo o al precedente
             edge.setFlow(f);
             edge.setCapacity(c);
         }

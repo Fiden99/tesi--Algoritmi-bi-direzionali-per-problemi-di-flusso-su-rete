@@ -90,7 +90,6 @@ namespace BFS.LastLevelOpt
             int c = edge.capacity - flow;
             if (f < 0 || c < 0)
                 throw new ArgumentException("valore di flusso non valido");
-            n.inFlow = f;
             edge.setCapacity(c);
             edge.setFlow(f);
         }
