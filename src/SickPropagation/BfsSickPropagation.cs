@@ -14,12 +14,13 @@ namespace BFS.SickPropagation
         {
             foreach (var e in node.edges.Where(x => x.nextNode == node && x.capacity > 0))
             {
+                //TODO riguardare questa parte
                 if (grafo.labeledNodes[node.label - 1].Contains(e.previousNode))
                 {
                     node.setInFlow(Math.Min(e.previousNode.inFlow, e.capacity));
                     node.setPreviousNode(e.previousNode);
                     node.setValid(true);
-                    grafo.ChangeLabel(e.previousNode, node.label - 1);
+                    //grafo.ChangeLabel(e.previousNode, node.label - 1);
                     return true;
                 }
             }
