@@ -42,6 +42,19 @@
             "cwd": "${workspaceFolder}/src",
             "console": "internalConsole",
             "stopAtEntry": false
-        }
+        },
+        {
+            "name": "SickPropagationGraphOpt",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/src/bin/Debug/net6.0/BFS.dll",
+            "args": [
+                "sickOpt"
+            ],
+            "cwd": "${workspaceFolder}/src",
+            "console": "internalConsole",
+            "stopAtEntry": false
+        },
     ]
 }

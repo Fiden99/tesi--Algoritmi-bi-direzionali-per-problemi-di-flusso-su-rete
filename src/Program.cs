@@ -4,6 +4,7 @@ using BFS.Abstractions;
 using BFS.LastLevelOpt;
 using BFS.NoOpt;
 using BFS.SickPropagation;
+using BFS.SickPropagationGraphOpt;
 
 namespace BFS
 {
@@ -23,6 +24,7 @@ namespace BFS
                 "noopt" => new BfsNoOpt(),
                 "last" => new BfsLastLevelOpt(),
                 "sick" => new BfsSickPropagation(),
+                "sickOpt" => new BfsSickPropagationGraphOpt(),
                 _ => throw new NotImplementedException()
             };
 
