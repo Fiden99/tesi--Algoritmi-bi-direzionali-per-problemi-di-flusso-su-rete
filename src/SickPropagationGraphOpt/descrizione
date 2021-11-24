@@ -1,2 +1,5 @@
 come SickPropagation, ma vado a modificare i nodi in maniera tale che la ricerca dei nodi per
-il successore prossimo 
+il successore prossimo sia migliore, facendo gravare della ricerca dei nodi non durante la riparazione, 
+ma durante il changeLabel
+
+da controllare se è possibile migliorarlo ulteriormente o se ci sono correzioni da fare
