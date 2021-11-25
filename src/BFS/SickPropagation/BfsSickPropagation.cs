@@ -130,6 +130,5 @@ namespace BFS.SickPropagation
             }
             return fMax;
         }
-
     }
 }
