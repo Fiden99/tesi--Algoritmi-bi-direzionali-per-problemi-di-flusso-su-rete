@@ -47,19 +47,13 @@ namespace BFS.NoOpt
             }
         }
 
-        public static int FlowFordFulkerson()
+        public static int FlowFordFulkerson(Graph grafo)
         {
             int fMax = 0;
-            //aggiunti i nodi del grafo
-            SinkNode t = new SinkNode("t");
-            Node n6 = new Node("6", (t, 10));
-            Node n5 = new Node("5", (t, 35), (n6, 10));
-            Node n4 = new Node("4", (n6, 25));
-            Node n3 = new Node("3", (n4, 15), (n5, 15), (n6, 10));
-            Node n2 = new Node("2", (n5, 35), (n3, 10));
-            Node s = new SourceNode("s", (n2, 10), (n3, 30), (n4, 30));
+            var s = grafo.Source;
+            var t = grafo.Sink;
 
-            Graph grafo = new Graph(s, n2, n3, n4, n5, n6, t);
+            //aggiunti i nodi del grafo
             while (true)
             {
                 //ricordati di cambiarlo quando testi un nuovo programma
@@ -73,11 +67,7 @@ namespace BFS.NoOpt
                     mom.PreviousNode.AddFlow(f, mom);
                     mom = mom.PreviousNode;
                 }
-
             }
-
-            PrintGraph(grafo);
-            Console.WriteLine("flusso totale inviato = " + fMax);
             return fMax;
         }
     }

@@ -71,6 +71,11 @@ namespace BFS.NoOpt
         }
 
         public void AddNext(Node node, int cap) => this.Next.Add(new MonoEdge(node, cap));
+        public void AddNext(params (Node, int)[] nodes)
+        {
+            foreach (var x in nodes)
+                this.AddNext(x.Item1, x.Item2);
+        }
 
         public void AddNext(MonoEdge edge) => this.Next.Add(edge);
 
