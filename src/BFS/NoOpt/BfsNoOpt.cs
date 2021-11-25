@@ -5,29 +5,29 @@ using BFS.Abstractions;
 
 namespace BFS.NoOpt
 {
-    public class BfsNoOpt : IBFS
+    public class BfsNoOpt
     {
-        public static int doBfs(Graph grafo)
+        public static int DoBfs(Graph grafo)
         {
-            grafo.resetLabel();
+            grafo.ResetLabel();
             var coda = new Queue<Node>();
             coda.Enqueue(grafo.Source);
             while (coda.Count > 0)
             {
                 var element = coda.Dequeue();
-                foreach (MonoEdge x in element.next)
+                foreach (MonoEdge x in element.Next)
                 {
-                    Node n = x.nextNode;
-                    if (x.capacity < 0)
+                    Node n = x.NextNode;
+                    if (x.Capacity < 0)
                         throw new InvalidOperationException("capacità negativa");
 
-                    else if (n.previousNode == null && x.capacity > 0)
+                    else if (n.PreviousNode == null && x.Capacity > 0)
                     {
-                        n.setPreviousNode(element);
-                        n.initLabel(element.label + 1);
-                        n.setInFlow(Math.Min(element.inFlow, x.capacity));
+                        n.SetPreviousNode(element);
+                        n.InitLabel(element.Label + 1);
+                        n.SetInFlow(Math.Min(element.InFlow, x.Capacity));
                         if (n is SinkNode)
-                            return n.inFlow;
+                            return n.InFlow;
                         else
                             coda.Enqueue(n);
                     }
@@ -40,14 +40,14 @@ namespace BFS.NoOpt
         {
             foreach (var n in grafo.Nodes)
             {
-                Console.Write("node " + n.name + ", label = " + n.label + " ");
-                foreach (var x in n.next)
-                    Console.Write("to " + x.nextNode.name + ", f= " + x.flow + ",c = " + x.capacity + ", ");
+                Console.Write("node " + n.Name + ", label = " + n.Label + " ");
+                foreach (var x in n.Next)
+                    Console.Write("to " + x.NextNode.Name + ", f= " + x.Flow + ",c = " + x.Capacity + ", ");
                 Console.WriteLine();
             }
         }
 
-        public void Execute()
+        public static int FlowFordFulkerson()
         {
             int fMax = 0;
             //aggiunti i nodi del grafo
@@ -63,21 +63,22 @@ namespace BFS.NoOpt
             while (true)
             {
                 //ricordati di cambiarlo quando testi un nuovo programma
-                int f = NoOpt.BfsNoOpt.doBfs(grafo);
+                int f = NoOpt.BfsNoOpt.DoBfs(grafo);
                 if (f == 0)
                     break;
                 fMax += f;
                 Node mom = t;
                 while (mom != s)
                 {
-                    mom.previousNode.addFlow(f, mom);
-                    mom = mom.previousNode;
+                    mom.PreviousNode.AddFlow(f, mom);
+                    mom = mom.PreviousNode;
                 }
 
             }
 
             PrintGraph(grafo);
             Console.WriteLine("flusso totale inviato = " + fMax);
+            return fMax;
         }
     }
 }

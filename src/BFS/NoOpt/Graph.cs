@@ -29,16 +29,16 @@ namespace BFS.NoOpt
         public Node Source => Nodes.Single(x => x is SourceNode);
         public Node Sink => Nodes.Single(x => x is SinkNode);
 
-        public void resetLabel()
+        public void ResetLabel()
         {
             foreach (Node x in this.Nodes)
             {
-                if (x.valid == false)
-                    x.initLabel(0);
-                x.setInFlow(0);
-                x.setPreviousNode(null);
+                if (x.Valid == false)
+                    x.InitLabel(0);
+                x.SetInFlow(0);
+                x.SetPreviousNode(null);
             }
-            this.Nodes.Single(x => x is SourceNode).setInFlow(int.MaxValue);
+            this.Nodes.Single(x => x is SourceNode).SetInFlow(int.MaxValue);
 
         }
     }

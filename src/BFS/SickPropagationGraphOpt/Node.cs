@@ -6,67 +6,67 @@ namespace BFS.SickPropagationGraphOpt
 {
     public class BiEdge
     {
-        public Node previousNode { get; private set; }
-        public Node nextNode { get; private set; }
-        public int flow { get; private set; }
-        public int capacity { get; private set; }
+        public Node PreviousNode { get; private set; }
+        public Node NextNode { get; private set; }
+        public int Flow { get; private set; }
+        public int Capacity { get; private set; }
 
         public BiEdge(Node previous, Node next, int capacity)
         {
-            this.previousNode = previous;
-            this.nextNode = next;
-            this.capacity = capacity;
-            this.flow = 0;
+            this.PreviousNode = previous;
+            this.NextNode = next;
+            this.Capacity = capacity;
+            this.Flow = 0;
         }
         public void SetFlow(int flow)
         {
-            this.flow = flow;
+            this.Flow = flow;
         }
         public void SetCapacity(int cap)
         {
-            this.capacity = cap;
+            this.Capacity = cap;
         }
         public void AddFlow(int flow)
         {
-            int f = this.flow + flow;
-            int c = this.capacity - flow;
+            int f = this.Flow + flow;
+            int c = this.Capacity - flow;
             if (f < 0 || c < 0)
                 throw new ArgumentException();
-            this.flow = f;
-            this.capacity = c;
+            this.Flow = f;
+            this.Capacity = c;
         }
 
 
     }
     public class Node
     {
-        public string name { get; protected set; }
-        public bool valid { get; private set; }
-        public int label { get; private set; }
-        public int inFlow { get; protected set; }
-        public List<BiEdge> edges { get; private set; }
-        public Node previousNode { get; private set; }
-        public List<Node> previousLabelNodes { get; private set; }
-        public List<Node> nextLabelNodes { get; private set; }
+        public string Name { get; protected set; }
+        public bool Valid { get; private set; }
+        public int Label { get; private set; }
+        public int InFlow { get; protected set; }
+        public List<BiEdge> Edges { get; private set; }
+        public Node PreviousNode { get; private set; }
+        public List<Node> PreviousLabelNodes { get; private set; }
+        public List<Node> NextLabelNodes { get; private set; }
 
         public Node(string name)
         {
-            this.name = name;
-            this.valid = true;
-            this.label = 0;
-            this.edges = new List<BiEdge>();
-            this.previousLabelNodes = new List<Node>();
-            this.previousNode = null;
-            this.nextLabelNodes = new List<Node>();
+            this.Name = name;
+            this.Valid = true;
+            this.Label = 0;
+            this.Edges = new List<BiEdge>();
+            this.PreviousLabelNodes = new List<Node>();
+            this.PreviousNode = null;
+            this.NextLabelNodes = new List<Node>();
         }
         public void AddEdge(BiEdge edge)
         {
-            this.edges.Add(edge);
+            this.Edges.Add(edge);
         }
         public void AddEdge(Node node, int capacity)
         {
             BiEdge edge = new BiEdge(this, node, capacity);
-            this.edges.Add(edge);
+            this.Edges.Add(edge);
             node.AddEdge(edge);
         }
         public void AddEdge(params (Node, int)[] edges)
@@ -76,70 +76,70 @@ namespace BFS.SickPropagationGraphOpt
         }
         public void SetInFlow(int inFlow)
         {
-            this.inFlow = inFlow;
+            this.InFlow = inFlow;
         }
         public void SetPreviousNode(Node node)
         {
-            this.previousNode = node;
+            this.PreviousNode = node;
         }
         public void AddFlow(int flow, Node node)
         {
             //TODO da valutare se il nodo deve essere solo next o va bene anche previous
             //TODO da capire se in caso di previous node si debba aggiungere la capacità e non il flusso
 
-            BiEdge edge = this.edges.Single(x => x.nextNode == node);
-            int f = edge.flow + flow;
-            int c = edge.capacity - flow;
+            BiEdge edge = this.Edges.Single(x => x.NextNode == node);
+            int f = edge.Flow + flow;
+            int c = edge.Capacity - flow;
             if (c < 0 || f < 0)
                 throw new ArgumentException();
             edge.SetCapacity(c);
             edge.SetFlow(f);
-            this.inFlow += f;
+            this.InFlow += f;
 
         }
         public void AddFlow(int flow, BiEdge edge)
         {
             //TODO da valutare se fare un controllo se BiEdge appartiene o meno a this.edges
-            if (!this.edges.Contains(edge))
+            if (!this.Edges.Contains(edge))
                 throw new ArgumentException();
             edge.AddFlow(flow);
-            this.inFlow += flow;
+            this.InFlow += flow;
         }
         public void SetLabel(int label)
         {
-            this.label = label;
+            this.Label = label;
         }
         public void SetValid(bool valid)
         {
-            this.valid = valid;
+            this.Valid = valid;
         }
         public void AddPreviousLabelNode(Node node)
         {
             //TODO da valutare se tenere if eccezione
-            if (this.previousLabelNodes.Contains(node))
+            if (this.PreviousLabelNodes.Contains(node))
                 throw new ArgumentException();
-            this.previousLabelNodes.Add(node);
+            this.PreviousLabelNodes.Add(node);
         }
         public void RemovePreviousLabelNode(Node node)
         {
-            this.previousLabelNodes.Remove(node);
+            this.PreviousLabelNodes.Remove(node);
         }
 
         public void AddNextLabelNode(Node node)
         {
             //TODO da valutare se tenere if eccezione
-            if (this.nextLabelNodes.Contains(node))
+            if (this.NextLabelNodes.Contains(node))
                 throw new ArgumentException();
-            this.nextLabelNodes.Add(node);
+            this.NextLabelNodes.Add(node);
         }
         public void RemoveNextLabelNode(Node node)
         {
-            this.nextLabelNodes.Remove(node);
+            this.NextLabelNodes.Remove(node);
         }
         public void ResetPreviousNextLabelNodes()
         {
-            this.previousLabelNodes.Clear();
-            this.nextLabelNodes.Clear();
+            this.PreviousLabelNodes.Clear();
+            this.NextLabelNodes.Clear();
         }
 
     }

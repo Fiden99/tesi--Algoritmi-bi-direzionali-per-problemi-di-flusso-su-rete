@@ -5,31 +5,31 @@ using System.Linq;
 using BFS.Abstractions;
 namespace BFS.LastLevelOpt
 {
-    public class BfsLastLevelOpt : IBFS
+    public class BfsLastLevelOpt
     {
         private static bool Repair(Graph grafo, Node node)
         {
             bool changed = false;
-            foreach (var e in node.edges.Where(x => x.nextNode == node))
+            foreach (var e in node.Edges.Where(x => x.NextNode == node))
             {
-                if (e.capacity > 0)
+                if (e.Capacity > 0)
                 {
                     if (!changed)
                     {
-                        grafo.RepairNode(node, e.previousNode.label + 1);
+                        grafo.RepairNode(node, e.PreviousNode.Label + 1);
                         changed = true;
                     }
-                    else if (changed && e.previousNode.label < node.label)
-                        grafo.ChangeLabel(node, e.previousNode.label + 1);
+                    else if (changed && e.PreviousNode.Label < node.Label)
+                        grafo.ChangeLabel(node, e.PreviousNode.Label + 1);
                 }
             }
             return changed;
 
         }
-        public static int doBfs(Graph grafo)
+        public static int DoBfs(Graph grafo)
         {
             Queue<Node> coda;
-            if (grafo.invalidNode.Count == 0)
+            if (grafo.InvalidNodes.Count == 0)
             {
                 grafo.ResetLabel(0);
                 coda = new Queue<Node>();
@@ -37,34 +37,34 @@ namespace BFS.LastLevelOpt
             }
             else
             {
-                Node x = grafo.invalidNode.MinBy(x => x.label);
-                coda = new Queue<Node>(grafo.labeledNode[x.label]);
-                grafo.ResetLabel(x);
-                grafo.ResetLabel(x.label + 1);
+                Node x = grafo.InvalidNodes.MinBy(x => x.Label);
+                coda = new Queue<Node>(grafo.LabeledNode[x.Label]);
+                Graph.ResetLabel(x);
+                grafo.ResetLabel(x.Label + 1);
 
             }
             while (coda.Count > 0)
             {
                 var element = coda.Dequeue();
-                foreach (BiEdge edge in element.edges.Where(x => x.previousNode == element))
+                foreach (BiEdge edge in element.Edges.Where(x => x.PreviousNode == element))
                 {
-                    Node n = edge.nextNode;
-                    if (edge.capacity < 0)
+                    Node n = edge.NextNode;
+                    if (edge.Capacity < 0)
                         throw new InvalidOperationException();
-                    if (edge.capacity == 0)
+                    if (edge.Capacity == 0)
                     {
-                        if (!grafo.invalidNode.Contains(n))
+                        if (!grafo.InvalidNodes.Contains(n))
                             grafo.InvalidNode(n);
                         if (!Repair(grafo, n))
                             continue;
                     }
-                    if (n.previousNode == null && edge.capacity > 0)
+                    if (n.PreviousNode == null && edge.Capacity > 0)
                     {
-                        n.setPreviousNode(element);
-                        grafo.ChangeLabel(n, element.label + 1);
-                        n.setInFlow(Math.Min(element.inFlow, edge.capacity));
+                        n.SetPreviousNode(element);
+                        grafo.ChangeLabel(n, element.Label + 1);
+                        n.SetInFlow(Math.Min(element.InFlow, edge.Capacity));
                         if (n is SinkNode)
-                            return n.inFlow;
+                            return n.InFlow;
                         else
                             coda.Enqueue(n);
                     }
@@ -75,49 +75,50 @@ namespace BFS.LastLevelOpt
 
         public static void PrintGraph(Graph grafo)
         {
-            foreach (var set in grafo.labeledNode.Append(grafo.invalidNode))
+            foreach (var set in grafo.LabeledNode.Append(grafo.InvalidNodes))
             {
                 foreach (var node in set)
                 {
-                    Console.Write("node " + node.name + " label = " + node.label);
-                    foreach (var x in node.edges.Where(x => x.previousNode == node))
-                        Console.Write(" to " + x.nextNode.name + ", f = " + x.flow + ", c  = " + x.capacity + ";");
+                    Console.Write("node " + node.Name + " label = " + node.Label);
+                    foreach (var x in node.Edges.Where(x => x.PreviousNode == node))
+                        Console.Write(" to " + x.NextNode.Name + ", f = " + x.Flow + ", c  = " + x.Capacity + ";");
                     Console.WriteLine();
                 }
             }
         }
-        public void Execute()
+        public static int FlowFordFulkerson()
         {
             int fMax = 0;
             SinkNode t = new SinkNode("t");
             Node n6 = new Node("6");
-            n6.addEdge(t, 10);
+            n6.AddEdge(t, 10);
             Node n5 = new Node("5");
-            n5.addEdge((t, 35), (n6, 10));
+            n5.AddEdge((t, 35), (n6, 10));
             Node n4 = new Node("4");
-            n4.addEdge(n6, 25);
+            n4.AddEdge(n6, 25);
             Node n3 = new Node("3");
-            n3.addEdge((n4, 15), (n5, 15), (n6, 10));
+            n3.AddEdge((n4, 15), (n5, 15), (n6, 10));
             Node n2 = new Node("2");
-            n2.addEdge((n5, 35), (n3, 10));
+            n2.AddEdge((n5, 35), (n3, 10));
             SourceNode s = new SourceNode("s");
-            s.addEdge((n2, 10), (n3, 30), (n4, 30));
+            s.AddEdge((n2, 10), (n3, 30), (n4, 30));
             Graph grafo = new Graph(s, n2, n3, n4, n5, n6, t);
             while (true)
             {
-                int f = BfsLastLevelOpt.doBfs(grafo);
+                int f = BfsLastLevelOpt.DoBfs(grafo);
                 if (f == 0)
                     break;
                 fMax += f;
                 Node mom = t;
                 while (mom != s)
                 {
-                    mom.previousNode.addFlow(f, mom);
-                    mom = mom.previousNode;
+                    mom.PreviousNode.AddFlow(f, mom);
+                    mom = mom.PreviousNode;
                 }
             }
             PrintGraph(grafo);
             Console.WriteLine("flusso inviato = " + fMax);
+            return fMax;
         }
     }
 }

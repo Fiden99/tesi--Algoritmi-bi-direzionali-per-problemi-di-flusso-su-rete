@@ -11,6 +11,7 @@
         "**/bin/": true,
     },
     "cSpell.words": [
-        "noopt"
+        "noopt",
+        "Xunit"
     ]
 }
