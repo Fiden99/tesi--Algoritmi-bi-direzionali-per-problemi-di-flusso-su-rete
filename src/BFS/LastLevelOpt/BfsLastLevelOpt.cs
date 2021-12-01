@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Xml;
 using BFS.Abstractions;
 namespace BFS.LastLevelOpt
 {
@@ -9,27 +10,24 @@ namespace BFS.LastLevelOpt
     {
         private static bool Repair(Graph grafo, Node node)
         {
-            bool changed = false;
             foreach (var e in node.Edges.Where(x => x.NextNode == node))
             {
-                if (e.Capacity > 0)
+                Node previous = e.PreviousNode;
+                if (e.Capacity > 0 && previous.Label == (node.Label - 1) && previous.Valid == true)
                 {
-                    if (!changed)
-                    {
-                        grafo.RepairNode(node, e.PreviousNode.Label + 1);
-                        changed = true;
-                    }
-                    else if (changed && e.PreviousNode.Label < node.Label)
-                        grafo.ChangeLabel(node, e.PreviousNode.Label + 1);
+                    grafo.RepairNode(node, node.Label);
+                    node.SetPreviousNode(previous);
+                    node.SetInFlow(Math.Min(e.Capacity, previous.InFlow));
+                    return true;
                 }
             }
-            return changed;
+            return false;
 
         }
-        public static int DoBfs(Graph grafo)
+        public static int DoBfs(Graph grafo, int startLabel)
         {
             Queue<Node> coda;
-            if (grafo.InvalidNodes.Count == 0)
+            if (startLabel == 0)
             {
                 grafo.ResetLabel(0);
                 coda = new Queue<Node>();
@@ -37,10 +35,14 @@ namespace BFS.LastLevelOpt
             }
             else
             {
-                Node x = grafo.InvalidNodes.MinBy(x => x.Label);
-                coda = new Queue<Node>(grafo.LabeledNode[x.Label]);
-                Graph.ResetLabel(x);
-                grafo.ResetLabel(x.Label + 1);
+                /*
+                    Node x = grafo.InvalidNodes.MinBy(x => x.Label);
+                    coda = new Queue<Node>(grafo.LabeledNode[x.Label - 1]);
+                    //grafo.ResetLabel(x);
+                     grafo.ResetLabel(x.Label);
+                */
+                coda = new Queue<Node>(grafo.LabeledNode[startLabel - 1]);
+                grafo.ResetLabel(startLabel);
 
             }
             while (coda.Count > 0)
@@ -51,19 +53,29 @@ namespace BFS.LastLevelOpt
                     Node n = edge.NextNode;
                     if (edge.Capacity < 0)
                         throw new InvalidOperationException();
-                    if (edge.Capacity == 0)
+                    if (edge.Capacity == 0 && n.Valid == true)
                     {
-                        if (!grafo.InvalidNodes.Contains(n))
-                            grafo.InvalidNode(n);
-                        if (!Repair(grafo, n))
-                            continue;
+                        grafo.InvalidNode(n);
+                        if (Repair(grafo, n))
+                        {
+                            if (n is SinkNode)
+                                return n.InFlow;
+                            else
+                                coda.Enqueue(n);
+                        }
+                        else
+                            return DoBfs(grafo, n.Label);
                     }
-                    if (n.PreviousNode == null && edge.Capacity > 0)
+                    if (edge.Capacity > 0 && n.InFlow == 0 && element.Valid == true)
                     {
-                        n.SetPreviousNode(element);
-                        grafo.ChangeLabel(n, element.Label + 1);
+                        if (n.Valid == true)
+                            grafo.ChangeLabel(n, element.Label + 1);
+                        else
+                            grafo.RepairNode(n, element.Label + 1);
                         n.SetInFlow(Math.Min(element.InFlow, edge.Capacity));
-                        if (n is SinkNode)
+                        n.SetPreviousNode(element);
+                        //TODO trovare modo più elegante rispetto a questo
+                        if (n is SinkNode && !(n.InFlow == 0))
                             return n.InFlow;
                         else
                             coda.Enqueue(n);
@@ -75,7 +87,7 @@ namespace BFS.LastLevelOpt
 
         public static void PrintGraph(Graph grafo)
         {
-            foreach (var set in grafo.LabeledNode.Append(grafo.InvalidNodes))
+            foreach (var set in grafo.LabeledNode)
             {
                 foreach (var node in set)
                 {
@@ -85,6 +97,14 @@ namespace BFS.LastLevelOpt
                     Console.WriteLine();
                 }
             }
+            foreach (var node in grafo.InvalidNodes)
+            {
+                Console.Write("node " + node.Name);
+                foreach (var x in node.Edges.Where(x => x.PreviousNode == node))
+                    Console.Write(" to " + x.NextNode.Name + ", f = " + x.Flow + ", c  = " + x.Capacity + ";");
+                Console.WriteLine();
+
+            }
         }
         public static int FlowFordFulkerson(Graph grafo)
         {
@@ -93,7 +113,7 @@ namespace BFS.LastLevelOpt
             var t = grafo.Sink;
             while (true)
             {
-                int f = BfsLastLevelOpt.DoBfs(grafo);
+                int f = DoBfs(grafo, 0);
                 if (f == 0)
                     break;
                 fMax += f;

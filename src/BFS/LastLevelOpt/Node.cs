@@ -48,7 +48,7 @@ namespace BFS.LastLevelOpt
             this.Valid = true;
         }
 
-        public virtual void AddEdge(Node node, int cap)
+        public void AddEdge(Node node, int cap)
         {
             BiEdge edge = new BiEdge(this, node, cap);
             this.Edges.Add(edge);
@@ -60,7 +60,7 @@ namespace BFS.LastLevelOpt
             foreach (var x in edges)
                 AddEdge(x.Item1, x.Item2);
         }
-        public virtual void AddEdge(BiEdge edge)
+        public void AddEdge(BiEdge edge)
         {
             this.Edges.Add(edge);
         }
@@ -85,13 +85,16 @@ namespace BFS.LastLevelOpt
             //TODO da capire se in caso di previous node si debba aggiungere la capacità e non il flusso
             BiEdge edge = this.Edges.SingleOrDefault(x => x.NextNode == n);
             if (edge is null)
-                throw new ArgumentException("nodo non trovato");
+                throw new ArgumentException("arco non trovato");
             int f = edge.Flow + flow;
             int c = edge.Capacity - flow;
             if (f < 0 || c < 0)
                 throw new ArgumentException("valore di flusso non valido");
             edge.SetCapacity(c);
             edge.SetFlow(f);
+            n.InFlow -= flow;
+            //TODO da capire che flusso va inserito
+
         }
         public void SetLabel(int label)
         {

@@ -42,9 +42,7 @@ namespace BFS.LastLevelOpt
             {
                 Node sink = this.InvalidNodes.SingleOrDefault(x => x is SinkNode);
                 if (sink is null)
-                    sink = this.LabeledNode.Last().SingleOrDefault(x => x is SinkNode);
-                if (sink is null)
-                    throw new InvalidOperationException();
+                    sink = this.LabeledNode.Last().Single(x => x is SinkNode);
                 return sink;
             }
         }
@@ -59,9 +57,9 @@ namespace BFS.LastLevelOpt
                     if (n is SourceNode)
                         n.SetInFlow(int.MaxValue);
                     else
-
                         n.SetInFlow(0);
                     n.SetPreviousNode(null);
+                    //this.ChangeLabel(n, 0);
                 }
             }
         }
@@ -69,6 +67,7 @@ namespace BFS.LastLevelOpt
         {
             n.SetPreviousNode(null);
             n.SetInFlow(0);
+            //this.ChangeLabel(n, 0);
 
         }
         public void ChangeLabel(Node node, int to)
@@ -76,63 +75,34 @@ namespace BFS.LastLevelOpt
             if (node.Label == to)
                 return;
             if (!this.LabeledNode[node.Label].Remove(node))
-                throw new ArgumentException();
+                throw new ArgumentException("nodo non trovato nella label selezionata");
             while (this.LabeledNode.Count <= to)
                 this.LabeledNode.Add(new HashSet<Node>());
             if (!this.LabeledNode[to].Add(node))
-                throw new ArgumentException();
+                throw new ArgumentException("nodo già presente nella label selezionata");
             node.SetLabel(to);
         }
 
-        public void ChangeLabel(Node node, int from, int to)
-        {
-
-            if (node.Label != from && !this.LabeledNode[from].Remove(node))
-                throw new ArgumentException();
-            this.LabeledNode[from].Remove(node);
-            while (this.LabeledNode.Count <= to)
-                this.LabeledNode.Add(new HashSet<Node>());
-            if (!this.LabeledNode[to].Add(node))
-                throw new ArgumentException();
-            node.SetLabel(to);
-
-        }
         public void InvalidNode(Node node)
         {
-            bool removed = false;
-            foreach (var set in this.LabeledNode)
-            {
-                if (set.Remove(node))
-                {
-                    removed = true;
-                    break;
-                }
-            }
-            if (!removed)
-                throw new ArgumentException();
-            if (!InvalidNodes.Add(node))
-                throw new ArgumentException();
+            if (node.Valid == false)
+                return;
+            if (!this.LabeledNode[node.Label].Remove(node))
+                return;
+            InvalidNodes.Add(node);
             node.SetValid(false);
 
-        }
-        public void InvalidNode(Node node, int from)
-        {
-            if (!this.LabeledNode[from].Remove(node))
-                throw new ArgumentException();
-            if (!this.InvalidNodes.Add(node))
-                throw new ArgumentException();
-            node.SetValid(false);
         }
         public void RepairNode(Node node, int to)
         {
-
             if (!this.InvalidNodes.Remove(node))
-                throw new ArgumentException();
+                throw new ArgumentException("impossibile riparare il nodo, già assente in InvalidNodes");
             while (this.LabeledNode.Count <= to)
                 this.LabeledNode.Add(new HashSet<Node>());
             if (!this.LabeledNode[to].Add(node))
-                throw new ArgumentException();
+                throw new ArgumentException("impossibile aggiungere il nodo indicato, già presente nella label indicata");
             node.SetLabel(to);
+            node.SetValid(true);
         }
 
 
