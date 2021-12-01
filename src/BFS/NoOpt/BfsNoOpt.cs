@@ -68,6 +68,7 @@ namespace BFS.NoOpt
                     mom = mom.PreviousNode;
                 }
             }
+            PrintGraph(grafo);
             return fMax;
         }
     }
