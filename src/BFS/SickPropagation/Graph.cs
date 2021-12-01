@@ -98,6 +98,20 @@ namespace BFS.SickPropagation
             node.SetValid(false);
         }
 
+        public void RepairNode(Node node, int label)
+        {
+            if (node.Valid == true)
+                throw new ArgumentException("nodo già valido");
+            if (!this.InvalidNodes.Remove(node))
+                throw new ArgumentException("impossibile trovare il nodo indicato in InvalidNodes");
+            while (this.LabeledNodes.Count <= label)
+                this.LabeledNodes.Add(new HashSet<Node>());
+            if (!this.LabeledNodes[label].Add(node))
+                throw new ArgumentException("nodo già presente nella label indicata");
+            node.SetValid(true);
+            node.SetLabel(label);
+        }
+
 
     }
 }
