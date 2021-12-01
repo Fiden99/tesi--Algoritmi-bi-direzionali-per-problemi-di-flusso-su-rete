@@ -139,7 +139,7 @@ public class SickPropagationTests
         s.AddEdge((n1, 50), (n4, 20));
         SickPropagation.Graph graph = new SickPropagation.Graph(s, n1, n2, n3, n4, n5, n6, n7, n8, n9, t);
         var res = BfsSickPropagation.FlowFordFulkerson(graph);
-        Assert.Equal(70, res);
+        Assert.Equal(60, res);
 
 
 

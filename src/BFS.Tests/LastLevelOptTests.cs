@@ -138,9 +138,6 @@ public class LastLevelOptTests
         s.AddEdge((n1, 50), (n4, 20));
         Graph graph = new Graph(s, n1, n2, n3, n4, n5, n6, n7, n8, n9, t);
         var res = BfsLastLevelOpt.FlowFordFulkerson(graph);
-        Assert.Equal(70, res);
-
-
-
+        Assert.Equal(60, res);
     }
 }
