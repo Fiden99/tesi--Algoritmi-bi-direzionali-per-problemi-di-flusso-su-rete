@@ -29,20 +29,20 @@ namespace BFS.SickPropagationGraphOpt
         public static int DoBfs(Graph grafo)
         {
             Queue<Node> coda;
-            /*             if (grafo.InvalidNodes.Count == 0)
+            /*          if (grafo.InvalidNodes.Count == 0)
                         {
-             */
+            */
             grafo.Reset(0);
             coda = new Queue<Node>();
             coda.Enqueue(grafo.Source);
-            /*            }
-                         else
-                        {
-                            var min = grafo.InvalidNodes.Min(x => x.Label);
-                            coda = new Queue<Node>(grafo.LabeledNodes[min]);
-                            grafo.Reset(min + 1);
-                        }
-             */
+            /*         }
+                        else
+                       {
+                           var min = grafo.InvalidNodes.Min(x => x.Label);
+                           coda = new Queue<Node>(grafo.LabeledNodes[min]);
+                           grafo.Reset(min + 1);
+                       }
+                        */
             while (coda.Count > 0)
             {
                 var element = coda.Dequeue();
@@ -92,7 +92,6 @@ namespace BFS.SickPropagationGraphOpt
                         n.SetPreviousNode(element);
                         grafo.ChangeLabel(n, element.Label + 1);
                         n.SetInFlow(Math.Min(element.InFlow, edge.Capacity));
-                        //TODO da valutare se grafo.labeledNodes.Last().Contains(n) sia più efficiente inserirlo nell'if precedente o meno
                         if (n is SinkNode && n.Valid == true)
                             return n.InFlow;
                         else
