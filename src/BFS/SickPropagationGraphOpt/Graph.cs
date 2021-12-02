@@ -43,7 +43,7 @@ namespace BFS.SickPropagationGraphOpt
                 return sink;
             }
         }
-        public void Reset(IEnumerable<Node> nodes)
+        public static void Reset(IEnumerable<Node> nodes)
         {
             foreach (var node in nodes)
             {
@@ -77,9 +77,9 @@ namespace BFS.SickPropagationGraphOpt
             if (node.Label == to)
                 return;
             if (!this.LabeledNodes[node.Label].Remove(node))
-                throw new ArgumentException();
+                throw new ArgumentException("nodo non presente nella label indicata");
             if (!this.LabeledNodes[to].Add(node))
-                throw new ArgumentException();
+                throw new ArgumentException("nodo già presente nella label indicata");
             //TODO capire se è migliorabile
             node.ResetPreviousNextLabelNodes();
             //pulisce i previous e i next degli altri nodi a lui collegato
@@ -115,9 +115,9 @@ namespace BFS.SickPropagationGraphOpt
             if (node.Valid == false)
                 return;
             if (!this.LabeledNodes[node.Label].Remove(node))
-                throw new ArgumentException();
+                throw new ArgumentException("nodo non presente nella label indicata");
             if (this.InvalidNodes.Contains(node))
-                throw new ArgumentException();
+                throw new ArgumentException("nodo già presente in InvalidNodes");
             this.InvalidNodes.Add(node);
             node.SetValid(false);
             node.ResetPreviousNextLabelNodes();
