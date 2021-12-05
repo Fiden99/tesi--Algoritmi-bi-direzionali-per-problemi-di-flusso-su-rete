@@ -69,31 +69,67 @@ namespace BFS.SickPropagationGraphOpt
             }
         }
 
+
+        public void Repair(Node node, int label)
+        {
+            if (!this.InvalidNodes.Remove(node))
+                throw new ArgumentException("nodo non presente in InvalidNodes");
+            while (this.LabeledNodes.Count <= label + 1)
+                this.LabeledNodes.Add(new HashSet<Node>());
+            if (!this.LabeledNodes[label].Add(node))
+                throw new ArgumentException("nodo già presente nella label indicata");
+            //non vado a resettare le label dato che dovrebbero essere già essere pulite
+            foreach (var e in node.Edges)
+            {
+                Node next = e.NextNode;
+                Node previous = e.PreviousNode;
+                if (next == node && previous.Label == (label - 1))
+                {
+                    previous.AddNextLabelNode(node);
+                    node.AddPreviousLabelNode(previous);
+                }
+                else if (previous == node && next.Label == (label + 1))
+                {
+                    next.AddPreviousLabelNode(node);
+                    node.AddNextLabelNode(next);
+                }
+                node.SetValid(true);
+                node.SetLabel(label);
+            }
+
+
+        }
+
         //TODO da testare se funziona come voglio
         public void ChangeLabel(Node node, int to)
         {
-            while (this.LabeledNodes.Count <= to)
-                this.LabeledNodes.Add(new HashSet<Node>());
             if (node.Label == to)
                 return;
+            while (this.LabeledNodes.Count <= to + 1)
+                this.LabeledNodes.Add(new HashSet<Node>());
             if (!this.LabeledNodes[node.Label].Remove(node))
                 throw new ArgumentException("nodo non presente nella label indicata");
             if (!this.LabeledNodes[to].Add(node))
                 throw new ArgumentException("nodo già presente nella label indicata");
             //TODO capire se è migliorabile
+            foreach (var n in node.NextLabelNodes)
+                n.RemovePreviousLabelNode(node);
+            foreach (var n in node.PreviousLabelNodes)
+                n.RemoveNextLabelNode(node);
             node.ResetPreviousNextLabelNodes();
             //pulisce i previous e i next degli altri nodi a lui collegato
-            if (node.Label != 0)
-            {
-                foreach (var n in this.LabeledNodes[node.Label - 1])
+            /*  if (node.Label != 0)
                 {
-                    n.RemoveNextLabelNode(node);
-                }
-                foreach (var n in this.LabeledNodes[node.Label + 1])
-                {
-                    n.RemovePreviousLabelNode(node);
-                }
-            }
+                    foreach (var n in this.LabeledNodes[node.Label - 1])
+                    {
+                        n.RemoveNextLabelNode(node);
+                    }
+                    foreach (var n in this.LabeledNodes[node.Label + 1])
+                    {
+                        n.RemovePreviousLabelNode(node);
+                    }
+                } */
+
             //aggiunge i nodi necessari
             foreach (var e in node.Edges)
             {
@@ -120,8 +156,16 @@ namespace BFS.SickPropagationGraphOpt
                 throw new ArgumentException("nodo già presente in InvalidNodes");
             this.InvalidNodes.Add(node);
             node.SetValid(false);
-            node.ResetPreviousNextLabelNodes();
             //TODO da valutare se si deve fare il reset di NextLabel e PreviousLabel
+            foreach (var n in node.PreviousLabelNodes)
+            {
+                n.RemoveNextLabelNode(node);
+            }
+            foreach (var n in node.NextLabelNodes)
+            {
+                n.RemovePreviousLabelNode(node);
+            }
+            node.ResetPreviousNextLabelNodes();
         }
 
     }

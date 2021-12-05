@@ -13,7 +13,7 @@ namespace BFS.SickPropagationGraphOpt
             if (node.PreviousLabelNodes.Count != 0)
             {
                 Node previous = node.PreviousLabelNodes.First();
-                node.SetInFlow(Math.Min(previous.Edges.Single(x => x.NextNode == node).Capacity, previous.InFlow));
+                node.SetInFlow(Math.Min(previous.Edges.First(x => x.NextNode == node).Capacity, previous.InFlow));
                 node.SetPreviousNode(previous);
                 node.SetValid(true);
                 //grafo.ChangeLabel(e.previousNode, node.label - 1);
@@ -49,6 +49,8 @@ namespace BFS.SickPropagationGraphOpt
                 foreach (var edge in element.Edges.Where(x => x.PreviousNode == element))
                 {
                     var n = edge.NextNode;
+                    if (n.InFlow != 0)
+                        continue;
                     if (edge.Capacity < 0)
                         throw new InvalidOperationException();
                     if (edge.Capacity == 0 && !grafo.InvalidNodes.Contains(n))
@@ -75,7 +77,6 @@ namespace BFS.SickPropagationGraphOpt
                                         return next.InFlow;
                                     else
                                         coda.Enqueue(next);
-
                                 }
                             }
                         }
@@ -87,12 +88,17 @@ namespace BFS.SickPropagationGraphOpt
                                 coda.Enqueue(n);
                         }
                     }
-                    if (n.Valid == true && edge.Capacity > 0 && n.InFlow == 0)
+                    if (element.Valid == true && edge.Capacity > 0 && n.InFlow == 0)
                     {
                         n.SetPreviousNode(element);
-                        grafo.ChangeLabel(n, element.Label + 1);
+                        if (n.Valid == true)
+                            grafo.ChangeLabel(n, element.Label + 1);
+                        else
+                        {
+                            grafo.Repair(n, element.Label + 1);
+                        }
                         n.SetInFlow(Math.Min(element.InFlow, edge.Capacity));
-                        if (n is SinkNode && n.Valid == true)
+                        if (n is SinkNode && n.Valid == true && n.InFlow != 0)
                             return n.InFlow;
                         else
                             coda.Enqueue(n);

@@ -75,7 +75,7 @@ namespace BFS.LastLevelOpt
                         n.SetInFlow(Math.Min(element.InFlow, edge.Capacity));
                         n.SetPreviousNode(element);
                         //TODO trovare modo più elegante rispetto a questo
-                        if (n is SinkNode && !(n.InFlow == 0))
+                        if (n is SinkNode && n.InFlow != 0)
                             return n.InFlow;
                         else
                             coda.Enqueue(n);
