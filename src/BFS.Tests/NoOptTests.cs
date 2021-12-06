@@ -73,7 +73,7 @@ public class NoOptTests
         n9.AddNext(t, 50);
         n8.AddNext(t, 40);
         n7.AddNext(n9, 60);
-        n6.AddNext((n7, 10), (n8, 20));
+        n6.AddNext((n8, 20), (n9, 10));
         n5.AddNext(n8, 10);
         n4.AddNext((n5, 20), (n6, 30), (n7, 50));
         n3.AddNext((n4, 10), (n7, 10));

@@ -73,7 +73,7 @@ public class SickPropagationGraphOptTests
         n9.AddEdge(t, 50);
         n8.AddEdge(t, 40);
         n7.AddEdge(n9, 60);
-        n6.AddEdge((n7, 10), (n8, 20));
+        n6.AddEdge((n8, 20), (n9, 10));
         n5.AddEdge(n8, 10);
         n4.AddEdge((n5, 20), (n6, 30), (n7, 50));
         n3.AddEdge((n4, 10), (n7, 10));
