@@ -28,20 +28,19 @@ namespace BFS.SickPropagation
         public static int DoBfs(Graph grafo)
         {
             Queue<Node> coda;
-            //if (grafo.InvalidNodes.Count == 0)
-            //{
-            grafo.Reset(0);
-            coda = new Queue<Node>();
-            coda.Enqueue(grafo.Source);
-            //}
-            /*             else
-                        {
-                            var min = grafo.InvalidNodes.Min(x => x.Label);
-                            coda = new Queue<Node>(grafo.LabeledNodes[min]);
-                            grafo.Reset(min + 1);
+            if (grafo.InvalidNodes.Count == 0)
+            {
+                grafo.Reset(0);
+                coda = new Queue<Node>();
+                coda.Enqueue(grafo.Source);
+            }
+            else
+            {
+                var min = grafo.InvalidNodes.Min(x => x.Label);
+                coda = new Queue<Node>(grafo.LabeledNodes[min - 1]);
+                grafo.Reset(min);
 
-                        }
-             */
+            }
             while (coda.Count > 0)
             {
                 var element = coda.Dequeue();
@@ -70,7 +69,6 @@ namespace BFS.SickPropagation
                                     }
                                     else if (x is SinkNode && x.InFlow != 0)
                                         return x.InFlow;
-                                    //TODO capire se è veramente corretto inserire i nodi nella coda
                                     else
                                         coda.Enqueue(x);
                                 }
@@ -136,16 +134,25 @@ namespace BFS.SickPropagation
                 int f = BfsSickPropagation.DoBfs(graph);
                 if (f == 0)
                     break;
-                fMax += f;
                 Node mom = t;
-                while (mom != s)
+                try
                 {
-                    mom.PreviousNode.AddFlow(f, mom);
-                    mom = mom.PreviousNode;
+                    while (mom != s)
+                    {
+                        mom.PreviousNode.AddFlow(f, mom);
+                        mom = mom.PreviousNode;
+                    }
                 }
+                catch (ArgumentException)
+                {
+                    PrintGraph(graph);
+                    return fMax;
+                }
+                fMax += f;
             }
             PrintGraph(graph);
             return fMax;
+
         }
     }
 }

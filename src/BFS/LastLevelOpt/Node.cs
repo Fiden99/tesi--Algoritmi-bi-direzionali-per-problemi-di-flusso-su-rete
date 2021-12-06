@@ -92,7 +92,7 @@ namespace BFS.LastLevelOpt
                 throw new ArgumentException("valore di flusso non valido");
             edge.SetCapacity(c);
             edge.SetFlow(f);
-            n.InFlow -= flow;
+            this.SetInFlow(this.InFlow - flow);
             //TODO da capire che flusso va inserito
 
         }
