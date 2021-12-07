@@ -79,7 +79,7 @@ namespace BFS.LastLevelOpt
             this.PreviousNode = n;
         }
 
-        public void AddFlow(int flow, Node n)
+        public bool AddFlow(int flow, Node n)
         {
             //TODO da valutare se il nodo deve essere solo next o va bene anche previous
             //TODO da capire se in caso di previous node si debba aggiungere la capacità e non il flusso
@@ -94,6 +94,7 @@ namespace BFS.LastLevelOpt
             edge.SetFlow(f);
             this.SetInFlow(this.InFlow - flow);
             //TODO da capire che flusso va inserito
+            return c == 0;
 
         }
         public void SetLabel(int label)

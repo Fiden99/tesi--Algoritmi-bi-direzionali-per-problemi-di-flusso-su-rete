@@ -1,10 +1,8 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Xml;
-using BFS.Abstractions;
 namespace BFS.LastLevelOpt
+//TODO valutare se conviene comunque tenere il set InvalidNodes
 {
     public class BfsLastLevelOpt
     {
@@ -31,23 +29,28 @@ namespace BFS.LastLevelOpt
             if (node == null)
             {
 
-                if (grafo.InvalidNodes.Count == 0)
-                {
-                    grafo.ResetLabel(0);
-                    coda = new Queue<Node>();
-                    coda.Enqueue(grafo.Source);
-                }
-                else
-                {
+                grafo.ResetLabel(0);
+                coda = new Queue<Node>();
+                coda.Enqueue(grafo.Source);
 
-                    int x = grafo.InvalidNodes.Min(x => x.Label);
-                    coda = new Queue<Node>(grafo.LabeledNode[x - 1]);
-                    //grafo.ResetLabel(x);
-                    grafo.ResetLabel(x);
+                /*                 if (grafo.InvalidNodes.Count == 0)
+                                {
+                                    grafo.ResetLabel(0);
+                                    coda = new Queue<Node>();
+                                    coda.Enqueue(grafo.Source);
+                                }
+                                else
+                                {
 
-                    //coda = new Queue<Node>(grafo.LabeledNode[startLabel - 1]);
-                    //grafo.ResetLabel(startLabel);
-                }
+                                    int x = grafo.InvalidNodes.Min(x => x.Label);
+                                    coda = new Queue<Node>(grafo.LabeledNode[x - 1]);
+                                    //grafo.ResetLabel(x);
+                                    grafo.ResetLabel(x);
+
+                                    //coda = new Queue<Node>(grafo.LabeledNode[startLabel - 1]);
+                                    //grafo.ResetLabel(startLabel);
+                                }
+                 */
             }
             else
             {
@@ -117,12 +120,13 @@ namespace BFS.LastLevelOpt
         }
         public static int FlowFordFulkerson(Graph grafo)
         {
+            Node vuoto = null;
             int fMax = 0;
             var s = grafo.Source;
             var t = grafo.Sink;
             while (true)
             {
-                int f = DoBfs(grafo, null);
+                int f = DoBfs(grafo, vuoto);
                 if (f == 0)
                     break;
                 Node mom = t;
@@ -132,7 +136,8 @@ namespace BFS.LastLevelOpt
                     {
                         //TODO capire come migliorare senza usare trycatch
 
-                        mom.PreviousNode.AddFlow(f, mom);
+                        if (mom.PreviousNode.AddFlow(f, mom))
+                            vuoto = mom;
                         mom = mom.PreviousNode;
 
                     }
