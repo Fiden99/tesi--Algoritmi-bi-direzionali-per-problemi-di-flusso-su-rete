@@ -1,6 +1,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using BFS.LastLevelOpt;
 
@@ -18,7 +19,7 @@ namespace BFS.SickPropagation
                 {
                     node.SetInFlow(Math.Min(previous.InFlow, e.Capacity));
                     node.SetPreviousNode(previous);
-                    grafo.ChangeLabel(previous, node.Label - 1);
+                    //grafo.ChangeLabel(previous, node.Label - 1);
                     return true;
                 }
             }
@@ -28,6 +29,7 @@ namespace BFS.SickPropagation
         public static int DoBfs(Graph grafo, Node noCap)
         {
             Queue<Node> coda;
+            Queue<Node> malati = new Queue<Node>();
             //if (grafo.InvalidNodes.Count == 0)
             if (noCap is null)
             {
@@ -53,36 +55,20 @@ namespace BFS.SickPropagation
                     if (edge.Capacity < 0)
                         throw new InvalidOperationException();
                     if (edge.Capacity == 0 && n.Valid == true)
-                    {//capire se si può fare in maniera molto migliore
-                        if (!Repair(grafo, n))
+                    {
+                        malati.Enqueue(n);
+                        do
                         {
-                            Queue<Node> malati = new Queue<Node>();
-                            malati.Enqueue(n);
-                            while (malati.Count > 0)
-                            {
-                                Node z = malati.Dequeue();
-                                foreach (var x in z.Edges.Where(x => x.PreviousNode == z).Select(x => x.NextNode))
-                                {
-                                    if (!Repair(grafo, x))
-                                    {
-                                        //Graph.Reset(x);
-                                        malati.Enqueue(x);
-                                    }
-                                    else if (x is SinkNode && x.InFlow != 0)
-                                        return x.InFlow;
-                                    else
-                                        coda.Enqueue(x);
-                                }
-                            }
-                        }
-                        else
-                        {
-                            if (n is SinkNode && n.InFlow != 0)
-                                return n.InFlow;
+                            var m = malati.Dequeue();
+                            if (!Repair(grafo, m))
+                                foreach (var x in m.Edges.Where(x => x.PreviousNode == m).Select(x => x.NextNode))
+                                    malati.Enqueue(x);
+                            else if (m is SinkNode && m.InFlow != 0)
+                                return m.InFlow;
                             else
-                                coda.Enqueue(n);
-                        }
+                                coda.Enqueue(m);
 
+                        } while (malati.Count > 0);
                     }
                     //if (element.Valid == true && edge.Capacity > 0 && (n.Label == 0 || n.Label > element.Label))
                     if (element.Valid == true && edge.Capacity > 0 && n.InFlow == 0)
