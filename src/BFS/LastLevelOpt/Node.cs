@@ -83,9 +83,7 @@ namespace BFS.LastLevelOpt
         {
             //TODO da valutare se il nodo deve essere solo next o va bene anche previous
             //TODO da capire se in caso di previous node si debba aggiungere la capacità e non il flusso
-            BiEdge edge = this.Edges.SingleOrDefault(x => x.NextNode == n);
-            if (edge is null)
-                throw new ArgumentException("arco non trovato");
+            BiEdge edge = this.Edges.Single(x => x.NextNode == n);
             int f = edge.Flow + flow;
             int c = edge.Capacity - flow;
             if (f < 0 || c < 0)
@@ -93,7 +91,6 @@ namespace BFS.LastLevelOpt
             edge.SetCapacity(c);
             edge.SetFlow(f);
             this.SetInFlow(this.InFlow - flow);
-            //TODO da capire che flusso va inserito
             return c == 0;
 
         }
