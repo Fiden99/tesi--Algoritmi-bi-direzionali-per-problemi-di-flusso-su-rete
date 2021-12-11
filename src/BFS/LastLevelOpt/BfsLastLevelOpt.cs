@@ -144,7 +144,6 @@ namespace BFS.LastLevelOpt
                 Node mom = t;
                 while (mom != s)
                 {
-                    //TODO capire come migliorare senza usare trycatch
 
                     if (mom.PreviousNode.AddFlow(f, mom))
                         vuoto = mom;

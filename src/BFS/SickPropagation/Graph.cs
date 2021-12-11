@@ -8,7 +8,7 @@ namespace BFS.SickPropagation
     public class Graph
     {
         public List<HashSet<Node>> LabeledNodes { get; private set; }
-        //TODO da capire se si può tenere invalidNodes come set o meno
+        //TODO da capire se deve tenere InvalidNodes
         public HashSet<Node> InvalidNodes { get; private set; }
 
         public Graph()
@@ -66,7 +66,6 @@ namespace BFS.SickPropagation
         public static void Reset(Node n)
         {
             n.SetPreviousNode(null);
-            //TODO da capire se posso tenere inFlow di sourceNode int.MaxValue o devo eliminare togliere per forza la capacità degli archi che partono da lui
             if (n is SourceNode)
                 n.SetInFlow(int.MaxValue);
             else

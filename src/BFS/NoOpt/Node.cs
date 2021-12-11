@@ -102,7 +102,6 @@ namespace BFS.NoOpt
             int c = edge.Capacity - flow;
             if (f < 0 || c < 0)
                 throw new ArgumentException("valore di flusso non Valido");
-            //TODO da capire a chi devo dare l'InFlow, se al successivo o al precedente
             edge.SetFlow(f);
             edge.SetCapacity(c);
         }
