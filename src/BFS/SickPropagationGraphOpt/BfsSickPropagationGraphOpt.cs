@@ -10,8 +10,9 @@ namespace BFS.SickPropagationGraphOpt
     {
         //TODO valutare il fatto che dopo il reset non ci sono ho PreviousLabelNodes pulita
         // capire se durante il reset dobbiamo rimuovere o meno PreviousLabelNodes
-        public static bool Repair(Node node)
+        public static bool Repair(Node node, Node removedNode)
         {
+            node.RemovePreviousLabelNode(removedNode);
             if (node.PreviousLabelNodes.Count != 0)
             {
                 Node previous = node.PreviousLabelNodes.First();
@@ -38,7 +39,7 @@ namespace BFS.SickPropagationGraphOpt
         public static int DoBfs(Graph grafo, Node noCap)
         {
             Queue<Node> coda;
-            Queue<Node> malati = new Queue<Node>();
+            Queue<(Node, Node)> malati = new Queue<(Node, Node)>();
             if (noCap == null)
             {
 
@@ -49,6 +50,8 @@ namespace BFS.SickPropagationGraphOpt
             else
             {
                 coda = new Queue<Node>(grafo.LabeledNodes[noCap.Label - 1]);
+                //coda = new Queue<Node>();
+                //coda.Enqueue(noCap);
                 grafo.Reset(noCap.Label);
                 foreach (Node n in coda)
                 {
@@ -69,22 +72,24 @@ namespace BFS.SickPropagationGraphOpt
                         throw new InvalidOperationException();
                     if (edge.Capacity == 0 && n.Valid == true)
                     {
-                        malati.Enqueue(n);
-                        do
+                        malati.Enqueue((n, element));
+                        while (malati.Count > 0)
                         {
-                            Node x = malati.Dequeue();
-                            if (!Repair(x))
+                            var x = malati.Dequeue();
+                            Node actual = x.Item1;
+                            Node previous = x.Item2;
+                            if (!Repair(actual, previous))
                             {
-                                grafo.InvalidNode(x);
-                                foreach (var y in x.NextLabelNodes)
-                                    malati.Enqueue(y);
+                                grafo.InvalidNode(actual);
+                                foreach (var y in actual.NextLabelNodes)
+                                    malati.Enqueue((y, actual));
                             }
-                            else if (x is SinkNode && x.InFlow != 0)
-                                return x.InFlow;
+                            else if (actual is SinkNode && actual.InFlow != 0)
+                                return actual.InFlow;
                             else
-                                coda.Enqueue(x);
+                                coda.Enqueue(actual);
 
-                        } while (malati.Count > 0);
+                        }
                     }
                     if (element.Valid == true && edge.Capacity > 0 && n.InFlow == 0)
                     {
