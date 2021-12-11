@@ -126,29 +126,30 @@ namespace BFS.LastLevelOpt
             var t = grafo.Sink;
             while (true)
             {
-                int f = DoBfs(grafo, vuoto);
+                int f;
+                //try
+                //{
+                f = DoBfs(grafo, vuoto);
                 if (f == 0)
                     break;
                 Node mom = t;
-                try
+                while (mom != s)
                 {
-                    while (mom != s)
-                    {
-                        //TODO capire come migliorare senza usare trycatch
+                    //TODO capire come migliorare senza usare trycatch
 
-                        if (mom.PreviousNode.AddFlow(f, mom))
-                            vuoto = mom;
-                        mom = mom.PreviousNode;
-
-                    }
-                }
-                catch (ArgumentException)
-                {
-                    PrintGraph(grafo);
-                    Console.WriteLine("flusso inviato = " + fMax);
-                    return fMax;
+                    if (mom.PreviousNode.AddFlow(f, mom))
+                        vuoto = mom;
+                    mom = mom.PreviousNode;
 
                 }
+                //}
+                /*                 catch (ArgumentException)
+                                {
+                                    PrintGraph(grafo);
+                                    Console.WriteLine("flusso inviato = " + fMax);
+                                    return fMax;
+
+                                } */
                 fMax += f;
             }
             PrintGraph(grafo);

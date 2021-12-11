@@ -123,20 +123,20 @@ namespace BFS.SickPropagation
                 if (f == 0)
                     break;
                 Node mom = t;
-                try
+                /*                 try
+                                { */
+                while (mom != s)
                 {
-                    while (mom != s)
-                    {
-                        if (mom.PreviousNode.AddFlow(f, mom))
-                            vuoto = mom;
-                        mom = mom.PreviousNode;
-                    }
+                    if (mom.PreviousNode.AddFlow(f, mom))
+                        vuoto = mom;
+                    mom = mom.PreviousNode;
                 }
-                catch (ArgumentException)
-                {
-                    PrintGraph(graph);
-                    return fMax;
-                }
+                /*                 }
+                                catch (ArgumentException)
+                                {
+                                    PrintGraph(graph);
+                                    return fMax;
+                                } */
                 fMax += f;
             }
             PrintGraph(graph);
