@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using BFS.Abstractions;
@@ -7,9 +8,10 @@ namespace BFS.SickPropagationGraphOpt
 {
     public class BfsSickPropagationGraphOpt
     {
-        public static bool Repair(Graph grafo, Node node, BiEdge edge)
+        //TODO valutare il fatto che dopo il reset non ci sono ho PreviousLabelNodes pulita
+        // capire se durante il reset dobbiamo rimuovere o meno PreviousLabelNodes
+        public static bool Repair(Node node)
         {
-            node.RemovePreviousLabelNode(edge.PreviousNode);
             if (node.PreviousLabelNodes.Count != 0)
             {
                 Node previous = node.PreviousLabelNodes.First();
@@ -26,23 +28,35 @@ namespace BFS.SickPropagationGraphOpt
             }
             return false;
         }
-        public static int DoBfs(Graph grafo)
+        public static int CorrectFlow(Node node)
+        {
+            if (node.PreviousNode != null && node.InFlow > node.PreviousNode.InFlow)
+                node.SetInFlow(CorrectFlow(node.PreviousNode));
+            return node.InFlow;
+        }
+
+        public static int DoBfs(Graph grafo, Node noCap)
         {
             Queue<Node> coda;
-            /*          if (grafo.InvalidNodes.Count == 0)
-                        {
-            */
-            grafo.Reset(0);
-            coda = new Queue<Node>();
-            coda.Enqueue(grafo.Source);
-            /*         }
-                        else
-                       {
-                           var min = grafo.InvalidNodes.Min(x => x.Label);
-                           coda = new Queue<Node>(grafo.LabeledNodes[min]);
-                           grafo.Reset(min + 1);
-                       }
-                        */
+            Queue<Node> malati = new Queue<Node>();
+            if (noCap == null)
+            {
+
+                grafo.Reset(0);
+                coda = new Queue<Node>();
+                coda.Enqueue(grafo.Source);
+            }
+            else
+            {
+                coda = new Queue<Node>(grafo.LabeledNodes[noCap.Label - 1]);
+                grafo.Reset(noCap.Label);
+                foreach (Node n in coda)
+                {
+                    n.SetInFlow(CorrectFlow(n));
+                }
+
+            }
+
             while (coda.Count > 0)
             {
                 var element = coda.Dequeue();
@@ -53,40 +67,25 @@ namespace BFS.SickPropagationGraphOpt
                         continue;
                     if (edge.Capacity < 0)
                         throw new InvalidOperationException();
-                    if (edge.Capacity == 0 && !grafo.InvalidNodes.Contains(n))
+                    if (edge.Capacity == 0 && n.Valid == true)
                     {
-                        if (!Repair(grafo, n, edge))
+                        malati.Enqueue(n);
+                        do
                         {
-                            Queue<Node> malati = new Queue<Node>();
-                            malati.Enqueue(n);
-                            grafo.InvalidNode(n);
-                            Graph.Reset(n);
-                            while (malati.Count > 0)
+                            Node x = malati.Dequeue();
+                            if (!Repair(x))
                             {
-                                Node p = malati.Dequeue();
-                                foreach (var x in p.Edges.Where(x => x.PreviousNode == p))
-                                {
-                                    var next = x.NextNode;
-                                    if (!Repair(grafo, next, x))
-                                    {
-                                        //Graph.Reset(next);
-                                        grafo.InvalidNode(next);
-                                        malati.Enqueue(next);
-                                    }
-                                    else if (next is SinkNode && next.InFlow != 0)
-                                        return next.InFlow;
-                                    else
-                                        coda.Enqueue(next);
-                                }
+                                grafo.InvalidNode(x);
+                                foreach (var y in x.NextLabelNodes)
+                                    malati.Enqueue(y);
+
                             }
-                        }
-                        else
-                        {
-                            if (n is SinkNode && n.InFlow != 0)
-                                return n.InFlow;
+                            else if (x is SinkNode && x.InFlow != 0)
+                                return x.InFlow;
                             else
-                                coda.Enqueue(n);
-                        }
+                                coda.Enqueue(x);
+
+                        } while (malati.Count > 0);
                     }
                     if (element.Valid == true && edge.Capacity > 0 && n.InFlow == 0)
                     {
@@ -95,7 +94,7 @@ namespace BFS.SickPropagationGraphOpt
                             grafo.ChangeLabel(n, element.Label + 1);
                         else
                         {
-                            grafo.Repair(n, element.Label + 1);
+                            grafo.RepairNode(n, element.Label + 1);
                         }
                         n.SetInFlow(Math.Min(element.InFlow, edge.Capacity));
                         if (n is SinkNode && n.Valid == true && n.InFlow != 0)
@@ -131,21 +130,34 @@ namespace BFS.SickPropagationGraphOpt
         }
         public static int FlowFordFulkerson(Graph grafo)
         {
+            Node noCap = null;
             int fMax = 0;
             var s = grafo.Source;
             var t = grafo.Sink;
             while (true)
             {
-                int f = BfsSickPropagationGraphOpt.DoBfs(grafo);
+                int f = BfsSickPropagationGraphOpt.DoBfs(grafo, noCap);
                 if (f == 0)
                     break;
-                fMax += f;
                 Node mom = t;
+                /*                 try
+                                { */
                 while (mom != s)
                 {
-                    mom.PreviousNode.AddFlow(f, mom);
+                    if (mom.PreviousNode.AddFlow(f, mom))
+                        noCap = mom;
                     mom = mom.PreviousNode;
                 }
+
+                /*                 }
+                                catch (ArgumentException)
+                                {
+
+                                    PrintGraph(grafo);
+                                    Console.WriteLine("flusso inviato = " + fMax);
+                                    return fMax;
+                                } */
+                fMax += f;
             }
             PrintGraph(grafo);
             Console.WriteLine("flusso inviato = " + fMax);

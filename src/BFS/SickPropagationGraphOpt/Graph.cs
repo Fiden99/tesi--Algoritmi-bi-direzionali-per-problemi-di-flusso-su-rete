@@ -53,12 +53,11 @@ namespace BFS.SickPropagationGraphOpt
         public static void Reset(Node node)
         {
             node.SetPreviousNode(null);
+            node.ResetPreviousNextLabelNodes();
             if (node is not SourceNode)
                 node.SetInFlow(0);
             else
-                //TODO da capire se va bene solo int.MaxValue o devo sottrarre le capacità
                 node.SetInFlow(int.MaxValue);
-            //TODO da capire come vanno trattato previousLabelNodes
 
         }
         public void Reset(int label)
@@ -67,10 +66,14 @@ namespace BFS.SickPropagationGraphOpt
             {
                 Reset(this.LabeledNodes[i]);
             }
+            if (label > 0)
+                foreach (var node in this.LabeledNodes[label - 1])
+                    node.NextLabelNodes.Clear();
+
         }
 
 
-        public void Repair(Node node, int label)
+        public void RepairNode(Node node, int label)
         {
             if (!this.InvalidNodes.Remove(node))
                 throw new ArgumentException("nodo non presente in InvalidNodes");
@@ -83,12 +86,12 @@ namespace BFS.SickPropagationGraphOpt
             {
                 Node next = e.NextNode;
                 Node previous = e.PreviousNode;
-                if (next == node && previous.Label == (label - 1))
+                if (next == node && previous.Label == (label - 1) && previous.Valid == true)
                 {
                     previous.AddNextLabelNode(node);
                     node.AddPreviousLabelNode(previous);
                 }
-                else if (previous == node && next.Label == (label + 1))
+                else if (previous == node && next.Label == (label + 1) && next.Valid == true)
                 {
                     next.AddPreviousLabelNode(node);
                     node.AddNextLabelNode(next);

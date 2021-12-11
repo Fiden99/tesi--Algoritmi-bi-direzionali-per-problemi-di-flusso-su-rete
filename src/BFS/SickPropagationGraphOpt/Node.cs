@@ -82,7 +82,7 @@ namespace BFS.SickPropagationGraphOpt
         {
             this.PreviousNode = node;
         }
-        public void AddFlow(int flow, Node node)
+        public bool AddFlow(int flow, Node node)
         {
             //TODO da valutare se il nodo deve essere solo next o va bene anche previous
             //TODO da capire se in caso di previous node si debba aggiungere la capacità e non il flusso
@@ -91,10 +91,11 @@ namespace BFS.SickPropagationGraphOpt
             int f = edge.Flow + flow;
             int c = edge.Capacity - flow;
             if (c < 0 || f < 0)
-                throw new ArgumentException();
+                throw new ArgumentException("valore di flusso non valido");
             edge.SetCapacity(c);
             edge.SetFlow(f);
-            this.InFlow += f;
+            this.SetInFlow(this.InFlow - flow);
+            return c == 0;
 
         }
         public void AddFlow(int flow, BiEdge edge)
@@ -117,7 +118,7 @@ namespace BFS.SickPropagationGraphOpt
         {
             //TODO da valutare se tenere if eccezione
             if (this.PreviousLabelNodes.Contains(node))
-                throw new ArgumentException();
+                throw new ArgumentException("nodo " + node.Name + " già contenuto in previousLabelNodes di " + this.Name);
             this.PreviousLabelNodes.Add(node);
         }
         public void RemovePreviousLabelNode(Node node)
@@ -129,7 +130,7 @@ namespace BFS.SickPropagationGraphOpt
         {
             //TODO da valutare se tenere if eccezione
             if (this.NextLabelNodes.Contains(node))
-                throw new ArgumentException();
+                throw new ArgumentException("nodo " + node.Name + " già contenuto in nextLabelNodes di " + this.Name);
             this.NextLabelNodes.Add(node);
         }
         public void RemoveNextLabelNode(Node node)
