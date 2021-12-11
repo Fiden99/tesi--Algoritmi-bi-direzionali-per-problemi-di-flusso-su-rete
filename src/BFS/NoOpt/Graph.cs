@@ -33,8 +33,8 @@ namespace BFS.NoOpt
         {
             foreach (Node x in this.Nodes)
             {
-                if (x.Valid == false)
-                    x.InitLabel(0);
+                //if (x.Valid == false)
+                x.InitLabel(0);
                 x.SetInFlow(0);
                 x.SetPreviousNode(null);
             }

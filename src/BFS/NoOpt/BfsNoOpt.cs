@@ -15,17 +15,17 @@ namespace BFS.NoOpt
             while (coda.Count > 0)
             {
                 var element = coda.Dequeue();
-                foreach (MonoEdge x in element.Next)
+                foreach (MonoEdge e in element.Next)
                 {
-                    Node n = x.NextNode;
-                    if (x.Capacity < 0)
+                    Node n = e.NextNode;
+                    if (e.Capacity < 0)
                         throw new InvalidOperationException("capacità negativa");
 
-                    else if (n.PreviousNode == null && x.Capacity > 0)
+                    else if (n.PreviousNode == null && e.Capacity > 0)
                     {
                         n.SetPreviousNode(element);
                         n.InitLabel(element.Label + 1);
-                        n.SetInFlow(Math.Min(element.InFlow, x.Capacity));
+                        n.SetInFlow(Math.Min(element.InFlow, e.Capacity));
                         if (n is SinkNode)
                             return n.InFlow;
                         else
