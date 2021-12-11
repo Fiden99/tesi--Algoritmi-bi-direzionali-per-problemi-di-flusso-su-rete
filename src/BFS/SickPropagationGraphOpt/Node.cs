@@ -116,10 +116,10 @@ namespace BFS.SickPropagationGraphOpt
         }
         public void AddPreviousLabelNode(Node node)
         {
-            //TODO da valutare se tenere if eccezione
-            if (this.PreviousLabelNodes.Contains(node))
-                throw new ArgumentException("nodo " + node.Name + " già contenuto in previousLabelNodes di " + this.Name);
-            this.PreviousLabelNodes.Add(node);
+            //TODO migliorare il codice in maniera tale che non debba controllare se è presente il nodo o meno
+            if (!this.PreviousLabelNodes.Contains(node))
+                // throw new ArgumentException("nodo " + node.Name + " già contenuto in previousLabelNodes di " + this.Name);
+                this.PreviousLabelNodes.Add(node);
         }
         public void RemovePreviousLabelNode(Node node)
         {
@@ -128,10 +128,10 @@ namespace BFS.SickPropagationGraphOpt
 
         public void AddNextLabelNode(Node node)
         {
-            //TODO da valutare se tenere if eccezione
-            if (this.NextLabelNodes.Contains(node))
-                throw new ArgumentException("nodo " + node.Name + " già contenuto in nextLabelNodes di " + this.Name);
-            this.NextLabelNodes.Add(node);
+            //TODO migliorare il codice in maniera tale che non debba controllare se è presente il nodo o meno
+            if (!this.NextLabelNodes.Contains(node))
+                //throw new ArgumentException("nodo " + node.Name + " già contenuto in nextLabelNodes di " + this.Name);
+                this.NextLabelNodes.Add(node);
         }
         public void RemoveNextLabelNode(Node node)
         {

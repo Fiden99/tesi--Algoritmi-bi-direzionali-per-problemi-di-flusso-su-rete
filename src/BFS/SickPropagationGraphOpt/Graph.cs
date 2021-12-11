@@ -66,9 +66,11 @@ namespace BFS.SickPropagationGraphOpt
             {
                 Reset(this.LabeledNodes[i]);
             }
+            /*
             if (label > 0)
                 foreach (var node in this.LabeledNodes[label - 1])
                     node.NextLabelNodes.Clear();
+            */
 
         }
 

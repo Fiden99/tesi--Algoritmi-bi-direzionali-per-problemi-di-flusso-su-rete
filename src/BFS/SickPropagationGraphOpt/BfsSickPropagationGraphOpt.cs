@@ -78,7 +78,6 @@ namespace BFS.SickPropagationGraphOpt
                                 grafo.InvalidNode(x);
                                 foreach (var y in x.NextLabelNodes)
                                     malati.Enqueue(y);
-
                             }
                             else if (x is SinkNode && x.InFlow != 0)
                                 return x.InFlow;
