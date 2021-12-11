@@ -20,6 +20,13 @@ namespace BFS.LastLevelOpt
                 }
             }
             return false;
+        }
+
+        public static int CorrectFlow(Node node)
+        {
+            if (node.PreviousNode != null && node.InFlow > node.PreviousNode.InFlow)
+                node.SetInFlow(CorrectFlow(node.PreviousNode));
+            return node.InFlow;
 
         }
         public static int DoBfs(Graph grafo, Node node)
@@ -56,6 +63,8 @@ namespace BFS.LastLevelOpt
             {
                 coda = new Queue<Node>(grafo.LabeledNode[node.Label - 1]);
                 grafo.ResetLabel(node.Label);
+                foreach (Node n in coda)
+                    n.SetInFlow(CorrectFlow(n));
 
             }
             while (coda.Count > 0)

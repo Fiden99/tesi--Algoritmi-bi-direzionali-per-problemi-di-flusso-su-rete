@@ -26,6 +26,13 @@ namespace BFS.SickPropagation
             grafo.InvalidNode(node);
             return false;
         }
+
+        public static int CorrectFlow(Node node)
+        {
+            if (node.PreviousNode != null && node.InFlow > node.PreviousNode.InFlow)
+                node.SetInFlow(CorrectFlow(node.PreviousNode));
+            return node.InFlow;
+        }
         public static int DoBfs(Graph grafo, Node noCap)
         {
             Queue<Node> coda;
@@ -42,6 +49,8 @@ namespace BFS.SickPropagation
                 //var min = grafo.InvalidNodes.Min(x => x.Label);
                 coda = new Queue<Node>(grafo.LabeledNodes[noCap.Label - 1]);
                 grafo.Reset(noCap.Label);
+                foreach (Node n in coda)
+                    n.SetInFlow(CorrectFlow(n));
 
             }
             while (coda.Count > 0)
