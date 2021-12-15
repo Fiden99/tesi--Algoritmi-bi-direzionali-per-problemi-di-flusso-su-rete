@@ -66,18 +66,17 @@ namespace BFS.SickPropagation
                     if (edge.Capacity == 0 && n.Valid == true)
                     {
                         malati.Enqueue(n);
-                        do
+                        while (malati.Count > 0)
                         {
                             var m = malati.Dequeue();
                             if (!Repair(grafo, m))
-                                foreach (var x in m.Edges.Where(x => x.PreviousNode == m).Select(x => x.NextNode))
+                                foreach (var x in m.Edges.Where(x => x.PreviousNode == m && x.PreviousNode.Label == m.Label + 1).Select(x => x.NextNode))
                                     malati.Enqueue(x);
-                            else if (m is SinkNode && m.InFlow != 0)
+                            else if (m is SinkNode)//&& m.InFlow != 0)
                                 return m.InFlow;
                             else
                                 coda.Enqueue(m);
-
-                        } while (malati.Count > 0);
+                        }
                     }
                     //if (element.Valid == true && edge.Capacity > 0 && (n.Label == 0 || n.Label > element.Label))
                     if (element.Valid == true && edge.Capacity > 0 && n.InFlow == 0)
@@ -88,7 +87,7 @@ namespace BFS.SickPropagation
                         else
                             grafo.RepairNode(n, element.Label + 1);
                         n.SetInFlow(Math.Min(element.InFlow, edge.Capacity));
-                        if (n is SinkNode && n.Valid == true && n.InFlow != 0)
+                        if (n is SinkNode && n.Valid == true)//) && n.InFlow != 0)
                             return n.InFlow;
                         else
                             coda.Enqueue(n);

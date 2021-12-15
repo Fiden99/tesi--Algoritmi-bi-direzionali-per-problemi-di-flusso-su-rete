@@ -66,9 +66,9 @@ namespace BFS.SickPropagation
         public static void Reset(Node n)
         {
             n.SetPreviousNode(null);
-            if (n is SourceNode)
-                n.SetInFlow(int.MaxValue);
-            else
+            if (n is not SourceNode)
+                //n.SetInFlow(int.MaxValue);
+                //else
                 n.SetInFlow(0);
         }
         public void ChangeLabel(Node node, int to)

@@ -84,7 +84,7 @@ namespace BFS.SickPropagationGraphOpt
                                 foreach (var y in actual.NextLabelNodes)
                                     malati.Enqueue((y, actual));
                             }
-                            else if (actual is SinkNode && actual.InFlow != 0)
+                            else if (actual is SinkNode)//&& actual.InFlow != 0)
                                 return actual.InFlow;
                             else
                                 coda.Enqueue(actual);
@@ -101,7 +101,7 @@ namespace BFS.SickPropagationGraphOpt
                             grafo.RepairNode(n, element.Label + 1);
                         }
                         n.SetInFlow(Math.Min(element.InFlow, edge.Capacity));
-                        if (n is SinkNode && n.Valid == true && n.InFlow != 0)
+                        if (n is SinkNode && n.Valid == true)//&& n.InFlow != 0)
                             return n.InFlow;
                         else
                             coda.Enqueue(n);

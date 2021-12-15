@@ -80,7 +80,7 @@ namespace BFS.LastLevelOpt
                         grafo.InvalidNode(n);
                         if (Repair(grafo, n))
                         {
-                            if (n is SinkNode && n.InFlow != 0)
+                            if (n is SinkNode)
                                 return n.InFlow;
                             else
                                 coda.Enqueue(n);
@@ -96,7 +96,7 @@ namespace BFS.LastLevelOpt
                             grafo.RepairNode(n, element.Label + 1);
                         n.SetInFlow(Math.Min(element.InFlow, edge.Capacity));
                         n.SetPreviousNode(element);
-                        if (n is SinkNode && n.InFlow != 0)
+                        if (n is SinkNode)
                             return n.InFlow;
                         else
                             coda.Enqueue(n);
