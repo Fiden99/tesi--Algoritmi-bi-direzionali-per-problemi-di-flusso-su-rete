@@ -180,7 +180,7 @@ public class LastLevelOptTests
         n14.AddEdge(n16, 30);
         n15.AddEdge(t, 50);
         n16.AddEdge(t, 50);
-        //t.AddEdge(n17, 100);
+        t.AddEdge(n17, 100);
         n17.AddEdge(n14, 100);
         Graph graph = new Graph(s, n1, n2, n3, n4, n5, n6, n7, n8, n9, n10, n11, n12, n13, n14, n15, n16, n17, t);
 

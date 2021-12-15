@@ -145,7 +145,7 @@ public class NoOptTests
     public void Test5()
     {
         SinkNode t = new SinkNode("t");
-        //Node n17 = new Node("17");
+        Node n17 = new Node("17");
         Node n16 = new Node("16");
         Node n15 = new Node("15");
         Node n14 = new Node("14");
@@ -180,8 +180,8 @@ public class NoOptTests
         n14.AddNext(n16, 30);
         n15.AddNext(t, 50);
         n16.AddNext(t, 50);
-        //t.AddNext(n17, 100);
-        //n17.AddNext(n14, 100);
+        t.AddNext(n17, 100);
+        n17.AddNext(n14, 100);
         Graph graph = new Graph(s, n1, n2, n3, n4, n5, n6, n7, n8, n9, n10, n11, n12, n13, n14, n15, n16, t);
 
         var res = BfsNoOpt.FlowFordFulkerson(graph);

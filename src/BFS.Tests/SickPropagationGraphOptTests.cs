@@ -145,7 +145,7 @@ public class SickPropagationGraphOptTests
     public void Test5()
     {
         SinkNode t = new SinkNode("t");
-        //Node n17 = new Node("17");
+        Node n17 = new Node("17");
         Node n16 = new Node("16");
         Node n15 = new Node("15");
         Node n14 = new Node("14");
@@ -180,9 +180,9 @@ public class SickPropagationGraphOptTests
         n14.AddEdge(n16, 30);
         n15.AddEdge(t, 50);
         n16.AddEdge(t, 50);
-        //t.AddEdge(n17, 100);
-        //n17.AddEdge(n14, 100);
-        Graph graph = new Graph(s, n1, n2, n3, n4, n5, n6, n7, n8, n9, n10, n11, n12, n13, n14, n15, n16, t);
+        t.AddEdge(n17, 100);
+        n17.AddEdge(n14, 100);
+        Graph graph = new Graph(s, n1, n2, n3, n4, n5, n6, n7, n8, n9, n10, n11, n12, n13, n14, n15, n16, n17, t);
 
         var res = BfsSickPropagationGraphOpt.FlowFordFulkerson(graph);
         Assert.Equal(35, res);
