@@ -29,6 +29,11 @@ namespace BFS.NoOpt
 
     }
 
+    public class ReversedMonoEdge : MonoEdge
+    {
+        public ReversedMonoEdge(Node n, int cap) : base(n, cap) { }
+    }
+
     public class Node
     {
         public int InFlow { get; protected set; }
@@ -49,7 +54,7 @@ namespace BFS.NoOpt
             this.InFlow = 0;
             this.PreviousNode = null;
         }
-        public Node(string name, params (Node, int)[] next)
+        /*        public Node(string name, params (Node, int)[] next)
         {
             this.Name = name;
             this.Valid = true;
@@ -69,8 +74,13 @@ namespace BFS.NoOpt
             this.InFlow = 0;
             this.PreviousNode = null;
         }
+        */
 
-        public void AddNext(Node node, int cap) => this.Next.Add(new MonoEdge(node, cap));
+        public void AddNext(Node node, int cap)
+        {
+            this.Next.Add(new MonoEdge(node, cap));
+            node.AddNext(new ReversedMonoEdge(this, cap));
+        }
         public void AddNext(params (Node, int)[] nodes)
         {
             foreach (var x in nodes)
@@ -79,7 +89,7 @@ namespace BFS.NoOpt
 
         public void AddNext(MonoEdge edge) => this.Next.Add(edge);
 
-        public void AddNext(IEnumerable<MonoEdge> edges) => this.Next.AddRange(edges);
+        //public void AddNext(IEnumerable<MonoEdge> edges) => this.Next.AddRange(edges);
 
         public void InitLabel(uint label)
         {
@@ -98,12 +108,25 @@ namespace BFS.NoOpt
         public void AddFlow(int flow, Node n)
         {
             MonoEdge edge = this.Next.Single(x => x.NextNode == n);
-            int f = edge.Flow + flow;
-            int c = edge.Capacity - flow;
+            MonoEdge rEdge = n.Next.Single(x => x.NextNode == this);
+            int f, c;
+            if (edge is ReversedMonoEdge)
+            {
+                f = edge.Flow - flow;
+                c = edge.Capacity + flow;
+
+            }
+            else
+            {
+                f = edge.Flow + flow;
+                c = edge.Capacity - flow;
+            }
             if (f < 0 || c < 0)
                 throw new ArgumentException("valore di flusso non Valido");
             edge.SetFlow(f);
             edge.SetCapacity(c);
+            rEdge.SetCapacity(c);
+            rEdge.SetFlow(f);
         }
         public void SetInFlow(int x)
         {

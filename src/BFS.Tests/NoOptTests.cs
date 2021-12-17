@@ -182,7 +182,7 @@ public class NoOptTests
         n16.AddNext(t, 50);
         t.AddNext(n17, 100);
         n17.AddNext(n14, 100);
-        Graph graph = new Graph(s, n1, n2, n3, n4, n5, n6, n7, n8, n9, n10, n11, n12, n13, n14, n15, n16, t);
+        Graph graph = new Graph(s, n1, n2, n3, n4, n5, n6, n7, n8, n9, n10, n11, n12, n13, n14, n15, n16, n17, t);
 
         var res = BfsNoOpt.FlowFordFulkerson(graph);
         Assert.Equal(35, res);

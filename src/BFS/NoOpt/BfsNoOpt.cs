@@ -21,11 +21,14 @@ namespace BFS.NoOpt
                     if (e.Capacity < 0)
                         throw new InvalidOperationException("capacità negativa");
 
-                    else if (n.PreviousNode == null && e.Capacity > 0)
+                    else if (n.PreviousNode == null && ((e.Capacity > 0 && e is not ReversedMonoEdge) || (e.Flow > 0 && e is ReversedMonoEdge)))
                     {
                         n.SetPreviousNode(element);
                         n.InitLabel(element.Label + 1);
-                        n.SetInFlow(Math.Min(element.InFlow, e.Capacity));
+                        if (e is ReversedMonoEdge)
+                            n.SetInFlow(Math.Min(element.InFlow, e.Flow));
+                        else
+                            n.SetInFlow(Math.Min(element.InFlow, e.Capacity));
                         if (n is SinkNode)
                             return n.InFlow;
                         else
