@@ -51,12 +51,9 @@ namespace BFS.LastLevelOpt
         {
             for (int i = label; i < LabeledNode.Count; i++)
             {
-                foreach (var n in LabeledNode[i])
-                {//TODO da capire se posso tenere inFlow di sourceNode int.MaxValue o devo eliminare togliere per forza la capacità degli archi che partono da lui
-
-                    if (n is SourceNode)
-                        n.SetInFlow(int.MaxValue);
-                    else
+                foreach (Node n in LabeledNode[i])
+                {
+                    if (n is not SourceNode)
                         n.SetInFlow(0);
                     n.SetPreviousNode(null);
                     //this.ChangeLabel(n, 0);
@@ -91,7 +88,6 @@ namespace BFS.LastLevelOpt
                 return;
             InvalidNodes.Add(node);
             node.SetValid(false);
-
         }
         public void RepairNode(Node node, int to)
         {

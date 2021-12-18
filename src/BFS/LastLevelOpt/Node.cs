@@ -88,7 +88,7 @@ namespace BFS.LastLevelOpt
         public bool AddFlow(int flow, Node n)
         {
             //TODO ricordarsi di controllare se edge è reversed o meno
-            BiEdge edge = this.Edges.Single(x => x.NextNode == n);
+            BiEdge edge = this.Edges.Single(x => x.NextNode == n || x.PreviousNode == n);
             int f, c;
             if (edge.Reversed == false)
             {

@@ -8,14 +8,24 @@ namespace BFS.LastLevelOpt
     {
         private static bool Repair(Graph grafo, Node node)
         {
-            foreach (var e in node.Edges.Where(x => x.NextNode == node))
+            foreach (var e in node.Edges)
             {
                 Node previous = e.PreviousNode;
-                if (e.Capacity > 0 && previous.Label == (node.Label - 1) && previous.Valid == true)
+                Node next = e.NextNode;
+                if (node == next && e.Capacity > 0 && previous.Label == (node.Label - 1) && previous.Valid == true)
                 {
                     grafo.RepairNode(node, node.Label);
                     node.SetPreviousNode(previous);
                     node.SetInFlow(Math.Min(e.Capacity, previous.InFlow));
+                    e.SetReversed(false);
+                    return true;
+                }
+                if (node == previous && e.Flow > 0 && next.Label == (node.Label - 1) && next.Valid == true)
+                {
+                    grafo.RepairNode(node, node.Label);
+                    node.SetPreviousNode(next);
+                    node.SetInFlow(Math.Min(e.Flow, next.InFlow));
+                    e.SetReversed(true);
                     return true;
                 }
             }
@@ -27,13 +37,13 @@ namespace BFS.LastLevelOpt
             if (node.PreviousNode != null && node.InFlow > node.PreviousNode.InFlow)
                 node.SetInFlow(CorrectFlow(node.PreviousNode));
             return node.InFlow;
-
         }
-        public static int DoBfs(Graph grafo, Node node)
+
+        public static int DoBfs(Graph grafo, Node noCap)
         {
 
             Queue<Node> coda;
-            if (node == null)
+            if (noCap == null)
             {
 
                 grafo.ResetLabel(0);
@@ -61,8 +71,14 @@ namespace BFS.LastLevelOpt
             }
             else
             {
-                coda = new Queue<Node>(grafo.LabeledNode[node.Label - 1]);
-                grafo.ResetLabel(node.Label);
+                Node t = grafo.Sink;
+                grafo.InvalidNode(noCap);
+                if (Repair(grafo, noCap) && t.PreviousNode.InFlow != 0 && t.Edges.Single(x => x.PreviousNode == t.PreviousNode).Capacity > 0)
+                {
+                    return Math.Min(t.InFlow, noCap.InFlow);
+                }
+                coda = new Queue<Node>(grafo.LabeledNode[noCap.Label - 1]);
+                grafo.ResetLabel(noCap.Label);
                 foreach (Node n in coda)
                     n.SetInFlow(CorrectFlow(n));
 
@@ -74,28 +90,12 @@ namespace BFS.LastLevelOpt
                 {
                     Node n = edge.NextNode;
                     Node p = edge.PreviousNode;
-                    if (n.InFlow != 0)
-                        continue;
                     if (edge.Capacity < 0)
                         throw new InvalidOperationException();
-
-                    if (p == element && edge.Capacity == 0 && n.Valid == true)
-                    {
-                        grafo.InvalidNode(n);
-                        if (Repair(grafo, n))
-                        {
-                            if (n is SinkNode)
-                                return n.InFlow;
-                            else
-                                coda.Enqueue(n);
-                            continue;
-                        }
-                        else
-                            return DoBfs(grafo, n);
-                    }
+                    //BFS normale
                     if (element.Valid == true)
                     {
-                        if (p == element && edge.Capacity > 0)
+                        if (p == element && edge.Capacity > 0 && (n.InFlow == 0 || n.Valid == false))
                         {
                             if (n.Valid == true)
                                 grafo.ChangeLabel(n, p.Label + 1);
@@ -109,7 +109,7 @@ namespace BFS.LastLevelOpt
                             coda.Enqueue(n);
 
                         }
-                        else if (n == element && edge.Flow > 0)
+                        else if (n == element && edge.Flow > 0 && (p.InFlow == 0 || p.Valid == false))
                         {
                             if (p.Valid == true)
                                 grafo.ChangeLabel(p, n.Label + 1);
