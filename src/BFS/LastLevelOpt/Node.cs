@@ -11,12 +11,15 @@ namespace BFS.LastLevelOpt
         public Node PreviousNode { get; private set; }
         public int Flow { get; private set; }
         public int Capacity { get; private set; }
+        public bool Reversed { get; private set; }
         public BiEdge(Node from, Node to, int capacity)
         {
             this.PreviousNode = from;
             this.NextNode = to;
             this.Capacity = capacity;
             this.Flow = 0;
+            this.Reversed = false;
+
         }
         public void SetFlow(int flow)
         {
@@ -25,6 +28,10 @@ namespace BFS.LastLevelOpt
         public void SetCapacity(int capacity)
         {
             this.Capacity = capacity;
+        }
+        public void SetReversed(bool reversed)
+        {
+            this.Reversed = reversed;
         }
     }
 
@@ -53,7 +60,6 @@ namespace BFS.LastLevelOpt
             BiEdge edge = new BiEdge(this, node, cap);
             this.Edges.Add(edge);
             node.AddEdge(edge);
-
         }
         public void AddEdge(params (Node, int)[] edges)
         {
@@ -81,11 +87,19 @@ namespace BFS.LastLevelOpt
 
         public bool AddFlow(int flow, Node n)
         {
-            //TODO da valutare se il nodo deve essere solo next o va bene anche previous
-            //TODO da capire se in caso di previous node si debba aggiungere la capacità e non il flusso
+            //TODO ricordarsi di controllare se edge è reversed o meno
             BiEdge edge = this.Edges.Single(x => x.NextNode == n);
-            int f = edge.Flow + flow;
-            int c = edge.Capacity - flow;
+            int f, c;
+            if (edge.Reversed == false)
+            {
+                f = edge.Flow + flow;
+                c = edge.Capacity - flow;
+            }
+            else
+            {
+                f = edge.Flow - flow;
+                c = edge.Capacity + flow;
+            }
             if (f < 0 || c < 0)
                 throw new ArgumentException("valore di flusso non valido");
             edge.SetCapacity(c);

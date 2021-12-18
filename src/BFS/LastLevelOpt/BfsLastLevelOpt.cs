@@ -70,12 +70,16 @@ namespace BFS.LastLevelOpt
             while (coda.Count > 0)
             {
                 var element = coda.Dequeue();
-                foreach (BiEdge edge in element.Edges.Where(x => x.PreviousNode == element))
+                foreach (BiEdge edge in element.Edges)
                 {
                     Node n = edge.NextNode;
+                    Node p = edge.PreviousNode;
+                    if (n.InFlow != 0)
+                        continue;
                     if (edge.Capacity < 0)
                         throw new InvalidOperationException();
-                    if (edge.Capacity == 0 && n.Valid == true)
+
+                    if (p == element && edge.Capacity == 0 && n.Valid == true)
                     {
                         grafo.InvalidNode(n);
                         if (Repair(grafo, n))
@@ -84,22 +88,41 @@ namespace BFS.LastLevelOpt
                                 return n.InFlow;
                             else
                                 coda.Enqueue(n);
+                            continue;
                         }
                         else
                             return DoBfs(grafo, n);
                     }
-                    if (edge.Capacity > 0 && n.InFlow == 0 && element.Valid == true)
+                    if (element.Valid == true)
                     {
-                        if (n.Valid == true)
-                            grafo.ChangeLabel(n, element.Label + 1);
-                        else
-                            grafo.RepairNode(n, element.Label + 1);
-                        n.SetInFlow(Math.Min(element.InFlow, edge.Capacity));
-                        n.SetPreviousNode(element);
-                        if (n is SinkNode)
-                            return n.InFlow;
-                        else
+                        if (p == element && edge.Capacity > 0)
+                        {
+                            if (n.Valid == true)
+                                grafo.ChangeLabel(n, p.Label + 1);
+                            else
+                                grafo.RepairNode(n, p.Label + 1);
+                            n.SetInFlow(Math.Min(p.InFlow, edge.Capacity));
+                            n.SetPreviousNode(p);
+                            edge.SetReversed(false);
+                            if (n is SinkNode)
+                                return n.InFlow;
                             coda.Enqueue(n);
+
+                        }
+                        else if (n == element && edge.Flow > 0)
+                        {
+                            if (p.Valid == true)
+                                grafo.ChangeLabel(p, n.Label + 1);
+                            else
+                                grafo.RepairNode(p, n.Label + 1);
+
+                            p.SetInFlow(Math.Min(n.InFlow, edge.Flow));
+                            p.SetPreviousNode(n);
+                            edge.SetReversed(true);
+                            if (p is SinkNode)
+                                return p.InFlow;
+                            coda.Enqueue(p);
+                        }
                     }
                 }
             }
@@ -130,14 +153,12 @@ namespace BFS.LastLevelOpt
         public static int FlowFordFulkerson(Graph grafo)
         {
             Node vuoto = null;
-            int fMax = 0;
+            //int fMax = 0;
             var s = grafo.Source;
             var t = grafo.Sink;
             while (true)
             {
                 int f;
-                //try
-                //{
                 f = DoBfs(grafo, vuoto);
                 if (f == 0)
                     break;
@@ -150,19 +171,11 @@ namespace BFS.LastLevelOpt
                     mom = mom.PreviousNode;
 
                 }
-                //}
-                /*                 catch (ArgumentException)
-                                {
-                                    PrintGraph(grafo);
-                                    Console.WriteLine("flusso inviato = " + fMax);
-                                    return fMax;
-
-                                } */
-                fMax += f;
+                //fMax += f;
             }
             PrintGraph(grafo);
-            Console.WriteLine("flusso inviato = " + fMax);
-            return fMax;
+            Console.WriteLine("flusso inviato = " + (int.MaxValue - s.InFlow));
+            return int.MaxValue - s.InFlow;
         }
     }
 }
