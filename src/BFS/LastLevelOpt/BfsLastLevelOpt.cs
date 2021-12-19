@@ -32,6 +32,7 @@ namespace BFS.LastLevelOpt
             return false;
         }
 
+        //TODO da capire se CorrectFlow deve arrivare fino a s oppure si può fermare prima
         public static int CorrectFlow(Node node)
         {
             if (node.PreviousNode != null && node.InFlow > node.PreviousNode.InFlow)
