@@ -94,6 +94,8 @@ namespace BFS.SickPropagation
             if (this.InvalidNodes.Contains(node))
                 throw new ArgumentException();
             this.InvalidNodes.Add(node);
+            node.SetInFlow(0);
+            node.SetPreviousNode(null);
             node.SetValid(false);
         }
 
