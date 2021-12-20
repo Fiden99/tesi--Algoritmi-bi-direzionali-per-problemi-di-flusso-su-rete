@@ -10,6 +10,7 @@ namespace BFS.SickPropagationGraphOpt
         public Node NextNode { get; private set; }
         public int Flow { get; private set; }
         public int Capacity { get; private set; }
+        public bool Reversed { get; private set; }
 
         public BiEdge(Node previous, Node next, int capacity)
         {
@@ -17,6 +18,7 @@ namespace BFS.SickPropagationGraphOpt
             this.NextNode = next;
             this.Capacity = capacity;
             this.Flow = 0;
+            this.Reversed = false;
         }
         public void SetFlow(int flow)
         {
@@ -26,14 +28,28 @@ namespace BFS.SickPropagationGraphOpt
         {
             this.Capacity = cap;
         }
-        public void AddFlow(int flow)
+        public void SetReversed(bool rev)
         {
-            int f = this.Flow + flow;
-            int c = this.Capacity - flow;
+            this.Reversed = rev;
+        }
+        public bool AddFlow(int flow)
+        {
+            int f, c;
+            if (this.Reversed == false)
+            {
+                f = this.Flow + flow;
+                c = this.Capacity - flow;
+            }
+            else
+            {
+                f = this.Flow - flow;
+                c = this.Capacity + flow;
+            }
             if (f < 0 || c < 0)
                 throw new ArgumentException();
             this.Flow = f;
             this.Capacity = c;
+            return c == 0;
         }
 
 
@@ -87,15 +103,9 @@ namespace BFS.SickPropagationGraphOpt
             //TODO da valutare se il nodo deve essere solo next o va bene anche previous
             //TODO da capire se in caso di previous node si debba aggiungere la capacità e non il flusso
 
-            BiEdge edge = this.Edges.Single(x => x.NextNode == node);
-            int f = edge.Flow + flow;
-            int c = edge.Capacity - flow;
-            if (c < 0 || f < 0)
-                throw new ArgumentException("valore di flusso non valido");
-            edge.SetCapacity(c);
-            edge.SetFlow(f);
+            BiEdge edge = this.Edges.Single(x => x.NextNode == node || x.PreviousNode == node);
             this.SetInFlow(this.InFlow - flow);
-            return c == 0;
+            return edge.AddFlow(flow);
 
         }
         public void AddFlow(int flow, BiEdge edge)
