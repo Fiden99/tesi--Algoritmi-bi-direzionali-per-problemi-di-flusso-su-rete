@@ -21,7 +21,7 @@ namespace BFS.NoOpt
                     if (e.Capacity < 0)
                         throw new InvalidOperationException("capacità negativa");
 
-                    else if (n.PreviousNode == null && ((e.Capacity > 0 && e is not ReversedMonoEdge) || (e.Flow > 0 && e is ReversedMonoEdge)))
+                    else if (n.InFlow == 0 && ((e.Capacity > 0 && e is not ReversedMonoEdge) || (e.Flow > 0 && e is ReversedMonoEdge)))
                     {
                         n.SetPreviousNode(element);
                         n.InitLabel(element.Label + 1);
@@ -52,7 +52,7 @@ namespace BFS.NoOpt
 
         public static int FlowFordFulkerson(Graph grafo)
         {
-            int fMax = 0;
+            //int fMax = 0;
             var s = grafo.Source;
             var t = grafo.Sink;
 
@@ -63,7 +63,7 @@ namespace BFS.NoOpt
                 int f = NoOpt.BfsNoOpt.DoBfs(grafo);
                 if (f == 0)
                     break;
-                fMax += f;
+                //fMax += f;
                 Node mom = t;
                 while (mom != s)
                 {
@@ -72,7 +72,7 @@ namespace BFS.NoOpt
                 }
             }
             PrintGraph(grafo);
-            return fMax;
+            return int.MaxValue - s.InFlow;
         }
     }
 }

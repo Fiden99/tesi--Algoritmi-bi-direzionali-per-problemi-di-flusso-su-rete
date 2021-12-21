@@ -127,6 +127,7 @@ namespace BFS.NoOpt
             edge.SetCapacity(c);
             rEdge.SetCapacity(c);
             rEdge.SetFlow(f);
+            this.SetInFlow(this.InFlow - flow);
         }
         public void SetInFlow(int x)
         {

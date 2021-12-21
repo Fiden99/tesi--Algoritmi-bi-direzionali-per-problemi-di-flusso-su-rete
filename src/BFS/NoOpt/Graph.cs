@@ -33,13 +33,11 @@ namespace BFS.NoOpt
         {
             foreach (Node x in this.Nodes)
             {
-                //if (x.Valid == false)
+                if (x is not SourceNode)
+                    x.SetInFlow(0);
                 x.InitLabel(0);
-                x.SetInFlow(0);
                 x.SetPreviousNode(null);
             }
-            this.Nodes.Single(x => x is SourceNode).SetInFlow(int.MaxValue);
-
         }
     }
 }
