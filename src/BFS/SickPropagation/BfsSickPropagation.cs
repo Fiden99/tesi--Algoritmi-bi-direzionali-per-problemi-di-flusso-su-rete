@@ -54,7 +54,7 @@ namespace BFS.SickPropagation
             //if (grafo.InvalidNodes.Count == 0)
             if (noCap is null)
             {
-                grafo.Reset(0);
+                //grafo.Reset(0);
                 coda = new Queue<Node>();
                 coda.Enqueue(grafo.Source);
             }
