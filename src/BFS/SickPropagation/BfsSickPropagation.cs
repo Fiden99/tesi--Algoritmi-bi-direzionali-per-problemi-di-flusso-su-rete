@@ -8,6 +8,32 @@ namespace BFS.SickPropagation
 {
     public class BfsSickPropagation
     {
+        private static int SickPropagation(Graph grafo, Node n, Queue<Node> coda)
+        {
+            Queue<Node> malati = new Queue<Node>();
+            malati.Enqueue(n);
+            while (malati.Count > 0)
+            {
+                Node m = malati.Dequeue();
+                if (!Repair(grafo, m))
+                    foreach (var e in m.Edges)
+                    {
+                        //TODO capire se devo tenere 
+                        //e.NextNode == m.PreviousNode
+                        //oppure 
+                        //e.NextNode.Label == m.Label + 1
+                        if (e.PreviousNode == m && e.NextNode == m.PreviousNode)
+                            malati.Enqueue(e.NextNode);
+                        else if (e.NextNode == m && e.PreviousNode == m.PreviousNode)
+                            malati.Enqueue(e.PreviousNode);
+                    }
+                else if (m is SinkNode)
+                    return m.InFlow;
+                else
+                    coda.Enqueue(m);
+            }
+            return -1;
+        }
         private static bool Repair(Graph grafo, Node node)
         {
             foreach (var e in node.Edges)
@@ -70,28 +96,7 @@ namespace BFS.SickPropagation
                 foreach (Node n in coda)
                     n.SetInFlow(CorrectFlow(n));
                 grafo.Reset(noCap.Label);
-                malati.Enqueue(noCap);
-                while (malati.Count > 0)
-                {
-                    Node m = malati.Dequeue();
-                    if (!Repair(grafo, m))
-                        foreach (var e in m.Edges)
-                        {
-                            //TODO capire se devo tenere 
-                            //e.NextNode == m.PreviousNode
-                            //oppure 
-                            //e.NextNode.Label == m.Label + 1
-                            if (e.PreviousNode == m && e.NextNode == m.PreviousNode)
-                                malati.Enqueue(e.NextNode);
-                            else if (e.NextNode == m && e.PreviousNode == m.PreviousNode)
-                                malati.Enqueue(e.PreviousNode);
-                        }
-                    else if (m is SinkNode)
-                        return m.InFlow;
-                    else
-                        coda.Enqueue(m);
-                }
-
+                SickPropagation(grafo, noCap, coda);
             }
             while (coda.Count > 0)
             {
@@ -104,6 +109,10 @@ namespace BFS.SickPropagation
                         continue;
                     if (edge.Capacity < 0)
                         throw new InvalidOperationException();
+                    if (edge.Capacity == 0 && edge.Reversed == false)
+                        SickPropagation(grafo, n, coda);
+                    if (edge.Flow == 0 && edge.Reversed == true)
+                        SickPropagation(grafo, p, coda);
                     if (element.Valid == true)
                     {
                         if (p == element && edge.Capacity > 0 && n.InFlow == 0)
