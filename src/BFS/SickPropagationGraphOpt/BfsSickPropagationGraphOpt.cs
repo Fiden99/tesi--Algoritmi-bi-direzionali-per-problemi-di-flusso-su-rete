@@ -122,8 +122,6 @@ namespace BFS.SickPropagationGraphOpt
                                 return p.InFlow;
                             else
                                 coda.Enqueue(p);
-
-
                         }
                     }
                 }
@@ -137,7 +135,7 @@ namespace BFS.SickPropagationGraphOpt
                 foreach (var node in set)
                 {
                     Console.Write("node " + node.Name + " label = " + node.Label);
-                    foreach (var x in node.Edges.Where(x => x.PreviousNode == node))
+                    foreach (var x in node.Edges.Where(x => x.PreviousNode == node || x.NextNode == node))
                         Console.Write(" to " + x.NextNode.Name + ", f = " + x.Flow + ", c  = " + x.Capacity + ";");
                     Console.WriteLine();
                 }
@@ -147,7 +145,7 @@ namespace BFS.SickPropagationGraphOpt
             foreach (var node in grafo.InvalidNodes)
             {
                 Console.Write("node " + node.Name);
-                foreach (var x in node.Edges.Where(x => x.PreviousNode == node))
+                foreach (var x in node.Edges.Where(x => x.PreviousNode == node || x.NextNode == node))
                     Console.Write(" to " + x.NextNode.Name + ", f = " + x.Flow + ", c  = " + x.Capacity + ";");
                 Console.WriteLine();
             }
@@ -155,7 +153,7 @@ namespace BFS.SickPropagationGraphOpt
         public static int FlowFordFulkerson(Graph grafo)
         {
             Node noCap = null;
-            int fMax = 0;
+            //int fMax = 0;
             var s = grafo.Source;
             var t = grafo.Sink;
             while (true)
@@ -181,11 +179,11 @@ namespace BFS.SickPropagationGraphOpt
                                     Console.WriteLine("flusso inviato = " + fMax);
                                     return fMax;
                                 } */
-                fMax += f;
+                //fMax += f;
             }
             PrintGraph(grafo);
-            Console.WriteLine("flusso inviato = " + fMax);
-            return fMax;
+            Console.WriteLine("flusso inviato = " + (int.MaxValue - s.InFlow));
+            return (int.MaxValue - s.InFlow);
         }
     }
 }
