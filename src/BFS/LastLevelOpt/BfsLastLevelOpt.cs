@@ -47,7 +47,7 @@ namespace BFS.LastLevelOpt
             if (noCap == null)
             {
 
-                grafo.ResetLabel(0);
+                //grafo.ResetLabel(0);
                 coda = new Queue<Node>();
                 coda.Enqueue(grafo.Source);
 
