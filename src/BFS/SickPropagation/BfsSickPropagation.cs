@@ -2,45 +2,55 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime;
+using System.Security.Cryptography;
 using BFS.LastLevelOpt;
 
 namespace BFS.SickPropagation
 {
     public class BfsSickPropagation
     {
-        private static int SickPropagation(Graph grafo, Node n, Queue<Node> coda)
+        private static int SickPropagation(Graph grafo, Node node, Queue<Node> coda)
         {
             Queue<Node> malati = new Queue<Node>();
-            malati.Enqueue(n);
+            malati.Enqueue(node);
             while (malati.Count > 0)
             {
                 Node m = malati.Dequeue();
                 if (!Repair(grafo, m))
                     foreach (var e in m.Edges)
                     {
+                        Node n = e.NextNode;
+                        Node p = e.PreviousNode;
                         //TODO capire se devo tenere 
                         //e.NextNode == m.PreviousNode
                         //oppure 
                         //e.NextNode.Label == m.Label + 1
-                        if (e.PreviousNode == m && e.NextNode == m.PreviousNode)
-                            malati.Enqueue(e.NextNode);
-                        else if (e.NextNode == m && e.PreviousNode == m.PreviousNode)
-                            malati.Enqueue(e.PreviousNode);
+                        if (p == m && m == n.PreviousNode)
+                            malati.Enqueue(n);
+                        else if (n == m && m == p.PreviousNode)
+                            malati.Enqueue(p);
                     }
                 else if (m is SinkNode)
-                    return m.InFlow;
+                {
+                    CorrectFlow(m);
+                    return m.InFlow;//RecoverFlow(m);
+                }
                 else
+                {
                     coda.Enqueue(m);
+                }
             }
-            return -1;
+            return 0;
         }
         private static bool Repair(Graph grafo, Node node)
         {
             foreach (var e in node.Edges)
             {
+                Node previous = e.PreviousNode;
+                Node next = e.NextNode;
                 if (e.NextNode == node && e.Capacity > 0)
                 {
-                    Node previous = e.PreviousNode;
                     if (previous.Label == (node.Label - 1) && previous.Valid == true && previous.InFlow != 0)
                     {
                         node.SetInFlow(Math.Min(previous.InFlow, e.Capacity));
@@ -48,16 +58,15 @@ namespace BFS.SickPropagation
                         e.SetReversed(false);
                         return true;
                     }
-                    else if (e.PreviousNode == node && e.Flow > 0)
+                }
+                else if (previous == node && e.Flow > 0)
+                {
+                    if (next.Label == (node.Label - 1) && next.Valid == true && next.InFlow != 0)
                     {
-                        Node next = e.NextNode;
-                        if (next.Label == (node.Label - 1) && next.Valid == true && next.InFlow != 0)
-                        {
-                            node.SetInFlow(Math.Min(next.InFlow, e.Flow));
-                            node.SetPreviousNode(next);
-                            e.SetReversed(true);
-                            return true;
-                        }
+                        node.SetInFlow(Math.Min(next.InFlow, e.Flow));
+                        node.SetPreviousNode(next);
+                        e.SetReversed(true);
+                        return true;
                     }
                 }
             }
@@ -65,12 +74,46 @@ namespace BFS.SickPropagation
             return false;
         }
 
-        //TODO capire se CorrectFlow deve tornare indietro fino a s oppure si può fermare prima
+        //TODO capire se si può migliorare fermandosi alla prima volta in cui v è uguale alla capacità
         public static int CorrectFlow(Node node)
         {
-            if (node.PreviousNode != null && node.InFlow > node.PreviousNode.InFlow)
-                node.SetInFlow(CorrectFlow(node.PreviousNode));
+            int v;
+            if (node is not SourceNode)
+            {
+                var p = node.PreviousNode;
+                var e = node.Edges.Single(x => x.NextNode == p || p == x.PreviousNode);
+                if (e.Reversed)
+                {
+                    v = Math.Min(e.Flow, CorrectFlow(p));
+                    if (v == e.Flow && p.InFlow == v)
+                        return v;
+                }
+                else
+                {
+                    v = Math.Min(e.Capacity, CorrectFlow(p));
+                    if (v == e.Capacity && v == p.InFlow)
+                        return v;
+                }
+                node.SetInFlow(v);
+            }
+            else
+                v = node.InFlow;
+            return v;
+        }
+
+        public static int RecoverFlow(Node node)
+        {
+            if (node.InFlow != 0)
+                return node.InFlow;
+            var e = node.Edges.Single(x => x.PreviousNode == node.PreviousNode || x.NextNode == node.PreviousNode);
+            if (node.PreviousNode != null && node.InFlow == 0)
+                if (e.Capacity > 0 && e.NextNode == node)
+                    node.SetInFlow(Math.Min(RecoverFlow(node.PreviousNode), e.Capacity));
+                else if (e.Flow > 0 && e.PreviousNode == node)
+                    node.SetInFlow(Math.Min(RecoverFlow(node.PreviousNode), e.Flow));
             return node.InFlow;
+
+
         }
 
         public static int DoBfs(Graph grafo, Node noCap)
@@ -92,15 +135,25 @@ namespace BFS.SickPropagation
                     return Math.Min(t.InFlow, noCap.InFlow);
                 }
 
-                coda = new Queue<Node>(grafo.LabeledNodes[noCap.Label - 1]);
-                foreach (Node n in coda)
-                    n.SetInFlow(CorrectFlow(n));
+                coda = new Queue<Node>();
+                int v = SickPropagation(grafo, noCap, coda);
+                if (v != 0)
+                    return v;
                 grafo.Reset(noCap.Label);
-                SickPropagation(grafo, noCap, coda);
+                if (coda.Count == 0)
+                    foreach (var n in grafo.LabeledNodes[noCap.Label - 1])
+                        coda.Enqueue(n);
+                else
+                    foreach (var n in coda)
+                        RecoverFlow(n);
+
+
             }
             while (coda.Count > 0)
             {
                 var element = coda.Dequeue();
+                if (element.Valid == false)
+                    continue;
                 foreach (var edge in element.Edges)
                 {
                     var n = edge.NextNode;
@@ -109,41 +162,43 @@ namespace BFS.SickPropagation
                         continue;
                     if (edge.Capacity < 0)
                         throw new InvalidOperationException();
-                    if (edge.Capacity == 0 && edge.Reversed == false)
-                        SickPropagation(grafo, n, coda);
-                    if (edge.Flow == 0 && edge.Reversed == true)
-                        SickPropagation(grafo, p, coda);
-                    if (element.Valid == true)
+                    if (p == element && edge.Capacity > 0 && n.InFlow == 0 && (n.Label >= p.Label || n.Label == 0 || n.Valid == false))
                     {
-                        if (p == element && edge.Capacity > 0 && n.InFlow == 0)
+                        n.SetPreviousNode(p);
+                        if (n.Valid == true)
+                            grafo.ChangeLabel(n, p.Label + 1);
+                        else
+                            grafo.RepairNode(n, p.Label + 1);
+                        n.SetInFlow(Math.Min(p.InFlow, edge.Capacity));
+                        edge.SetReversed(false);
+                        if (n is SinkNode)
                         {
-                            n.SetPreviousNode(p);
-                            if (n.Valid == true)
-                                grafo.ChangeLabel(n, p.Label + 1);
-                            else
-                                grafo.RepairNode(n, p.Label + 1);
-                            n.SetInFlow(Math.Min(p.InFlow, edge.Capacity));
-                            edge.SetReversed(false);
-                            if (n is SinkNode)
-                                return n.InFlow;
-                            else
-                                coda.Enqueue(n);
+                            CorrectFlow(n);
+                            return n.InFlow;
                         }
-                        else if (n == element && edge.Flow > 0 && p.InFlow == 0)
-                        {
-                            p.SetPreviousNode(n);
-                            if (p.Valid == true)
-                                grafo.ChangeLabel(p, n.Label + 1);
-                            else
-                                grafo.RepairNode(p, n.Label + 1);
-                            p.SetInFlow(Math.Min(n.InFlow, edge.Flow));
-                            edge.SetReversed(true);
-                            if (p is SinkNode)
-                                return p.InFlow;
-                            else
-                                coda.Enqueue(p);
-                        }
+                        else
+                            coda.Enqueue(n);
                     }
+                    else if (n == element && edge.Flow > 0 && p.InFlow == 0 && (p.Label >= n.Label || p.Label == 0 || p.Valid == false))
+                    {
+                        p.SetPreviousNode(n);
+                        if (p.Valid == true)
+                            grafo.ChangeLabel(p, n.Label + 1);
+                        else
+                            grafo.RepairNode(p, n.Label + 1);
+                        p.SetInFlow(Math.Min(n.InFlow, edge.Flow));
+                        edge.SetReversed(true);
+                        if (p is SinkNode)
+                        {
+                            //RecoverFlow(p);
+                            CorrectFlow(p);
+                            return p.InFlow;
+
+                        }
+                        else
+                            coda.Enqueue(p);
+                    }
+
                 }
             }
             return 0;
@@ -183,20 +238,12 @@ namespace BFS.SickPropagation
                 if (f == 0)
                     break;
                 Node mom = t;
-                /*                 try
-                                { */
                 while (mom != s)
                 {
                     if (mom.PreviousNode.AddFlow(f, mom))
                         vuoto = mom;
                     mom = mom.PreviousNode;
                 }
-                /*                 }
-                                catch (ArgumentException)
-                                {
-                                    PrintGraph(graph);
-                                    return fMax;
-                                } */
                 fMax += f;
             }
             PrintGraph(graph);

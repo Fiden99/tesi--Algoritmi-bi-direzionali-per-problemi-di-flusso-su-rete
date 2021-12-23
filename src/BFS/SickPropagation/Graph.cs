@@ -39,11 +39,10 @@ namespace BFS.SickPropagation
         {
             get
             {
+                LabeledNodes.RemoveAll(x => x.Count == 0);
                 Node sink = this.LabeledNodes.Last().SingleOrDefault(x => x is SinkNode);
                 if (sink is null)
-                    sink = this.InvalidNodes.OfType<SinkNode>().SingleOrDefault();
-                if (sink is null)
-                    throw new InvalidOperationException();
+                    sink = this.InvalidNodes.OfType<SinkNode>().Single();
                 return sink;
             }
         }
@@ -65,10 +64,8 @@ namespace BFS.SickPropagation
         }
         public static void Reset(Node n)
         {
-            n.SetPreviousNode(null);
+            //n.SetPreviousNode(null);
             if (n is not SourceNode)
-                //n.SetInFlow(int.MaxValue);
-                //else
                 n.SetInFlow(0);
         }
         public void ChangeLabel(Node node, int to)
