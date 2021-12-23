@@ -104,13 +104,11 @@ namespace BFS.SickPropagationGraphOpt
             }
             else
             {
-
                 Node t = grafo.Sink;
                 if (Repair(grafo, noCap, noCap.PreviousNode) && t.PreviousNode.InFlow != 0 && t.Edges.Single(x => x.PreviousNode == t.PreviousNode).Capacity > 0)
                 {
                     return Math.Min(t.InFlow, noCap.InFlow);
                 }
-
                 coda = new Queue<Node>();
                 int v = SickPropagation(grafo, noCap, noCap.PreviousNode, coda);
                 if (v != 0)
@@ -121,15 +119,13 @@ namespace BFS.SickPropagationGraphOpt
                         coda.Enqueue(n);
                 foreach (var n in coda)
                     RecoverFlow(n);
-
             }
-
             while (coda.Count > 0)
             {
                 var element = coda.Dequeue();
                 //TODO capire se è possibile che element sia invalido o meno
-                if (element.Valid == false)
-                    continue;
+                //if (element.Valid == false)
+                //continue;
                 foreach (var edge in element.Edges)
                 {
                     var p = edge.PreviousNode;

@@ -147,8 +147,8 @@ namespace BFS.SickPropagation
             while (coda.Count > 0)
             {
                 var element = coda.Dequeue();
-                if (element.Valid == false)
-                    continue;
+                //if (element.Valid == false)
+                //continue;
                 foreach (var edge in element.Edges)
                 {
                     var n = edge.NextNode;
