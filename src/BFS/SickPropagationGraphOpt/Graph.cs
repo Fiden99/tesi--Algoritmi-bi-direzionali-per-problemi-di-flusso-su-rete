@@ -37,6 +37,7 @@ namespace BFS.SickPropagationGraphOpt
         {
             get
             {
+                this.LabeledNodes.RemoveAll(x => x.Count == 0);
                 Node sink = this.LabeledNodes.Last().SingleOrDefault(x => x is SinkNode);
                 if (sink is null)
                     sink = this.InvalidNodes.Single(x => x is SinkNode);
@@ -52,12 +53,12 @@ namespace BFS.SickPropagationGraphOpt
         }
         public static void Reset(Node node)
         {
-            node.SetPreviousNode(null);
-            node.ResetPreviousNextLabelNodes();
+            //node.SetPreviousNode(null);
+            //node.ResetPreviousNextLabelNodes();
             if (node is not SourceNode)
                 node.SetInFlow(0);
-            else
-                node.SetInFlow(int.MaxValue);
+            // else
+            // node.SetInFlow(int.MaxValue);
 
         }
         public void Reset(int label)
@@ -171,6 +172,7 @@ namespace BFS.SickPropagationGraphOpt
                 n.RemovePreviousLabelNode(node);
             }
             node.ResetPreviousNextLabelNodes();
+            node.SetInFlow(0);
         }
 
     }

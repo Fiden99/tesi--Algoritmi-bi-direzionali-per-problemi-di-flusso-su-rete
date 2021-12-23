@@ -46,7 +46,7 @@ namespace BFS.SickPropagationGraphOpt
                 c = this.Capacity + flow;
             }
             if (f < 0 || c < 0)
-                throw new ArgumentException();
+                throw new ArgumentException("flusso inviato non valido");
             this.Flow = f;
             this.Capacity = c;
             return c == 0;
