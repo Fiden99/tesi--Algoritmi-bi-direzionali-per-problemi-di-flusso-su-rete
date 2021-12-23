@@ -1,0 +1,64 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage{amsmath}
+
+\title{Algoritmo di ricerca di flusso massimo tramite Edmond-Karp senza alcuna ottimizzazione}
+\author{Filippo Magi }
+
+\begin{document}
+
+\maketitle
+
+\section{Algoritmo senza ottimizzazione}
+
+\begin{algorithm}
+    \caption{Ricerca del massimo flusso a costo minimo senza alcuna ottimizzazione}
+    \begin{algorithmic}
+    \REQUIRE grafo dei residui $\overset{\leftrightarrow}{G} = \{V(G),E(G) \cup \{ \overset{\leftarrow}{e} : e \in E(G) \}$ .
+    \ENSURE valore del flusso massimo
+    \STATE s $\leftarrow$ SourceNode di  $\overset{\leftrightarrow}{G}$
+    \STATE t $\leftarrow$ SinkNode di  $\overset{\leftrightarrow}{G}$
+    \LOOP
+    \STATE f $\leftarrow$ DoBfs(grafo)
+    \IF{ f = 0}
+    \STATE \textbf{break}
+    \ENDIF
+    \STATE mom $\leftarrow$ t
+    \WHILE{ mom $\ne$ s}
+    \STATE aggiorno capacità o flusso del nodo m a seconda del suo predecessore
+    \STATE mom $\leftarrow$ predecessore di mom
+    \ENDWHILE
+    \ENDLOOP
+    \RETURN flusso uscente da s
+    
+    \end{algorithmic}
+    \end{algorithm}
+    
+    \begin{algorithm}
+    \caption{Algoritmo DoBfs senza alcuna ottimizzazione}
+    \begin{algorithmic}
+    \REQUIRE grafo dei residui $\overset{\leftrightarrow}{G}$
+    \ENSURE quantità di flusso inviata, grafo dei residui $\overset{\leftrightarrow}{G}$ aggiornato per cammino $f$ aumentante
+    \STATE cancella informazioni precedenti presenti in $V(G)$
+    \STATE coda $\leftarrow$ Coda di nodi
+    \STATE coda.Enqueue(SoruceNode di $\overset{\leftrightarrow}{G}$)
+    \WHILE{coda non è vuota }
+    \STATE element $\leftarrow$ coda.Dequeue
+    \FORALL{arco \textbf{edge} che esce dal nodo element}
+    \STATE n $\leftarrow$ nodo che entra da edge
+    \IF{nodo n non è già stato visitato  AND è possibile inviare(o ritirare) del flusso }
+    \STATE aggiorno dati di n (nodo precedente, label, flusso entrante)
+    \IF{n è il SinkNode di $\overset{\leftrightarrow}{G}$}
+    \RETURN flusso entrante in n
+    \ELSE
+    \STATE coda.Enqueue(n)
+    \ENDIF
+    \ENDIF
+    \ENDFOR
+    \ENDWHILE
+    \RETURN 0
+    \end{algorithmic}
+    \end{algorithm}
+\end{document}
