@@ -157,7 +157,7 @@ namespace BFS.SickPropagation
                         continue;
                     if (edge.Capacity < 0)
                         throw new InvalidOperationException();
-                    if (p == element && edge.Capacity > 0 && (n.Label >= p.Label || n.Label == 0 || n.Valid == false))
+                    if (p == element && edge.Capacity > 0 && (n.Label >= p.Label || noCap == null || n.Valid == false))
                     {
                         n.SetPreviousNode(p);
                         if (n.Valid == true)
@@ -174,7 +174,7 @@ namespace BFS.SickPropagation
                         else
                             coda.Enqueue(n);
                     }
-                    else if (n == element && edge.Flow > 0 && (p.Label >= n.Label || p.Label == 0 || p.Valid == false))
+                    else if (n == element && edge.Flow > 0 && (p.Label >= n.Label || noCap == null || p.Valid == false))
                     {
                         p.SetPreviousNode(n);
                         if (p.Valid == true)
@@ -193,7 +193,6 @@ namespace BFS.SickPropagation
                         else
                             coda.Enqueue(p);
                     }
-
                 }
             }
             return 0;
