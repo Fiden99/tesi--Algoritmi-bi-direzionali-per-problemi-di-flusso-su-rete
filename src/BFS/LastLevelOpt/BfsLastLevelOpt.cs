@@ -14,7 +14,7 @@ namespace BFS.LastLevelOpt
                 Node next = e.NextNode;
                 if (node == next && e.Capacity > 0 && previous.Label == (node.Label - 1) && previous.Valid == true)
                 {
-                    grafo.RepairNode(node, node.Label);
+                    grafo.ChangeLabel(node, node.Label);
                     node.SetPreviousNode(previous);
                     node.SetInFlow(Math.Min(e.Capacity, previous.InFlow));
                     e.SetReversed(false);
@@ -22,13 +22,14 @@ namespace BFS.LastLevelOpt
                 }
                 if (node == previous && e.Flow > 0 && next.Label == (node.Label - 1) && next.Valid == true)
                 {
-                    grafo.RepairNode(node, node.Label);
+                    grafo.ChangeLabel(node, node.Label);
                     node.SetPreviousNode(next);
                     node.SetInFlow(Math.Min(e.Flow, next.InFlow));
                     e.SetReversed(true);
                     return true;
                 }
             }
+            grafo.InvalidNode(node);
             return false;
         }
 
@@ -73,7 +74,6 @@ namespace BFS.LastLevelOpt
             else
             {
                 Node t = grafo.Sink;
-                grafo.InvalidNode(noCap);
                 if (Repair(grafo, noCap) && t.PreviousNode.InFlow != 0 && t.Edges.Single(x => x.PreviousNode == t.PreviousNode).Capacity > 0)
                 {
                     return Math.Min(t.InFlow, noCap.InFlow);
