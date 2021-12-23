@@ -112,8 +112,6 @@ namespace BFS.SickPropagation
                 else if (e.Flow > 0 && e.PreviousNode == node)
                     node.SetInFlow(Math.Min(RecoverFlow(node.PreviousNode), e.Flow));
             return node.InFlow;
-
-
         }
 
         public static int DoBfs(Graph grafo, Node noCap)
@@ -143,11 +141,8 @@ namespace BFS.SickPropagation
                 if (coda.Count == 0)
                     foreach (var n in grafo.LabeledNodes[noCap.Label - 1])
                         coda.Enqueue(n);
-                else
-                    foreach (var n in coda)
-                        RecoverFlow(n);
-
-
+                foreach (var n in coda)
+                    RecoverFlow(n);
             }
             while (coda.Count > 0)
             {
@@ -229,7 +224,7 @@ namespace BFS.SickPropagation
         public static int FlowFordFulkerson(Graph graph)
         {
             Node vuoto = null;
-            int fMax = 0;
+            //int fMax = 0;
             Node t = graph.Sink;
             Node s = graph.Source;
             while (true)
@@ -244,10 +239,10 @@ namespace BFS.SickPropagation
                         vuoto = mom;
                     mom = mom.PreviousNode;
                 }
-                fMax += f;
+                //fMax += f;
             }
             PrintGraph(graph);
-            return fMax;
+            return int.MaxValue - s.InFlow;
 
         }
     }
