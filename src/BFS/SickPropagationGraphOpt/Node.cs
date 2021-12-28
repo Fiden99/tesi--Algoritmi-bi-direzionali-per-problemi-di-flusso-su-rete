@@ -64,6 +64,7 @@ namespace BFS.SickPropagationGraphOpt
         public Node PreviousNode { get; private set; }
         public List<Node> PreviousLabelNodes { get; private set; }
         public List<Node> NextLabelNodes { get; private set; }
+        public BiEdge PreviousEdge { get; private set; }
 
         public Node(string name)
         {
@@ -73,6 +74,7 @@ namespace BFS.SickPropagationGraphOpt
             this.Edges = new List<BiEdge>();
             this.PreviousLabelNodes = new List<Node>();
             this.PreviousNode = null;
+            this.PreviousEdge = null;
             this.NextLabelNodes = new List<Node>();
         }
         public void AddEdge(BiEdge edge)
@@ -98,6 +100,18 @@ namespace BFS.SickPropagationGraphOpt
         {
             this.PreviousNode = node;
         }
+        public void SetPreviousEdge(BiEdge e)
+        {
+            this.PreviousEdge = e;
+        }
+        public void SetPrevious(BiEdge e)
+        {
+            this.PreviousEdge = e;
+            if (this == e.PreviousNode)
+                this.PreviousNode = e.NextNode;
+            else
+                this.PreviousNode = e.PreviousNode;
+        }
         public bool AddFlow(int flow, Node node)
         {
             //TODO da valutare se il nodo deve essere solo next o va bene anche previous
@@ -108,13 +122,15 @@ namespace BFS.SickPropagationGraphOpt
             return edge.AddFlow(flow);
 
         }
-        public void AddFlow(int flow, BiEdge edge)
+        public bool AddFlow(int flow, BiEdge edge)
         {
             //TODO da valutare se fare un controllo se BiEdge appartiene o meno a this.edges
+#if DEBUG
             if (!this.Edges.Contains(edge))
                 throw new ArgumentException();
-            edge.AddFlow(flow);
-            this.InFlow += flow;
+#endif
+            this.SetInFlow(this.InFlow - flow);
+            return edge.AddFlow(flow);
         }
         public void SetLabel(int label)
         {

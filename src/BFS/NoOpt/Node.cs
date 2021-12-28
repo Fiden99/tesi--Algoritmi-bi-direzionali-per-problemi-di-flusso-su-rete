@@ -39,9 +39,7 @@ namespace BFS.NoOpt
         public int InFlow { get; protected set; }
         public uint Label { get; private set; }
         public List<MonoEdge> Next { get; private set; }
-
         public bool Valid { get; private set; }
-
         public string Name { get; private set; }
         public Node PreviousNode { get; private set; }
 

@@ -104,6 +104,7 @@ namespace BFS.LastLevelOpt
                                 grafo.RepairNode(n, p.Label + 1);
                             n.SetInFlow(Math.Min(p.InFlow, edge.Capacity));
                             n.SetPreviousNode(p);
+                            n.SetPreviousEdge(edge);
                             edge.SetReversed(false);
                             if (n is SinkNode)
                                 return n.InFlow;
@@ -119,6 +120,7 @@ namespace BFS.LastLevelOpt
 
                             p.SetInFlow(Math.Min(n.InFlow, edge.Flow));
                             p.SetPreviousNode(n);
+                            p.SetPreviousEdge(edge);
                             edge.SetReversed(true);
                             if (p is SinkNode)
                                 return p.InFlow;
@@ -167,7 +169,7 @@ namespace BFS.LastLevelOpt
                 while (mom != s)
                 {
 
-                    if (mom.PreviousNode.AddFlow(f, mom))
+                    if (mom.PreviousNode.AddFlow(f, mom.PreviousEdge))
                         vuoto = mom;
                     mom = mom.PreviousNode;
 

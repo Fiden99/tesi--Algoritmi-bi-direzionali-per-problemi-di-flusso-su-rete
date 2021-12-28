@@ -44,6 +44,7 @@ namespace BFS.LastLevelOpt
         public int InFlow { get; protected set; }
         public List<BiEdge> Edges { get; private set; }
         public Node PreviousNode { get; private set; }
+        public BiEdge PreviousEdge { get; private set; }
 
         public Node(string name)
         {
@@ -53,6 +54,7 @@ namespace BFS.LastLevelOpt
             this.PreviousNode = null;
             this.Label = 0;
             this.Valid = true;
+            this.PreviousEdge = null;
         }
 
         public void AddEdge(Node node, int cap)
@@ -84,11 +86,27 @@ namespace BFS.LastLevelOpt
         {
             this.PreviousNode = n;
         }
+        public void SetPreviousEdge(BiEdge e)
+        {
+            this.PreviousEdge = e;
+        }
+        public void SetPrevious(BiEdge e)
+        {
+            this.PreviousEdge = e;
+            if (this == e.NextNode)
+                this.PreviousNode = e.PreviousNode;
+            else
+                this.PreviousNode = e.NextNode;
+        }
 
         public bool AddFlow(int flow, Node n)
         {
-            //TODO ricordarsi di controllare se edge è reversed o meno
             BiEdge edge = this.Edges.Single(x => x.NextNode == n || x.PreviousNode == n);
+            return AddFlow(flow, edge);
+
+        }
+        public bool AddFlow(int flow, BiEdge edge)
+        {
             int f, c;
             if (edge.Reversed == false)
             {

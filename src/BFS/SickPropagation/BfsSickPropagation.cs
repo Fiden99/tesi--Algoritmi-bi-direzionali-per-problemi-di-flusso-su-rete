@@ -55,6 +55,7 @@ namespace BFS.SickPropagation
                     {
                         node.SetInFlow(Math.Min(previous.InFlow, e.Capacity));
                         node.SetPreviousNode(previous);
+                        node.SetPreviousEdge(e);
                         e.SetReversed(false);
                         return true;
                     }
@@ -65,6 +66,7 @@ namespace BFS.SickPropagation
                     {
                         node.SetInFlow(Math.Min(next.InFlow, e.Flow));
                         node.SetPreviousNode(next);
+                        node.SetPreviousEdge(e);
                         e.SetReversed(true);
                         return true;
                     }
@@ -160,6 +162,7 @@ namespace BFS.SickPropagation
                     if (p == element && edge.Capacity > 0 && (n.Label >= p.Label || noCap == null || n.Valid == false))
                     {
                         n.SetPreviousNode(p);
+                        n.SetPreviousEdge(edge);
                         if (n.Valid == true)
                             grafo.ChangeLabel(n, p.Label + 1);
                         else
@@ -177,6 +180,7 @@ namespace BFS.SickPropagation
                     else if (n == element && edge.Flow > 0 && (p.Label >= n.Label || noCap == null || p.Valid == false))
                     {
                         p.SetPreviousNode(n);
+                        p.SetPreviousEdge(edge);
                         if (p.Valid == true)
                             grafo.ChangeLabel(p, n.Label + 1);
                         else
@@ -234,7 +238,7 @@ namespace BFS.SickPropagation
                 Node mom = t;
                 while (mom != s)
                 {
-                    if (mom.PreviousNode.AddFlow(f, mom))
+                    if (mom.PreviousNode.AddFlow(f, mom.PreviousEdge))
                         vuoto = mom;
                     mom = mom.PreviousNode;
                 }

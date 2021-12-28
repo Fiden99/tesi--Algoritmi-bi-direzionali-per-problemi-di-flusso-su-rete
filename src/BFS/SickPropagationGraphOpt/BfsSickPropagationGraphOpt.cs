@@ -38,8 +38,10 @@ namespace BFS.SickPropagationGraphOpt
             if (node.PreviousLabelNodes.Count != 0)
             {
                 Node previous = node.PreviousLabelNodes.First();
-                node.SetInFlow(Math.Min(previous.Edges.First(x => x.NextNode == node).Capacity, previous.InFlow));
+                BiEdge e = previous.Edges.First(x => x.NextNode == node);
+                node.SetInFlow(Math.Min(e.Capacity, previous.InFlow));
                 node.SetPreviousNode(previous);
+                node.SetPreviousEdge(e);
                 node.SetValid(true);
                 //grafo.ChangeLabel(e.previousNode, node.label - 1);
                 return true;
@@ -137,6 +139,7 @@ namespace BFS.SickPropagationGraphOpt
                     if (p == element && edge.Capacity > 0 && (n.Label >= p.Label || n.Label == 0 || n.Valid == false))
                     {
                         n.SetPreviousNode(element);
+                        n.SetPreviousEdge(edge);
                         if (n.Valid == true)
                             grafo.ChangeLabel(n, p.Label + 1);
                         else
@@ -151,6 +154,7 @@ namespace BFS.SickPropagationGraphOpt
                     if (n == element && edge.Flow > 0 && (p.Label >= n.Label || p.Label == 0 || p.Valid == false))
                     {
                         p.SetPreviousNode(element);
+                        p.SetPreviousEdge(edge);
                         if (p.Valid == true)
                             grafo.ChangeLabel(p, n.Label + 1);
                         else
@@ -204,7 +208,7 @@ namespace BFS.SickPropagationGraphOpt
                                 { */
                 while (mom != s)
                 {
-                    if (mom.PreviousNode.AddFlow(f, mom))
+                    if (mom.PreviousNode.AddFlow(f, mom.PreviousEdge))
                         noCap = mom;
                     mom = mom.PreviousNode;
                 }
