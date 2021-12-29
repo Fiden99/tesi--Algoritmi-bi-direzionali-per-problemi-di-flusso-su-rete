@@ -1,0 +1,81 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage{amsmath}
+
+\title{Shortest Augmenting Path}
+\author{Filippo Magi }
+
+\begin{document}
+
+\maketitle
+
+\section{Shortest Augmenting Path}
+\begin{algorithm}
+\caption{Shortest Augmenting Path}
+\begin{algorithmic}
+\REQUIRE grafo dei reisidui $\overset{\leftrightarrow}{G}$
+\ENSURE flusso massimo inviato, $\overset{\leftrightarrow}{G}$ aggiornato
+\STATE s $\leftarrow$ nodo sorgente di $\overset{\leftrightarrow}{G}$
+\STATE t $\leftarrow$ nodo destinazione di $\overset{\leftrightarrow}{G}$
+\STATE eseguo bfs, che parte da t, assegnando a ogni nodo la distanza da t 
+\STATE invio flusso nel percorso deciso dalla bfs
+\STATE flussoInviato $\leftarrow$ flusso inviato (dal percorso deciso dalla bfs)
+\WHILE{distanza tra t e s < numero di nodi di $\overset{\leftrightarrow}{G}$}
+\STATE f $\leftarrow$ Dfs$(\overset{\leftrightarrow}{G}, s, +\infty)$
+\IF{f $ne 0$}
+\STATE invia flusso f nel grafo nel percorso indicato
+\ELSE
+\STATE \textbf{break}
+\ENDIF
+\STATE flussoInviato $\leftarrow$ f + flussoInviato 
+\ENDWHILE
+\RETURN flussoInviato
+\end{algorithmic}
+\end{algorithm}
+\begin{algorithm}
+\caption{Dfs per trovare il flusso massimo in Shortest Augmenting Path}
+\begin{algorithmic}
+\REQUIRE grafo dei residui  $\overset{\leftrightarrow}{G}$,Nodo start, valore f
+\ENSURE valore del flusso inviabile, percorso percoribile per poter inviare il flusso prima indicato
+\IF{distanza tra nodo start e t < numero dei nodi presenti in $\overset{\leftrightarrow}{G}$}
+\FORALL{arco edge che entra o esce nel nodo start}
+\IF{edge è un arco uscente da start ed edge è ammissibile (distanza tra i nodi = 1 e capacità residua positiva)}
+\STATE aggiorno dati di n
+\STATE f $\leftarrow \min$(f,capacità di edge)
+\IF{n è il nodo di destinazione di $\overset{\leftrightarrow}{G}$}
+\RETURN f
+\ENDIF
+\RETURN Dfs($\overset{\leftrightarrow}{G}$,n,f)
+\ELSIF{edge è arco entrante verso start ed edge è ammissibile (distanza tra i nodi = 1 e flusso inviato positivo)}
+\STATE aggiorno dati di p
+\STATE f $\leftarrow \min$(f, flusso di edge)
+\IF{p è il nodo di destinazione di $\overset{\leftrightarrow}{G}$}
+\RETURN f
+\ENDIF
+\RETURN Dfs($\overset{\leftrightarrow}{G}$,p,f)
+\ENDIF
+\ENDFOR
+\STATE min $\leftarrow +\infty$
+\FORALL{arco edge che entra in start}
+\IF{flusso di edge è positivo}
+\STATE min $\leftarrow \min$(min, flusso di edge)
+\ENDIF
+\ENDFOR
+\FORALL{arco edge che esce da start}
+\IF{capacità di edge è positiva}
+\STATE min $\leftarrow \min$(min, capacità di edge)
+\ENDIF
+\ENDFOR
+\STATE distanza tra start e t $\leftarrow$ min
+\IF{start è nodo sorgente di $\overset{\leftrightarrow}{G}$}
+\RETURN Dfs($\overset{\leftrightarrow}{G}$,start,f)
+\ELSE
+\RETURN Dfs($\overset{\leftrightarrow}{G}$,predecessore di start,f)
+\ENDIF
+\ENDIF
+\RETURN 0
+\end{algorithmic}
+\end{algorithm}
+\end{document}
