@@ -11,7 +11,7 @@ namespace BFS.ShortestAugmentingPath
             Node mom = graph.Sink;
             while (mom is not SourceNode)
             {
-                mom.PreviousNode.AddFlow(flow, mom.PreviousEdge);
+                Node.AddFlow(flow, mom.PreviousEdge);
                 mom = mom.PreviousNode;
             }
         }
@@ -104,9 +104,7 @@ namespace BFS.ShortestAugmentingPath
         public static int FlowFordFulkerson(Graph graph)
         {
             Node s = graph.Source;
-            Node t = graph.Sink;
             int fMax = Bfs(graph);
-            Node mom = t;
             //primo flusso inviato (già ottenuto grazie a Bfs, servita per avere le distanze)
 
             SendFlow(graph, fMax);

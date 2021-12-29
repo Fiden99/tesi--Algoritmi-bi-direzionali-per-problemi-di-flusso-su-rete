@@ -127,7 +127,7 @@ namespace BFS.SickPropagationGraphOpt
             //TODO da valutare se fare un controllo se BiEdge appartiene o meno a this.edges
 #if DEBUG
             if (!this.Edges.Contains(edge))
-                throw new ArgumentException();
+                throw new ArgumentException("arco richiesto non contenuto in " + this.Name);
 #endif
             this.SetInFlow(this.InFlow - flow);
             return edge.AddFlow(flow);

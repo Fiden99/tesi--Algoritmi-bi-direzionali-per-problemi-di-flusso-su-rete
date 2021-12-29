@@ -73,11 +73,11 @@ namespace BFS.SickPropagation
             if (node.Label == to)
                 return;
             if (!this.LabeledNodes[node.Label].Remove(node))
-                throw new ArgumentException();
+                throw new ArgumentException("nodo non presente nella label indicata");
             while (this.LabeledNodes.Count <= to)
                 this.LabeledNodes.Add(new HashSet<Node>());
             if (!this.LabeledNodes[to].Add(node))
-                throw new ArgumentException();
+                throw new ArgumentException("nodo già presente nella label indicata");
             node.SetLabel(to);
         }
 
@@ -87,10 +87,9 @@ namespace BFS.SickPropagation
             if (node.Valid == false)
                 return;
             if (!this.LabeledNodes[node.Label].Remove(node))
-                throw new ArgumentException();
-            if (this.InvalidNodes.Contains(node))
-                throw new ArgumentException();
-            this.InvalidNodes.Add(node);
+                throw new ArgumentException("nodo non presente nella label indicata");
+            if (!this.InvalidNodes.Add(node))
+                throw new ArgumentException("nodo già inserito già inserito in invalidNode");
             node.SetInFlow(0);
             node.SetPreviousNode(null);
             node.SetValid(false);

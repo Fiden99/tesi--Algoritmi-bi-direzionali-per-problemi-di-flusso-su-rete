@@ -80,7 +80,7 @@ namespace BFS.ShortestAugmentingPath
             BiEdge edge = this.Edges.Single(x => x.NextNode == n || x.PreviousNode == n);
             AddFlow(flow, edge);
         }
-        public void AddFlow(int flow, BiEdge edge)
+        public static void AddFlow(int flow, BiEdge edge)
         {
             int f, c;
             if (edge.Reversed)
