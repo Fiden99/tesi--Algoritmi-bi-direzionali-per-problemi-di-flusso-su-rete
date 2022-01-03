@@ -144,16 +144,16 @@ namespace Monodirezionale.MaxFlow.SickPropagation
             }
             else
             {
+                coda = new Queue<Node>();
                 Node t = grafo.Sink;
-                //TODO possibile errore qui, da controllare
-                if (Repair(grafo, noCap) && t.Edges.Single(x => x.PreviousNode == t.PreviousNode).Capacity > 0)
+                if (Repair(grafo, noCap))
                 {
                     var flow = GetFlow(t);
                     if (flow != 0)
                         return flow;
+                    coda.Enqueue(noCap);
                 }
 
-                coda = new Queue<Node>();
                 int v = SickPropagation(grafo, noCap, coda);
                 if (v != 0)
                     return v;
