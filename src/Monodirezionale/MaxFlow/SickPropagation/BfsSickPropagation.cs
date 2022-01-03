@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Monodirezionale.MaxFlow.LastLevelOpt;
 
 namespace Monodirezionale.MaxFlow.SickPropagation
 {
@@ -31,8 +30,8 @@ namespace Monodirezionale.MaxFlow.SickPropagation
                     }
                 else if (m is SinkNode)
                 {
-                    CorrectFlow(m);
-                    return m.InFlow;//RecoverFlow(m);
+                    var n = GetFlow(m);
+                    return n;//RecoverFlow(m);
                 }
                 else
                 {
@@ -49,9 +48,9 @@ namespace Monodirezionale.MaxFlow.SickPropagation
                 Node next = e.NextNode;
                 if (e.NextNode == node && e.Capacity > 0)
                 {
-                    if (previous.Label == (node.Label - 1) && previous.Valid == true && previous.InFlow != 0)
+                    if (previous.Label == (node.Label - 1) && previous.Valid == true && previous.Visited == true)
                     {
-                        node.SetInFlow(Math.Min(previous.InFlow, e.Capacity));
+                        node.SetVisited(true);
                         node.SetPreviousNode(previous);
                         node.SetPreviousEdge(e);
                         e.SetReversed(false);
@@ -60,9 +59,9 @@ namespace Monodirezionale.MaxFlow.SickPropagation
                 }
                 else if (previous == node && e.Flow > 0)
                 {
-                    if (next.Label == (node.Label - 1) && next.Valid == true && next.InFlow != 0)
+                    if (next.Label == (node.Label - 1) && next.Valid == true && next.Visited == true)
                     {
-                        node.SetInFlow(Math.Min(next.InFlow, e.Flow));
+                        node.SetVisited(true);
                         node.SetPreviousNode(next);
                         node.SetPreviousEdge(e);
                         e.SetReversed(true);
@@ -72,48 +71,66 @@ namespace Monodirezionale.MaxFlow.SickPropagation
             }
             grafo.InvalidNode(node);
             return false;
-        }
 
-        //TODO capire se si può migliorare fermandosi alla prima volta in cui v è uguale alla capacità
-        public static int CorrectFlow(Node node)
+        }
+        public static int GetFlow(Node n)
         {
-            int v;
-            if (node is not SourceNode)
+            if (n is not SourceNode)
             {
-                var p = node.PreviousNode;
-                var e = node.Edges.Single(x => x.NextNode == p || p == x.PreviousNode);
-                if (e.Reversed)
+                var edge = n.PreviousEdge;
+                if (!edge.Reversed)
                 {
-                    v = Math.Min(e.Flow, CorrectFlow(p));
-                    if (v == e.Flow && p.InFlow == v)
-                        return v;
+                    return Math.Min(edge.Capacity, GetFlow(n.PreviousNode));
                 }
                 else
                 {
-                    v = Math.Min(e.Capacity, CorrectFlow(p));
-                    if (v == e.Capacity && v == p.InFlow)
-                        return v;
+                    return Math.Min(edge.Flow, GetFlow(n.PreviousNode));
                 }
-                node.SetInFlow(v);
             }
-            else
-                v = node.InFlow;
-            return v;
+            return int.MaxValue;
         }
+        /*
+                //TODO capire se si può migliorare fermandosi alla prima volta in cui v è uguale alla capacità
+                public static int CorrectFlow(Node node)
+                {
+                    int v;
+                    if (node is not SourceNode)
+                    {
+                        var p = node.PreviousNode;
+                        var e = node.Edges.Single(x => x.NextNode == p || p == x.PreviousNode);
+                        if (e.Reversed)
+                        {
+                            v = Math.Min(e.Flow, CorrectFlow(p));
+                            if (v == e.Flow && p.InFlow == v)
+                                return v;
+                        }
+                        else
+                        {
+                            v = Math.Min(e.Capacity, CorrectFlow(p));
+                            if (v == e.Capacity && v == p.InFlow)
+                                return v;
+                        }
+                        node.SetInFlow(v);
+                    }
+                    else
+                        v = node.InFlow;
+                    return v;
+                }
 
-        public static int RecoverFlow(Node node)
-        {
-            if (node.InFlow != 0)
-                return node.InFlow;
-            var e = node.Edges.Single(x => x.PreviousNode == node.PreviousNode || x.NextNode == node.PreviousNode);
-            if (node.PreviousNode != null && node.InFlow == 0)
-                if (e.Capacity > 0 && e.NextNode == node)
-                    node.SetInFlow(Math.Min(RecoverFlow(node.PreviousNode), e.Capacity));
-                else if (e.Flow > 0 && e.PreviousNode == node)
-                    node.SetInFlow(Math.Min(RecoverFlow(node.PreviousNode), e.Flow));
-            return node.InFlow;
-        }
+                public static int RecoverFlow(Node node)
+                {
+                    if (node.InFlow != 0)
+                        return node.InFlow;
+                    var e = node.Edges.Single(x => x.PreviousNode == node.PreviousNode || x.NextNode == node.PreviousNode);
+                    if (node.PreviousNode != null && node.InFlow == 0)
+                        if (e.Capacity > 0 && e.NextNode == node)
+                            node.SetInFlow(Math.Min(RecoverFlow(node.PreviousNode), e.Capacity));
+                        else if (e.Flow > 0 && e.PreviousNode == node)
+                            node.SetInFlow(Math.Min(RecoverFlow(node.PreviousNode), e.Flow));
+                    return node.InFlow;
 
+                }
+        */
         public static int DoMaxFlow(Graph grafo, Node noCap)
         {
             Queue<Node> coda;
@@ -128,9 +145,12 @@ namespace Monodirezionale.MaxFlow.SickPropagation
             else
             {
                 Node t = grafo.Sink;
-                if (Repair(grafo, noCap) && t.PreviousNode.InFlow != 0 && t.Edges.Single(x => x.PreviousNode == t.PreviousNode).Capacity > 0)
+                //TODO possibile errore qui, da controllare
+                if (Repair(grafo, noCap) && t.Edges.Single(x => x.PreviousNode == t.PreviousNode).Capacity > 0)
                 {
-                    return Math.Min(t.InFlow, noCap.InFlow);
+                    var flow = GetFlow(t);
+                    if (flow != 0)
+                        return flow;
                 }
 
                 coda = new Queue<Node>();
@@ -141,8 +161,8 @@ namespace Monodirezionale.MaxFlow.SickPropagation
                 if (coda.Count == 0)
                     foreach (var n in grafo.LabeledNodes[noCap.Label - 1])
                         coda.Enqueue(n);
-                foreach (var n in coda)
-                    RecoverFlow(n);
+                //foreach (var n in coda)
+                //RecoverFlow(n);
             }
             while (coda.Count > 0)
             {
@@ -153,7 +173,7 @@ namespace Monodirezionale.MaxFlow.SickPropagation
                 {
                     var n = edge.NextNode;
                     var p = edge.PreviousNode;
-                    if (n.InFlow != 0 && p.InFlow != 0)
+                    if (n.Visited && p.Visited)
                         continue;
                     if (edge.Capacity < 0)
                         throw new InvalidOperationException();
@@ -165,12 +185,11 @@ namespace Monodirezionale.MaxFlow.SickPropagation
                             grafo.ChangeLabel(n, p.Label + 1);
                         else
                             grafo.RepairNode(n, p.Label + 1);
-                        n.SetInFlow(Math.Min(p.InFlow, edge.Capacity));
+                        n.SetVisited(true);
                         edge.SetReversed(false);
                         if (n is SinkNode)
                         {
-                            CorrectFlow(n);
-                            return n.InFlow;
+                            return GetFlow(n);
                         }
                         else
                             coda.Enqueue(n);
@@ -183,13 +202,12 @@ namespace Monodirezionale.MaxFlow.SickPropagation
                             grafo.ChangeLabel(p, n.Label + 1);
                         else
                             grafo.RepairNode(p, n.Label + 1);
-                        p.SetInFlow(Math.Min(n.InFlow, edge.Flow));
+                        p.SetVisited(true);
                         edge.SetReversed(true);
                         if (p is SinkNode)
                         {
                             //RecoverFlow(p);
-                            CorrectFlow(p);
-                            return p.InFlow;
+                            return GetFlow(p);
 
                         }
                         else
@@ -225,7 +243,7 @@ namespace Monodirezionale.MaxFlow.SickPropagation
         public static int FlowFordFulkerson(Graph graph)
         {
             Node vuoto = null;
-            //int fMax = 0;
+            int fMax = 0;
             Node t = graph.Sink;
             Node s = graph.Source;
             while (true)
@@ -240,10 +258,10 @@ namespace Monodirezionale.MaxFlow.SickPropagation
                         vuoto = mom;
                     mom = mom.PreviousNode;
                 }
-                //fMax += f;
+                fMax += f;
             }
             PrintGraph(graph);
-            return int.MaxValue - s.InFlow;
+            return fMax;
 
         }
     }

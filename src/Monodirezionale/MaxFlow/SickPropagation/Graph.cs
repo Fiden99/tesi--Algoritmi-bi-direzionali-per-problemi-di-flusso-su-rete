@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Monodirezionale.MaxFlow.LastLevelOpt;
 
 namespace Monodirezionale.MaxFlow.SickPropagation
 {
@@ -66,7 +65,7 @@ namespace Monodirezionale.MaxFlow.SickPropagation
         {
             //n.SetPreviousNode(null);
             if (n is not SourceNode)
-                n.SetInFlow(0);
+                n.SetVisited(false);
         }
         public void ChangeLabel(Node node, int to)
         {
@@ -90,7 +89,7 @@ namespace Monodirezionale.MaxFlow.SickPropagation
                 throw new ArgumentException("nodo non presente nella label indicata");
             if (!this.InvalidNodes.Add(node))
                 throw new ArgumentException("nodo già inserito già inserito in invalidNode");
-            node.SetInFlow(0);
+            node.SetVisited(false);
             node.SetPreviousNode(null);
             node.SetValid(false);
         }
