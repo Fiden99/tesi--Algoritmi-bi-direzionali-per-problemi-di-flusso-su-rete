@@ -19,6 +19,8 @@ namespace Monodirezionale.MaxFlow.SickPropagationGraphOpt
                 {
                     foreach (var y in actual.NextLabelNodes)
                         malati.Enqueue((y, actual));
+                    grafo.InvalidNode(actual);
+
                 }
                 else if (actual is SinkNode)//&& actual.InFlow != 0)
                     return CorrectFlow(actual);
@@ -49,7 +51,7 @@ namespace Monodirezionale.MaxFlow.SickPropagationGraphOpt
                 */
 
             }
-            grafo.InvalidNode(node);
+            //grafo.InvalidNode(node);
             return false;
         }
         public static int CorrectFlow(Node node)
