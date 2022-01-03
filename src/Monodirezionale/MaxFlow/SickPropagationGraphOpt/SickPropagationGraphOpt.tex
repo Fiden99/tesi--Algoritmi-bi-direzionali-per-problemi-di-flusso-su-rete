@@ -4,12 +4,10 @@
 \usepackage{algorithmic}
 \usepackage{amsmath}
 
-\title{SickPropagation}
+\title{algoritmi}
 \author{Filippo Magi }
 
 \begin{document}
-
-\maketitle
 
 \section{Propagazione della malattia}
 \begin{algorithm}
@@ -48,21 +46,22 @@
 \STATE coda.enqueue(sourceNode di $\overset{\leftrightarrow}{G}$)
 \ELSE
 \STATE t $\leftarrow$ SinkNode di $\overset{\leftrightarrow}{G}$
-\STATE provo a riparare noCap \COMMENT {controllo se c'è un nodo con label = noCap.label-1 e con capacità o flusso diversa da 0, aggiornando i dati}
-\IF {noCap è stato riparato}
-\STATE f $\leftarrow$ flusso massimo consentito nel percorso da t a s 
-\IF{f $\ne 0$}
-\RETURN f
-\ENDIF
+\STATE provo a riparare noCap \COMMENT {controllo se c'è un nodo con label = noCap.label-1 e con capacità o flusso diversa da 0}
+\IF {noCap è stato riparato AND il flusso entrante nel predecessore di t $\ne 0$ AND capacità dell'arco (t, predecessore di t) $> 0$}
+\RETURN Min(flusso entrante di t, flusso passante per noCap)
 \ENDIF
 \STATE v $\leftarrow$ SickPropagation(grafo,noCap,coda)
 \IF{v $\ne 0$}
 \RETURN v
 \ENDIF
-\STATE confermo di non aver esplorato i nodi con label $\leq$ noCap.label
+\STATE cancello il flusso entrante nei nodi con label $\leq$ noCap.label
 \IF{coda è vuota}
 \STATE coda $\leftarrow$ nodi di $\overset{\leftrightarrow}{G}$ con label = (noCap.label - 1)
 \ENDIF
+\FORALL{ nodo n $\in$ coda}
+\STATE recupera flusso entrante dall'ultimo nodo che lo ha 
+\COMMENT{Dato che è possibile che il flusso entrante sia uguale a zero dovuto a SickPropagation, torno indietro fino al primo nodo con flusso entrante positivo, quindi, ricorsivamente, inserisco il flusso entrante per tutti i nodi che ho visitato}
+\ENDFOR
 \ENDIF
 \WHILE{la coda non è vuota}
 \STATE element $\leftarrow$ code.Dequeue()
@@ -73,16 +72,16 @@
 \STATE \textbf{continue}
 \ENDIF
 \IF{p = element AND capacità di edge $>0$ AND (n è successivo a p OR n non è valido OR noCap = null)}
-\STATE aggiorno i dati di n (label,visitato, nodo precedente, nel caso riparo il nodo)
+\STATE aggiorno i dati di n (label, flusso entrante, nodo precedente, nel caso riparo il nodo)
 \IF{ n è  SinkNode di $\overset{\leftrightarrow}{G}$}
-\RETURN flusso massimo da s a t, secondo il percorso scelto (dai vari previousNode all'interno dei nodi)
+\RETURN flusso entrante in n
 \ELSE
 \STATE coda.enqueue(n)
 \ENDIF
 \ELSIF{n = element AND flusso di edge $>0$ AND p non è stato visitato}
 \STATE aggiorno i dati di p
 \IF{ p è  SinkNode di $\overset{\leftrightarrow}{G}$}
-\RETURN flusso massimo da s a t, secondo il percorso scelto
+\RETURN flusso entrante in n
 \ELSE
 \STATE coda.enqueue(p)
 \ENDIF
@@ -107,7 +106,7 @@
 \IF{il nodo non è stato riparato}
 \STATE malati.enqueue(nodo con previousNode = m)
 \ELSIF{m è SinkNode di $\overset{\leftrightarrow}{G}$}
-\STATE v $\leftarrow$ ricorsivamente, dal t vado a recupeare il flusso massimo inviabile secondo il percorso deciso
+\STATE v $\leftarrow$ ricorsivamente, dal sourceNode di $\overset{\leftrightarrow}{G}$ ottengo il flusso massimo che posso inviare,salvando il flusso entrante per ogni arco (recuperato tramite previousNode) che attraverso
 \RETURN v
 \ELSE
 \STATE coda.enqueue(m)

@@ -133,18 +133,16 @@ namespace Monodirezionale.MaxFlow.SickPropagation
         */
         public static int DoMaxFlow(Graph grafo, Node noCap)
         {
-            Queue<Node> coda;
+            Queue<Node> coda = new Queue<Node>();
             Queue<Node> malati = new Queue<Node>();
             //if (grafo.InvalidNodes.Count == 0)
             if (noCap is null)
             {
                 //grafo.Reset(0);
-                coda = new Queue<Node>();
                 coda.Enqueue(grafo.Source);
             }
             else
             {
-                coda = new Queue<Node>();
                 Node t = grafo.Sink;
                 if (Repair(grafo, noCap))
                 {

@@ -144,7 +144,7 @@ namespace Monodirezionale.MaxFlow.SickPropagationGraphOpt
                             grafo.RepairNode(n, p.Label + 1);
                         n.SetInFlow(Math.Min(p.InFlow, edge.Capacity));
                         edge.SetReversed(false);
-                        if (n is SinkNode && n.Valid == true)//&& n.InFlow != 0)
+                        if (n is SinkNode)//&& n.InFlow != 0)
                             return n.InFlow;
                         else
                             coda.Enqueue(n);
@@ -159,7 +159,7 @@ namespace Monodirezionale.MaxFlow.SickPropagationGraphOpt
                             grafo.RepairNode(p, n.Label + 1);
                         p.SetInFlow(Math.Min(n.InFlow, edge.Flow));
                         edge.SetReversed(true);
-                        if (p is SinkNode && p.Valid == true)
+                        if (p is SinkNode)
                             return p.InFlow;
                         else
                             coda.Enqueue(p);
