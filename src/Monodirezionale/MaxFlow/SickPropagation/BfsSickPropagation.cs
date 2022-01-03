@@ -169,13 +169,15 @@ namespace Monodirezionale.MaxFlow.SickPropagation
                 //continue;
                 foreach (var edge in element.Edges)
                 {
-                    var n = edge.NextNode;
-                    var p = edge.PreviousNode;
-                    if (n.Visited && p.Visited)
-                        continue;
+#if DEBUG
                     if (edge.Capacity < 0)
                         throw new InvalidOperationException();
-                    if (p == element && edge.Capacity > 0 && (n.Label >= p.Label || noCap == null || n.Valid == false))
+#endif
+                    var n = edge.NextNode;
+                    var p = edge.PreviousNode;
+                    if ((n.Visited && p.Visited) || !element.Valid)
+                        continue;
+                    else if (p == element && edge.Capacity > 0 && (n.Label >= p.Label || noCap == null || n.Valid == false))
                     {
                         n.SetPreviousNode(p);
                         n.SetPreviousEdge(edge);
@@ -204,9 +206,7 @@ namespace Monodirezionale.MaxFlow.SickPropagation
                         edge.SetReversed(true);
                         if (p is SinkNode)
                         {
-                            //RecoverFlow(p);
                             return GetFlow(p);
-
                         }
                         else
                             coda.Enqueue(p);
