@@ -108,7 +108,7 @@ namespace Bidirezionale.Label.NoOpt
             else
                 return ((n.NextEdge is not null) ? n.NextEdge : n.PreviousEdge).AddFlow(flow);
         }
-        public virtual void Reset()
+        public void Reset()
         {
             this.SetInFlow(0);
             this.SetPreviousEdge(null);
