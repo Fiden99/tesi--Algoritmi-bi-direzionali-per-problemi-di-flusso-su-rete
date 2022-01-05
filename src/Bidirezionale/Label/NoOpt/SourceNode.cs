@@ -9,8 +9,10 @@ namespace Bidirezionale.Label.NoOpt
 
         public override void Reset()
         {
-            this.SetPreviousEdge(null);
-            this.SetPreviousNode(null);
+            /*             this.SetPreviousEdge(null);
+                        this.SetPreviousNode(null);
+             */
         }
+
     }
 }
