@@ -11,6 +11,7 @@ namespace Bidirezionale.Label.NoOpt
         public Graph()
         {
             this.Nodes = new();
+            this.MeanLabel = 0;
         }
         public Graph(params Node[] nodes)
         {
@@ -21,32 +22,23 @@ namespace Bidirezionale.Label.NoOpt
         public void SetMeanLabel(int l) => this.MeanLabel = l;
         public Node Sink => this.Nodes.Single(x => x is SinkNode);
         public Node Source => this.Nodes.Single(x => x is SourceNode);
-        public void Reset(Node node)
-        {
-            if (node is not SourceNode && node is not SinkNode)
-                node.SetInFlow(0);
-            node.SetPreviousEdge(null);
-            node.SetPreviousNode(null);
-            node.SetNextEdge(null);
-            node.SetNextNode(null);
-        }
 
         public void ResetSourceSide()
         {
             foreach (Node n in this.Nodes)
                 if (n.Label < this.MeanLabel)
-                    Reset(n);
+                    n.Reset();
         }
         public void ResetSinkSide()
         {
             foreach (Node n in this.Nodes)
                 if (n.Label >= this.MeanLabel)
-                    Reset(n);
+                    n.Reset();
         }
         public void Reset()
         {
             foreach (var n in Nodes)
-                Reset(n);
+                n.Reset();
         }
     }
 }

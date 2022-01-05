@@ -6,5 +6,11 @@ namespace Bidirezionale.Label.NoOpt
         {
             this.InFlow = int.MaxValue;
         }
+
+        public override void Reset()
+        {
+            this.SetPreviousEdge(null);
+            this.SetPreviousNode(null);
+        }
     }
 }

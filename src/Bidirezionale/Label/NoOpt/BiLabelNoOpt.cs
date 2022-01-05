@@ -197,7 +197,6 @@ namespace Bidirezionale.Label.NoOpt
                     mom.SetInFlow(mom.InFlow - f);
                     mom = mom.NextNode;
                 }
-
             }
             return fMax;
         }

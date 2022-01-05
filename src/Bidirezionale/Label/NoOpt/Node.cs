@@ -107,7 +107,14 @@ namespace Bidirezionale.Label.NoOpt
             }
             else
                 return ((n.NextEdge is not null) ? n.NextEdge : n.PreviousEdge).AddFlow(flow);
-
+        }
+        public virtual void Reset()
+        {
+            this.SetInFlow(0);
+            this.SetPreviousEdge(null);
+            this.SetPreviousNode(null);
+            this.SetNextEdge(null);
+            this.SetNextNode(null);
         }
     }
 }
