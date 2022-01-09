@@ -23,7 +23,7 @@ public class NoOptTests
         s.AddEdge((n2, 10), (n3, 30), (n4, 30));
         Graph graph = new Graph(s, n2, n3, n4, n5, n6, t);
 
-        var res = BiLabelNoOpt.FlowFordFulkerson(graph);
+        var res = BiNodePropagationNoOpt.FlowFordFulkerson(graph);
 
         Assert.Equal(35, res);
     }
@@ -53,7 +53,7 @@ public class NoOptTests
         n1.AddEdge((n4, 5), (n5, 5));
         s.AddEdge((n1, 10), (n2, 20), (n3, 30));
         Graph graph = new Graph(s, n1, n2, n3, n4, n5, n6, n7, n8, n9, t);
-        var res = BiLabelNoOpt.FlowFordFulkerson(graph);
+        var res = BiNodePropagationNoOpt.FlowFordFulkerson(graph);
         Assert.Equal(60, res);
     }
     [Fact]
@@ -81,7 +81,7 @@ public class NoOptTests
         n1.AddEdge((n4, 10), (n5, 10));
         s.AddEdge((n1, 30), (n2, 30), (n3, 30));
         NoOpt.Graph graph = new NoOpt.Graph(s, n1, n2, n3, n4, n5, n6, n7, n8, n9, t);
-        var res = BiLabelNoOpt.FlowFordFulkerson(graph);
+        var res = BiNodePropagationNoOpt.FlowFordFulkerson(graph);
         Assert.Equal(50, res);
     }
     [Fact]
@@ -109,7 +109,7 @@ public class NoOptTests
         n1.AddEdge((n4, 20), (n6, 20));
         s.AddEdge((n1, 10), (n2, 10), (n3, 10));
         NoOpt.Graph graph = new NoOpt.Graph(s, n1, n2, n3, n4, n5, n6, n7, n8, n9, t);
-        var res = BiLabelNoOpt.FlowFordFulkerson(graph);
+        var res = BiNodePropagationNoOpt.FlowFordFulkerson(graph);
         Assert.Equal(30, res);
     }
     [Fact]
@@ -137,7 +137,7 @@ public class NoOptTests
         n1.AddEdge((n2, 30), (n6, 40));
         s.AddEdge((n1, 50), (n4, 20));
         NoOpt.Graph graph = new NoOpt.Graph(s, n1, n2, n3, n4, n5, n6, n7, n8, n9, t);
-        var res = BiLabelNoOpt.FlowFordFulkerson(graph);
+        var res = BiNodePropagationNoOpt.FlowFordFulkerson(graph);
         Assert.Equal(60, res);
 
     }
@@ -184,7 +184,7 @@ public class NoOptTests
         n17.AddEdge(n14, 100);
         Graph graph = new Graph(s, n1, n2, n3, n4, n5, n6, n7, n8, n9, n10, n11, n12, n13, n14, n15, n16, n17, t);
 
-        var res = BiLabelNoOpt.FlowFordFulkerson(graph);
+        var res = BiNodePropagationNoOpt.FlowFordFulkerson(graph);
         Assert.Equal(35, res);
     }
 

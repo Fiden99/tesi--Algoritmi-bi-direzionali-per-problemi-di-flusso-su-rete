@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Bidirezionale.NodePropagation.NoOpt
 {
-    public class BiLabelNoOpt
+    public class BiNodePropagationNoOpt
     {
 
         private static (int, Node) DoBfs(Graph graph, bool sourceSide, bool sinkSide)
