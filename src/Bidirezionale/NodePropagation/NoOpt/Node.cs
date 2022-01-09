@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Bidirezionale.Label.NoOpt
+namespace Bidirezionale.NodePropagation.NoOpt
 {
 
     public class BiEdge

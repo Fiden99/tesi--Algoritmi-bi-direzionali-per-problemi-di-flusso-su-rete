@@ -1,4 +1,4 @@
-namespace Bidirezionale.Label.NoOpt
+namespace Bidirezionale.NodePropagation.NoOpt
 {
     public class SinkNode : Node
     {
