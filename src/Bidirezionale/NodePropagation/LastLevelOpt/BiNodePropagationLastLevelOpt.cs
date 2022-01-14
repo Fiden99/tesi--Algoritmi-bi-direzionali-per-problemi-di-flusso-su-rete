@@ -554,15 +554,17 @@ namespace Bidirezionale.NodePropagation.LastLevelOpt
                             momsink.SetInFlow(momsink.InFlow + f);
                             momsink = momsink.NextNode;
                         }
-                        while (momsource != s)
-                        {
-                            momsource.PreviousEdge.AddFlow(-f);
-                            momsource.SetValid(true);
-                            momsource.SetInFlow(momsource.InFlow + f);
-                            momsource = momsource.PreviousNode;
-                        }
                         if (!removedFlow)
+                        {
+                            while (momsource != s)
+                            {
+                                momsource.PreviousEdge.AddFlow(-f);
+                                momsource.SetValid(true);
+                                momsource.SetInFlow(momsource.InFlow + f);
+                                momsource = momsource.PreviousNode;
+                            }
                             fMax -= f;
+                        }
                         break;
                     }
                 }
