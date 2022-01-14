@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-namespace Bidirezionale.NodePropagation.LastLevelOpt
+namespace Bidirezionale.NodePropagation.LastLevelOptEdgeFlow
 {
     public class BiEdge
     {
