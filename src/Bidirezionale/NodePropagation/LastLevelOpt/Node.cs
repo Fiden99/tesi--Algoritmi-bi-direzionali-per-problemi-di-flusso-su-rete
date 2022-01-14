@@ -55,7 +55,7 @@ namespace Bidirezionale.NodePropagation.LastLevelOpt
 
     public class Node
     {
-        public int InFlow { get; protected set; }
+        public bool Visited { get; protected set; }
         public int Label { get; protected set; }
         public List<BiEdge> Edges { get; private set; }
         public string Name { get; private set; }
@@ -68,7 +68,7 @@ namespace Bidirezionale.NodePropagation.LastLevelOpt
         public Node(string name)
         {
             this.Name = name;
-            this.InFlow = 0;
+            this.Visited = false;
             this.Label = 0;
             this.Edges = new();
             this.PreviousNode = null;
@@ -81,7 +81,7 @@ namespace Bidirezionale.NodePropagation.LastLevelOpt
         public Node(string name, bool sourceSide)
         {
             this.Name = name;
-            this.InFlow = 0;
+            this.Visited = false;
             this.Label = 0;
             this.Edges = new();
             this.PreviousNode = null;
@@ -103,7 +103,7 @@ namespace Bidirezionale.NodePropagation.LastLevelOpt
                 this.AddEdge(x.Item1, x.Item2);
         }
         public void SetLabel(int label) => this.Label = label;
-        public void SetInFlow(int f) => this.InFlow = f;
+        public void SetVisited(bool visited) => this.Visited = visited;
         public void SetPreviousNode(Node n) => this.PreviousNode = n;
         public void SetNextNode(Node n) => this.NextNode = n;
         public void SetPreviousEdge(BiEdge e) => this.PreviousEdge = e;
@@ -111,7 +111,6 @@ namespace Bidirezionale.NodePropagation.LastLevelOpt
 
         public static bool AddFlow(Node n, int flow)
         {
-            n.SetInFlow(n.InFlow - flow);
             if (n.NextEdge is not null && n.PreviousEdge is not null)
             {
                 bool x = n.NextEdge.AddFlow(flow);
@@ -122,7 +121,7 @@ namespace Bidirezionale.NodePropagation.LastLevelOpt
         }
         public virtual void Reset()
         {
-            this.SetInFlow(0);
+            this.Visited = false;
             /* this.SetPreviousEdge(null);
             this.SetPreviousNode(null);
             this.SetNextEdge(null);
