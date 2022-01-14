@@ -42,10 +42,8 @@ namespace Bidirezionale.NodePropagation.LastLevelOpt
                 f = this.Flow - flow;
                 c = this.Capacity + flow;
             }
-#if DEBUG
             if (f < 0 || c < 0)
                 throw new ArgumentException("valore di flusso non valido");
-#endif
             this.SetCapacity(c);
             this.SetFlow(f);
             return c == 0;
