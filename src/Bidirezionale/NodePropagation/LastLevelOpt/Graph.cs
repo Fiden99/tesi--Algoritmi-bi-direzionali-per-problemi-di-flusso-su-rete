@@ -53,9 +53,9 @@ namespace Bidirezionale.NodePropagation.LastLevelOpt
         public Node Source => this.LabeledNodeSourceSide[0].Single(x => x is SourceNode);
         public static void Reset(Node node)
         {
-            if (node is not SourceNode && node is not SinkNode)
+            /*if (node is not SourceNode && node is not SinkNode)
                 node.SetInFlow(0);
-            /*             node.SetPreviousEdge(null);
+                        node.SetPreviousEdge(null);
                         node.SetPreviousNode(null);
                         node.SetNextEdge(null);
                         node.SetNextNode(null); */
