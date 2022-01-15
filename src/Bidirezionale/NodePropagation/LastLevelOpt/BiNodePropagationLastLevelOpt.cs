@@ -457,7 +457,6 @@ namespace Bidirezionale.NodePropagation.LastLevelOpt
             int fMax = 0;
             while (true)
             {
-
                 bool removedFlow = false;
                 var (f, n) = DoBfs(graph, vuotoSource, vuotoSink);
                 if (f == 0)
