@@ -1,0 +1,173 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{algorithm}
+%\usepackage{algorithmic}
+\usepackage{algcompatible}
+\usepackage{amsmath}
+
+\title{algoritmi bidirezionali}
+\author{Filippo Magi }
+
+\begin{document}
+
+\maketitle
+\section{Senza alcuna ottimizzazione}
+\subsection{FlowFordFulkerson}
+\begin{algorithm}
+\caption{Ricerca del flusso massimo}
+\begin{algorithmic}[1]
+\REQUIRE grafo dei residui $\overset{\leftrightarrow}{G} = \{V(G),E(G) \cup \{ \overset{\leftarrow}{e} : e \in E(G) \}$ .
+\ENSURE valore del flusso massimo di $\overset{\leftrightarrow}{G}, E(G) $ aggiornato
+\STATE fMax $\leftarrow$ 0
+\STATE vuotoSource $\leftarrow$ true
+\STATE vuotoSource $\leftarrow$ true
+\LOOP
+\STATE (f, nodo) $\leftarrow$ DoBfs($\overset{\leftrightarrow}{G}$,vuotoSource,vuotoSink)
+\IF{f = 0}
+\STATE \textbf{break}
+\ENDIF
+\STATE vuotoSource $\leftarrow$ false
+\STATE vuotoSource $\leftarrow$ false
+\STATE fMax $\leftarrow$ fMax + f
+\STATE mom $\leftarrow$ n
+\WHILE{n non è il sourceNode di $\overset{\leftrightarrow}{G}$}
+\STATE invio(o richiedo) su n.PreviousEdge (arco usato per arrivare a n) una quantità di flusso pari a f 
+\IF{capacità residua = 0}
+\STATE vuotoSource $\leftarrow$ true
+\ENDIF
+\STATE aggiorno flusso passante per n \COMMENT{n.InFlow -=f}
+\STATE n $\leftarrow$ nodo antecedente di n
+\ENDWHILE
+\WHILE{mom non è il sinkNode di $\overset{\leftrightarrow}{G}$}
+
+\STATE invio(o richiedo) su n.NextEdge (arco usato per arrivare a n) una quantità di flusso pari a f 
+\IF{capacità residua = 0}
+\STATE vuotoSink $\leftarrow$ true
+\ENDIF
+\STATE aggiorno flusso passante per n \COMMENT{n.InFlow -=f}
+\STATE n $\leftarrow$ nodo successore di n
+\ENDWHILE
+\ENDLOOP
+%\RETURN fMax
+\STATE \textbf{return} fMax
+\end{algorithmic}
+\end{algorithm}
+\subsection{DoBfs}
+\begin{algorithm}
+\caption{DoBfs : Ricerca un path tra s e x[], e da x[] a t, dove t[] sono i nodi intermedi dove si incontrano i due path}
+\begin{algorithmic}[1]
+\REQUIRE Grafo dei residui $\overset{\leftrightarrow}{G}$, sourceSide e sinkSide, che sono dei booleani che chiariscono in quale parte si dovrà operare
+\ENSURE valore del flusso inviabile, nodo appartenente x[], che tiene in memoria sia il nodo successivo, sia il nodo precedente
+\STATE codaSource $\leftarrow$ coda di nodi
+\STATE codaSink $\leftarrow$ coda di nodi
+\IF{sourceSide}
+\STATE elimino informazioni dai nodi tra s e x[]
+\STATE codaSource.enqueue(nodo source di $\overset{\leftrightarrow}{G}$)
+\ENDIF
+\IF{sinkSide}
+\STATE elimino informazioni dai nodi tra x[] e t
+\STATE codaSource.enqueue(nodo sink di $\overset{\leftrightarrow}{G}$)
+\ENDIF
+\STATE\COMMENT{per motivi prestazioni si controlla nel codice se si hanno sia sinkSide sia sourceSide positivi per non analizzare tutti i nodi 2 volte}
+\WHILE{né codaSource né codaSink sono vuote}
+\IF{codaSource non è vuota}
+\STATE element $\leftarrow$ codaSource.dequeue()
+\FORALL{arco edge in n.Edges}
+\STATE p $\leftarrow$ nodo precedente di edge
+\STATE n $\leftarrow$ nodo successore di edge
+\IF{element = p AND capacità di edge$ > 0 $}
+\IF{n è già stato esplorato}
+\IF{n è stato esplorato dalla parte di Source}
+\STATE \textbf{continue}
+\ELSE
+\STATE f $\leftarrow$ flusso massimo inviabile dato le informazioni di n,p,edge
+\IF{ f = 0}
+\STATE \textbf{continue}
+\ENDIF
+\STATE il percorso è stato trovato, aggiorno i dati di n (e il fatto che edge deve diminuire la capacità)
+%\RETURN (f,n)
+\STATE \textbf{return} (f,n)
+\ENDIF
+\ENDIF
+\STATE aggiorno di dati di n
+\STATE codaSource.enqueue(n)
+\ENDIF
+\algstore{DoBfsNoOpt1}
+\end{algorithmic}
+\end{algorithm}
+\newpage
+\begin{algorithm}
+\begin{algorithmic}[1]
+\algrestore{DoBfsNoOpt1}
+\IF{element = n AND flusso di edge$ > 0$}
+\IF {p è già stato esplorato}
+\IF{p è stato già esplorato dalla parte di Source}
+\STATE \textbf{continue}
+\ELSE
+\STATE f $\leftarrow$ flusso massimo inviabile dato le informazioni di n,p,edge
+\IF{f  = 0}
+\STATE \textbf{continue}
+\ENDIF
+\STATE percorso trovato, aggiorno i dati di p (e il fatto che edge deve diminuire il flusso)
+\RETURN (f,p)
+\ENDIF
+\ENDIF
+\STATE aggiorno dati di p
+\STATE codaSource.enqueue(p)
+\ENDIF
+
+\ENDFOR
+\ENDIF
+
+\IF{codaSink non è vuota}
+\STATE element $\leftarrow$ codaSink.dequeue()
+\FORALL{arco edge degli archi di element (element.Edges)}
+\STATE p $\leftarrow$ nodo precedente di edge
+\STATE n $\leftarrow$ nodo successivo di edge
+\IF{element = n AND capacità di edge $> 0$}
+\IF{p è stato esplorato}
+\IF{p è stato esplorato dalla parte di Sink}
+\STATE \textbf{continue}
+\ELSE
+\STATE f $\leftarrow$ flusso massimo inviabile dato le informazioni di n,p,edge
+\IF{f = 0}
+\STATE \textbf{continue}
+\ENDIF
+\STATE percorso trovato, aggiorno i dati di n (e il fatto che edge deve diminuire la capacità)
+\STATE \textbf{return} (f,n)
+\ENDIF
+\ENDIF
+\STATE aggiorno di dati di p
+\STATE codaSink.enqueue(p)
+\ENDIF
+\algstore{DoBfsNoOpt2}
+\end{algorithmic}
+\end{algorithm}
+\newpage
+\begin{algorithm}
+\begin{algorithmic}[1]
+\algrestore{DoBfsNoOpt2}
+\IF{element = p AND flusso di edge $ > 0 $}
+\IF{n è già stato esplorato}
+\IF{n è stato esplorato da Sink}
+\STATE \textbf{continue}
+\ELSE
+\STATE f $\leftarrow$ flusso massimo inviabile dato le informazioni di n,p,edge
+\IF{f = 0}
+\STATE \textbf{continue}
+\ENDIF
+\STATE percorso trovato, aggiorno i dati di p (e il fatto che edge deve diminuire il flusso)
+\STATE \textbf{return} (f,p)
+\ENDIF
+\ENDIF
+\STATE aggiorno dati di n (ed edge)
+\STATE codaSink.enqueue(n)
+\ENDIF
+\ENDFOR
+\ENDIF
+\ENDWHILE
+\end{algorithmic}
+\end{algorithm}
+
+
+\end{document}

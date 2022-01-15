@@ -34,7 +34,7 @@ namespace Bidirezionale.NodePropagation.NoOpt
 #endif
             while (codaSink.Count > 0 || codaSource.Count > 0)
             {
-                if (codaSource.Count > 0 && sourceSide)
+                if (codaSource.Count > 0)
                 {
                     var element = codaSource.Dequeue();
                     foreach (var e in element.Edges)
@@ -98,7 +98,7 @@ namespace Bidirezionale.NodePropagation.NoOpt
                         }
                     }
                 }
-                if (codaSink.Count > 0 && sinkSide)
+                if (codaSink.Count > 0)
                 {
                     var element = codaSink.Dequeue();
                     foreach (var e in element.Edges)
