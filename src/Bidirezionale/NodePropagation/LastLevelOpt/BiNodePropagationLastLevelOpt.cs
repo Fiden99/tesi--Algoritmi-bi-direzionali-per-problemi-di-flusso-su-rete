@@ -218,35 +218,22 @@ namespace Bidirezionale.NodePropagation.LastLevelOpt
                     sinkRepaired = true;
                     if (noCapSource == null || sourceRepaired)
                     {
-                        foreach (var n in graph.LastNodesSinkSide)
+                        foreach (var n in graph.LastNodesSinkSide.Where(x => x.Valid))
                         {
-                            if (!n.Valid)
-                                continue;
-                            int sourceFlow = int.MaxValue;
+                            int sourceFlow;
                             if (sourceRepaired && GetFlow(noCapSource, n) != null)
                                 sourceFlow = n.InFlow;
                             else
-                                if (!n.PreviousEdge.Reversed)
-                                sourceFlow = Math.Min(n.PreviousEdge.Capacity, n.PreviousNode.InFlow);
-                            else
-                                sourceFlow = Math.Min(n.PreviousEdge.Flow, n.PreviousNode.InFlow);
-                            if (sourceFlow == 0)
-                                continue;
-                            var node = GetFlow(noCapSink, n);
-                            if (node != null && node.InFlow != 0)
-                            {
-                                if (node.NextEdge.Reversed)
-                                    return (Math.Min(Math.Min(Math.Min(node.InFlow, node.NextNode.InFlow), node.NextEdge.Flow), sourceFlow), n);
-                                else
-                                    return (Math.Min(Math.Min(Math.Min(node.InFlow, node.NextNode.InFlow), node.NextEdge.Capacity), sourceFlow), n);
-                            }
+                                sourceFlow = Math.Min(n.PreviousNode.InFlow, n.PreviousEdge.Reversed ? n.PreviousEdge.Flow : n.PreviousEdge.Capacity);
+                            if (sourceFlow > 0 && GetFlow(noCapSink, n) != null && n.InFlow != 0)
+                                return (Math.Min(n.InFlow, sourceFlow), n);
                         }
                     }
                 }
                 if (noCapSink is SinkNode)
                 {
                     codaSink = new();
-                    codaSink.Enqueue(graph.Sink);
+                    codaSink.Enqueue(noCapSink);
                 }
                 else
                 {
@@ -254,6 +241,7 @@ namespace Bidirezionale.NodePropagation.LastLevelOpt
                     graph.ResetSinkSide(noCapSink.Label);
                 }
             }
+
 #if DEBUG
             if (noCapSink == null && noCapSource == null)
                 throw new InvalidOperationException("non ho nessun arco senza capacità residua");
