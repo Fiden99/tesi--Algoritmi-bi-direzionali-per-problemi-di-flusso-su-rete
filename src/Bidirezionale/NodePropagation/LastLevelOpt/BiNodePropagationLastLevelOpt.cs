@@ -173,11 +173,9 @@ namespace Bidirezionale.NodePropagation.LastLevelOpt
                 if (RepairNode(graph, noCapSource, false))
                 {
                     if (noCapSink == null)
-                        foreach (var n in graph.LastNodesSinkSide)
+                        foreach (var n in graph.LastNodesSinkSide.Where(x => x.Valid))
                         {
                             //TODO capire se devo fare un controllo di inflow tra n, il predecessore e il successore ( con nodi)
-                            if (!n.Valid)
-                                continue;
                             var node = GetFlow(noCapSource, n);
                             if (node != null && node.InFlow != 0)
                                 return (node.InFlow, n);
