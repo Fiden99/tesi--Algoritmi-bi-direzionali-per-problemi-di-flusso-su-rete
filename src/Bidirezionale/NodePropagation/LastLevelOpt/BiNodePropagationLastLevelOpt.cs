@@ -199,7 +199,7 @@ namespace Bidirezionale.NodePropagation.LastLevelOpt
                 if (noCapSource is SourceNode)
                 {
                     codaSource = new();
-                    codaSource.Enqueue(graph.Source);
+                    codaSource.Enqueue(noCapSource);
                 }
                 else if (!noCapSource.SourceSide)
                 {
