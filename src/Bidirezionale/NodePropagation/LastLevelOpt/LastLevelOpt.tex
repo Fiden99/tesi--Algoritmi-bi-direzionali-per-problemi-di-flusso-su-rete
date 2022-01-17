@@ -1,0 +1,285 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{algorithm}
+%\usepackage{algorithmic}
+\usepackage{algcompatible}
+\usepackage{amsmath}
+
+\title{algoritmi bidirezionali}
+\author{Filippo Magi }
+
+\begin{document}
+
+\maketitle
+\section{Ottimizzazione sugli ultimi livelli}
+\subsection{FlowFordFulkerson}
+\begin{algorithm}
+\caption{Ricerca del flusso massimo}
+\begin{algorithmic}[1]
+\REQUIRE grafo dei residui $\overset{\leftrightarrow}{G} = \{V(G),E(G) \cup \{ \overset{\leftarrow}{e} : e \in E(G) \}$ .
+\ENSURE valore del flusso massimo di $\overset{\leftrightarrow}{G} , E(G)$ aggiornato.
+\STATE vuotoSouce $\leftarrow$ nodo sorgente s  di $\overset{\leftrightarrow}{G}$
+\STATE vuotoSink $\leftarrow$ nodo destinazione t  di $\overset{\leftrightarrow}{G}$
+\STATE fMax $\leftarrow$ 0
+\LOOP
+\STATE (f,n) $\leftarrow$ DoBfs($\overset{\leftrightarrow}{G}$, vuotoSource,vuotoSink)
+\IF{f = 0}
+\STATE \textbf{break}
+\ENDIF
+fMax $\leftarrow$ fMax + f
+\STATE vuotoSouce $\leftarrow$ null
+\STATE vuotoSink $\leftarrow$ null
+%TODO migliorare questo stato, spiegando meglio e in meno parole la seguente istruzione n.SetInFlow(n.InFlow + f);
+\STATE aggiorno n per far sì che il doppio aggiornamento alla fine come se ce ne fosse stato solo uno
+\STATE momSource $\leftarrow$ n
+\STATE momSink $\leftarrow$ n
+\WHILE{momSource non è il sorgente di $\overset{\leftrightarrow}{G}$}
+\STATE aggiungo(o rimuovo) all'arco predecessore di momSource una quantità di flusso pari a f
+\IF{la capacità ( o il flusso) è negativo}
+\STATE vuotoSource $\leftarrow$ momsource
+\STATE faccio tornare i dati a come erano prima dell'aggiornamento (fMax, valori di flusso passante e archi modificati)
+\STATE \textbf{break}
+\ELSE
+\IF{capacità dell'arco indicato $ = 0$}
+\STATE momSource diventa non valido
+\STATE vuotoSource $\leftarrow$ momSource
+\ENDIF
+\STATE aggiorno flusso passante per momSource
+\STATE momSource $\leftarrow$ nodo predecessore di momSource
+\ENDIF
+\ENDWHILE
+\WHILE{momSink non è il nodo destinazione t di $\overset{\leftrightarrow}{G}$}
+\STATE aggiungo o rimuovo all'arco successore di momSink una quantità di flusso pari a f
+\IF{capacità o flusso risultante negativa}
+\STATE vuotoSink $\leftarrow$ momSink
+\STATE faccio tornare i dati a come erano prima dell'aggiornamento (fMax, valori di flusso passante e archi modificati)
+\STATE \textbf{break}
+\ELSE
+\IF{capacità dell'arco indicato $ = 0$}
+\STATE momSink diventa non valido
+\STATE vuotoSink $\leftarrow$ momSink
+\ENDIF
+\STATE aggiorno flusso passante per momSink
+\STATE momSink $\leftarrow$ nodo successivo di momSink
+\ENDIF
+\ENDWHILE
+\ENDLOOP
+\STATE \textbf{return} fMax
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{DoBfs}
+\begin{algorithm}
+\caption{DoBfs con ottimizzaione sugli ultimi livelli}
+\begin{algorithmic}[1]
+\REQUIRE grafo dei residui $\overset{\leftrightarrow}{G}$, noCapSource, noCapSink, cioè nodi,rispettivamente della parte sorgente e della parte destinazione, che non sono più raggiungili dal percorso deciso precedentemente 
+\ENSURE valore del flusso inviabile, nodo appartenente LastSinkNodes, cioè tutti i nodi che sono intermedi che fanno da ponte tra le due ricerche.
+\STATE codaSource $\leftarrow$ coda di nodi vuota
+\STATE codaSink $\leftarrow$ coda di nodi vuota
+\IF{noCapSource $\ne$ null}
+\STATE provo a riparare noCapSource, cioè esplorando gli archi a lui connessi, cerco un nodo con  tale che noCapSource.Label = (nodoTrovato.label + 1)
+\IF{riesco a riparare noCapSource}
+\IF{noCapSink = null}
+\FORALL{nodo n tale che è valido (cioè che ha l'arco precedente e successivo con capacità positiva) ed è appartenente a LastSinkNodes }
+\STATE da n cerco di retrocedere verso noCapSource, aggiornando ricorsivamente le informazioni dei nodi in modo opportuno (sopratutto per quanto riguarda n)
+\IF {ho trovato il percorso tra n e noCapSource AND il possibile flusso inviabile è $> 0$}
+\STATE \textbf{return} (flusso passante per n,n)
+\ENDIF
+\ENDFOR
+\ELSE
+\STATE sourceRepaired $\leftarrow true$
+\ENDIF
+\ENDIF
+\IF{noCapSource è il nodo sorgente di $\overset{\leftrightarrow}{G}$}
+\STATE coda.enqueue(noCapSource)
+\ELSIF {noCapSource non è stato esplorato dalla parte di source(è un nodo "di confine")}
+\STATE codaSource $\leftarrow$ coda dei ultimi nodi esplorati dalla parte di source, esclusi quelli "di confine" (LastNodesSourceSide)
+\ELSE
+\STATE codaSource $\leftarrow$ nodi esplorati da source con label = noCapSource.label-1
+\STATE cancello le informazioni da tutti i nodi esplorati da Source con label $\ge$ noCapSource.label
+\ENDIF
+\ENDIF
+\algstore{LastLevelOptNoCapSourceInit}
+
+\end{algorithmic}
+\end{algorithm}
+
+\newpage
+
+\begin{algorithm}
+\begin{algorithmic}[1]
+\algrestore{LastLevelOptNoCapSourceInit}
+\IF{noCapSink $\ne$ null}
+\STATE cerco di riparare noCapSink
+\IF{riesco a riparare noCapSink}
+\STATE sinkRepaired $\leftarrow$ true
+\FORALL{nodo n tale che è valido e  appartenenti a LastSinkNodes }
+\IF{noCapSource è stato riparato AND da n posso ricorsivamente retrocedere verso noCapSource(aggiornando i dati)}
+\STATE sourceFlow $\leftarrow$ flusso passante per n
+\ELSE
+\STATE sourceFlow $\leftarrow$ $\min$(flusso passabile attraverso il precessore di n, capacità/flusso inviabile tramite l'arco che collega quel nodo a n)
+\ENDIF
+\IF{sourceFlow $> 0$ AND n può retrocedere ricorsivamente verso noCapSink(aggiornando i dati) AND il flusso passabile per $n > 0$ }
+\STATE \textbf{retrun} ($\min$(flusso passabile per n, sourceFlow),n)
+\ENDIF
+\ENDFOR
+\ENDIF
+\IF{noCapSink è il nodo destinazione t}
+\STATE codaSink.enqueue(noCapSink)
+\ELSE
+\STATE codaSink $\leftarrow$ coda dei nodi $\in \overset{\leftrightarrow}{G}$ esplorati da sink con label = (noCapSink.label-1)
+\STATE cancello le informazioni da tutti i nodi esplorati da Sink con label $\ge$ noCapSink.label
+\ENDIF
+\ENDIF
+\algstore{LastLevelOptNoCapSinkInit}
+
+\end{algorithmic}
+\end{algorithm}
+
+\newpage
+
+\begin{algorithm}
+\begin{algorithmic}[1]
+\algrestore{LastLevelOptNoCapSinkInit}
+\WHILE{codaSink o codaSource non sono vuote}
+\IF{codaSource non è vuoto AND (noCapSource $\ne$ null OR non sono riuscito a riparare noCapSource}
+\STATE element $\leftarrow$ codaSource.dequeue()
+\IF{element non è della parte di source OR element non è valido}
+\STATE \textbf{continue}
+\ENDIF
+\FORALL{arco edge in archi che entrano ed escono da element}
+\STATE p $\leftarrow$ nodo precedente di edge
+\STATE n $\leftarrow$ nodo successivo di edge
+\IF{element = p AND capacità di edge $> 0$}
+\IF{n è già stato esplorato}
+\IF{n è parte di sourceside (esplorato da source)}
+\STATE \textbf{continue}
+\ELSE \Comment{in questo caso ho le due parti che si incontrano}
+\STATE f $\leftarrow$  flusso invabile date le informazioni di p,n,edge
+\IF{f = 0}
+\STATE \textbf{continue}
+\ENDIF
+\STATE aggiorno i dati di n e di edge
+\STATE aggiungo n a LastNodesSinkSide, inserisco tutti i nodi collegati direttamente a n che fanno parte di SourceSide in LastNodesSourceSide
+\STATE \textbf{return} (f,n)
+\ENDIF
+\ENDIF
+\IF{n è sinkSide, ma non è il nodo destinazione t}
+\STATE sinkRepaired $\leftarrow$ false
+\FORALL{nodo node che di sinkSide con label = (n.label - 1)}
+\STATE codaSink.enqueue(n)
+\ENDFOR
+\STATE cancello di dati su sinkside per ogni nodo con label $\ge$ n.label
+\STATE \textbf{continue}
+\ENDIF
+\STATE aggiorno di dati di n e di edge
+\STATE codaSource.enqueue(n)
+\algstore{finishedSourceSideCap}
+\end{algorithmic}
+\end{algorithm}
+\newpage
+\begin{algorithm}
+\begin{algorithmic}
+\algrestore{finishedSourceSideCap}
+\ELSIF {element = n AND flusso passante per $e>0$}
+\IF{p è stato già esplorato}
+\IF{p è stato eslorato da source}
+\STATE\textbf{continue}
+\ELSE
+\STATE f $\leftarrow$ flusso inviabile date le informazioni di n,p,edge
+\IF{f = 0}
+\STATE \textbf{continue}
+\ENDIF
+\STATE aggiorno le informazioni di p ed edge
+\STATE \textbf{return } (f,p)
+\ENDIF
+\ENDIF
+\IF{p è stato esplorato da Sink AND p non è il nodo destinatario t}
+\STATE sinkRepaired $\leftarrow$ false
+\FORALL{nodo node epsplorto da sinkNode con label = (p.label-1)}
+\STATE codaSink.enqueue(node)
+\ENDFOR
+\STATE cancello le informazioni di tutti i nodi esplorati da Sink con Label $\ge $ n.label
+\STATE\textbf{continue}
+\ENDIF
+\STATE aggiorno le informazioni di p ed di edge
+\STATE codaSource.enqueue(p)
+\ENDIF
+\ENDFOR
+\ENDIF
+\algstore{FinishedSourcePart}
+\end{algorithmic}
+\end{algorithm}
+\newpage
+\begin{algorithm}
+\begin{algorithmic}
+\algrestore{FinishedSourcePart}
+\IF{codaSink non è vuota AND  (noCapSink $\ne$ null OR not sinkRepaired)}
+\STATE element $\leftarrow$ codaSink.dequeue()
+\IF{element è sourceSide OR element non è valido}
+\STATE \textbf{continue}
+\ENDIF
+
+\FORALL{arco edge in element.Edges}
+\STATE p $\leftarrow$ nodo precedente di edge
+\STATE n $\leftarrow$ nodo successore di edge
+\IF{element = n AND capacità di edge $> 0 $}
+\IF{p è stato esplorato}
+\IF{p è stato esplorato da source}
+\STATE \textbf{continue}
+\ELSE
+\IF{source è stato riparato AND  n può retrocedere ricorsivamente verso noCapSink(aggiornando i dati) AND il flusso passabile per $n > 0$}
+\STATE f $\leftarrow$ valore di flusso inviabile date le ottenute
+\IF{$f > 0$ }
+\STATE \textbf{return} f
+\ENDIF
+\ENDIF
+\STATE f $\leftarrow$ flusso inviabile dato p,n ed edge
+\IF{f = 0}
+\STATE \textbf{continue}
+\ENDIF
+\STATE aggiorno di dati di n ed edge
+\STATE \textbf{return} (f,n)
+\ENDIF
+\ENDIF
+\IF{p è stato esplorato da source, se non per L'Inizializzazione (cioè noCapSink è il nodo destinazione t)}
+\STATE \textbf{continue}
+\ENDIF
+\STATE aggiorno informazioni di p ed edge
+\STATE codaSink.enqueue(p)
+\algstore{FinishSinkElementN}
+\end{algorithmic}
+\end{algorithm}
+\newpage
+\begin{algorithm}
+\begin{algorithmic}
+\algrestore{FinishSinkElementN}
+\ELSIF{element = n AND flusso passante per edge $>0$}
+\IF{n è stato esplorato}
+\IF{n è stato esplorato da source (sourceSide)}
+\STATE \textbf{continue}
+\ELSE
+\IF{sourceRepaired AND da p riesco a raggiungere noCapSource(aggiornando ricorsivamente i dati)}
+\STATE \textbf{return} (flusso passabile attraverso p,p)
+\ENDIF
+\STATE f $\leftarrow$ flusso passante dati i dati di p,n ed edge
+\IF{f = 0}
+\STATE \textbf{continue}
+\ENDIF
+\STATE aggiorno i dati di p ed edge
+\STATE \textbf{return } (f,p)
+\ENDIF
+\ENDIF
+\IF{n è sourceSide ed non è il nodo sorgente s}
+\STATE \textbf{continue}
+\ENDIF
+\STATE aggiorno di dati di n
+\STATE codaSink.enqueue(n)
+\ENDIF
+\ENDFOR
+\ENDIF
+\ENDWHILE
+\STATE \textbf{return} (0,null)
+\end{algorithmic}
+\end{algorithm}
+\end{document}
