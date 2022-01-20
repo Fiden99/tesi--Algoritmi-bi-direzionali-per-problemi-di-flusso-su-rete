@@ -83,16 +83,16 @@ namespace Monodirezionale.MaxFlow.ShortestAugmentingPath
         public static void AddFlow(int flow, BiEdge edge)
         {
             int f, c;
-            if (edge.Reversed)
+            /*/if (edge.Reversed)
             {
                 f = edge.Flow - flow;
                 c = edge.Capacity + flow;
             }
             else
-            {
-                f = edge.Flow + flow;
-                c = edge.Capacity - flow;
-            }
+            {*/
+            f = edge.Flow + flow;
+            c = edge.Capacity - flow;
+            //}
 #if DEBUG
             if (c < 0 || f < 0)
                 throw new ArgumentException("valore di flusso non valido");
@@ -100,6 +100,11 @@ namespace Monodirezionale.MaxFlow.ShortestAugmentingPath
             edge.SetCapacity(c);
             edge.SetFlow(f);
 
+        }
+        public void Reset()
+        {
+            this.PreviousEdge = null;
+            this.PreviousNode = null;
         }
 
 
