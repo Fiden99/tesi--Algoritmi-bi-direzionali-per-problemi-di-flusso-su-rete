@@ -70,7 +70,7 @@ namespace Monodirezionale.MaxFlow.NoOpt
                     mom = mom.PreviousNode;
                 }
             }
-            PrintGraph(grafo);
+            //PrintGraph(grafo);
             return int.MaxValue - s.InFlow;
         }
     }

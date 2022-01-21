@@ -133,7 +133,7 @@ namespace Monodirezionale.MaxFlow.ShortestAugmentingPath
                     break;
                 SendFlow(f, t);
             }
-            PrintGraph(graph);
+            //PrintGraph(graph);
             return fMax;
         }
     }

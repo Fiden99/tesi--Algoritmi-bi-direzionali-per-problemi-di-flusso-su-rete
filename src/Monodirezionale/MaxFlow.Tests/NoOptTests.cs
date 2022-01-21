@@ -1,3 +1,5 @@
+using System;
+using System.Diagnostics;
 using Monodirezionale.MaxFlow.NoOpt;
 using Xunit;
 
@@ -8,6 +10,7 @@ public class NoOptTests
     [Fact]
     public void TestBase()
     {
+        var watch = new Stopwatch();
         SinkNode t = new SinkNode("t");
         Node n6 = new Node("6");
         n6.AddNext(t, 10);
@@ -22,15 +25,17 @@ public class NoOptTests
         SourceNode s = new SourceNode("s");
         s.AddNext((n2, 10), (n3, 30), (n4, 30));
         Graph graph = new Graph(s, n2, n3, n4, n5, n6, t);
-
+        watch.Start();
         var res = BfsNoOpt.FlowFordFulkerson(graph);
-
+        watch.Stop();
+        Console.WriteLine($"Execution Time: {watch.ElapsedMilliseconds} ms");
         Assert.Equal(35, res);
     }
 
     [Fact]
     public void Test1()
     {
+        var watch = new Stopwatch();
         SinkNode t = new SinkNode("t");
         Node n9 = new Node("9");
         Node n8 = new Node("8");
@@ -53,12 +58,16 @@ public class NoOptTests
         n1.AddNext((n4, 5), (n5, 5));
         s.AddNext((n1, 10), (n2, 20), (n3, 30));
         Graph graph = new Graph(s, n1, n2, n3, n4, n5, n6, n7, n8, n9, t);
+        watch.Start();
         var res = BfsNoOpt.FlowFordFulkerson(graph);
+        watch.Stop();
+        Console.WriteLine($"Execution Time: {watch.ElapsedMilliseconds} ms");
         Assert.Equal(60, res);
     }
     [Fact]
     public void Test2()
     {
+        var watch = new Stopwatch();
         SinkNode t = new SinkNode("t");
         Node n9 = new Node("9");
         Node n8 = new Node("8");
@@ -81,12 +90,16 @@ public class NoOptTests
         n1.AddNext((n4, 10), (n5, 10));
         s.AddNext((n1, 30), (n2, 30), (n3, 30));
         NoOpt.Graph graph = new NoOpt.Graph(s, n1, n2, n3, n4, n5, n6, n7, n8, n9, t);
+        watch.Start();
         var res = BfsNoOpt.FlowFordFulkerson(graph);
+        watch.Stop();
+        Console.WriteLine($"Execution Time: {watch.ElapsedMilliseconds} ms");
         Assert.Equal(50, res);
     }
     [Fact]
     public void Test3()
     {
+        var watch = new Stopwatch();
         SinkNode t = new SinkNode("t");
         Node n9 = new Node("9");
         Node n8 = new Node("8");
@@ -109,12 +122,16 @@ public class NoOptTests
         n1.AddNext((n4, 20), (n6, 20));
         s.AddNext((n1, 10), (n2, 10), (n3, 10));
         NoOpt.Graph graph = new NoOpt.Graph(s, n1, n2, n3, n4, n5, n6, n7, n8, n9, t);
+        watch.Start();
         var res = BfsNoOpt.FlowFordFulkerson(graph);
+        watch.Stop();
+        Console.WriteLine($"Execution Time: {watch.ElapsedMilliseconds} ms");
         Assert.Equal(30, res);
     }
     [Fact]
     public void Test4()
     {
+        var watch = new Stopwatch();
         SinkNode t = new SinkNode("t");
         Node n9 = new Node("9");
         Node n8 = new Node("8");
@@ -137,7 +154,10 @@ public class NoOptTests
         n1.AddNext((n2, 30), (n6, 40));
         s.AddNext((n1, 50), (n4, 20));
         NoOpt.Graph graph = new NoOpt.Graph(s, n1, n2, n3, n4, n5, n6, n7, n8, n9, t);
+        watch.Start();
         var res = BfsNoOpt.FlowFordFulkerson(graph);
+        watch.Stop();
+        Console.WriteLine($"Execution Time: {watch.ElapsedMilliseconds} ms");
         Assert.Equal(60, res);
 
     }
@@ -182,7 +202,11 @@ public class NoOptTests
         n16.AddNext(t, 50);
         t.AddNext(n17, 100);
         n17.AddNext(n14, 100);
+        var watch = new Stopwatch();
+        watch.Start();
         Graph graph = new Graph(s, n1, n2, n3, n4, n5, n6, n7, n8, n9, n10, n11, n12, n13, n14, n15, n16, n17, t);
+        watch.Stop();
+        Console.WriteLine($"Execution Time: {watch.ElapsedMilliseconds} ms");
 
         var res = BfsNoOpt.FlowFordFulkerson(graph);
         Assert.Equal(35, res);

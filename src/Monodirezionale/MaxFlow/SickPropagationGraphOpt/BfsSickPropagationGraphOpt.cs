@@ -223,8 +223,8 @@ namespace Monodirezionale.MaxFlow.SickPropagationGraphOpt
                                 } */
                 //fMax += f;
             }
-            PrintGraph(grafo);
-            Console.WriteLine("flusso inviato = " + (int.MaxValue - s.InFlow));
+            //PrintGraph(grafo);
+            //Console.WriteLine("flusso inviato = " + (int.MaxValue - s.InFlow));
             return (int.MaxValue - s.InFlow);
         }
     }

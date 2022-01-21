@@ -258,7 +258,7 @@ namespace Monodirezionale.MaxFlow.SickPropagation
                 }
                 fMax += f;
             }
-            PrintGraph(graph);
+            //PrintGraph(graph);
             return fMax;
 
         }
