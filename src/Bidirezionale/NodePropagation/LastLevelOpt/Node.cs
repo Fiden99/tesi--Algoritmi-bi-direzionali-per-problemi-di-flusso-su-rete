@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Net.Mail;
+
 namespace Bidirezionale.NodePropagation.LastLevelOpt
 {
     public class BiEdge
@@ -29,7 +31,7 @@ namespace Bidirezionale.NodePropagation.LastLevelOpt
         {
             this.Reversed = reversed;
         }
-        public bool AddFlow(int flow)
+        public (bool, bool) AddFlow(int flow)
         {
             int f, c;
             if (this.Reversed == false)
@@ -43,10 +45,10 @@ namespace Bidirezionale.NodePropagation.LastLevelOpt
                 c = this.Capacity + flow;
             }
             if (f < 0 || c < 0)
-                throw new ArgumentException("valore di flusso non valido");
+                return (false, true);
             this.SetCapacity(c);
             this.SetFlow(f);
-            return c == 0;
+            return (c == 0, false);
         }
     }
 
@@ -107,13 +109,16 @@ namespace Bidirezionale.NodePropagation.LastLevelOpt
         public void SetPreviousEdge(BiEdge e) => this.PreviousEdge = e;
         public void SetNextEdge(BiEdge e) => this.NextEdge = e;
 
-        public static bool AddFlow(Node n, int flow)
+        public static (bool, bool) AddFlow(Node n, int flow)
         {
             n.SetInFlow(n.InFlow - flow);
             if (n.NextEdge is not null && n.PreviousEdge is not null)
             {
-                bool x = n.NextEdge.AddFlow(flow);
-                return x & n.PreviousEdge.AddFlow(flow);
+
+                var x = n.NextEdge.AddFlow(flow);
+                var y = n.PreviousEdge.AddFlow(flow);
+
+                return (x.Item1 & y.Item1, y.Item2 | x.Item2);
             }
             else
                 return ((n.NextEdge is not null) ? n.NextEdge : n.PreviousEdge).AddFlow(flow);

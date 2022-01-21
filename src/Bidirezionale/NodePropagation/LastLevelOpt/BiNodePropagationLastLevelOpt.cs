@@ -453,58 +453,15 @@ namespace Bidirezionale.NodePropagation.LastLevelOpt
                 Node momsink = n;
                 while (momsource != s)
                 {
-                    try
+
+                    var x = momsource.PreviousEdge.AddFlow(f);
+                    if (x.Item1)
                     {
-                        if (momsource.PreviousEdge.AddFlow(f))
+                        if (x.Item2)
                         {
                             vuotoSource = momsource;
-                            momsource.SetValid(false);
-                        }
-                        momsource.SetInFlow(momsource.InFlow - f);
-                        momsource = momsource.PreviousNode;
-                    }
-                    catch (ArgumentException)
-                    {
-                        vuotoSource = momsource;
-                        momsource = n;
-                        while (momsource != vuotoSource)
-                        {
-                            momsource.PreviousEdge.AddFlow(-f);
-                            momsource.SetValid(true);
-                            momsource.SetInFlow(momsource.InFlow + f);
-                            momsource = momsource.PreviousNode;
-                        }
-                        fMax -= f;
-                        removedFlow = true;
-                        break;
-                    }
-                }
-                while (momsink != t)
-                {
-                    try
-                    {
-                        if (momsink.NextEdge.AddFlow(f))
-                        {
-                            vuotoSink = momsink;
-                            momsink.SetValid(false);
-                        }
-                        momsink.SetInFlow(momsink.InFlow - f);
-                        momsink = momsink.NextNode;
-                    }
-                    catch (ArgumentException)
-                    {
-                        vuotoSink = momsink;
-                        momsink = n;
-                        while (momsink != vuotoSink)
-                        {
-                            momsink.NextEdge.AddFlow(-f);
-                            momsink.SetValid(true);
-                            momsink.SetInFlow(momsink.InFlow + f);
-                            momsink = momsink.NextNode;
-                        }
-                        if (!removedFlow)
-                        {
-                            while (momsource != s)
+                            momsource = n;
+                            while (momsource != vuotoSource)
                             {
                                 momsource.PreviousEdge.AddFlow(-f);
                                 momsource.SetValid(true);
@@ -512,10 +469,52 @@ namespace Bidirezionale.NodePropagation.LastLevelOpt
                                 momsource = momsource.PreviousNode;
                             }
                             fMax -= f;
+                            removedFlow = true;
+                            break;
                         }
-                        break;
+                        vuotoSource = momsource;
+                        momsource.SetValid(false);
                     }
+                    momsource.SetInFlow(momsource.InFlow - f);
+                    momsource = momsource.PreviousNode;
+
                 }
+                while (momsink != t)
+                {
+                    var x = momsink.NextEdge.AddFlow(f);
+                    if (x.Item1)
+                    {
+                        if (x.Item2)
+                        {
+                            vuotoSink = momsink;
+                            momsink = n;
+                            while (momsink != vuotoSink)
+                            {
+                                momsink.NextEdge.AddFlow(-f);
+                                momsink.SetValid(true);
+                                momsink.SetInFlow(momsink.InFlow + f);
+                                momsink = momsink.NextNode;
+                            }
+                            if (!removedFlow)
+                            {
+                                while (momsource != s)
+                                {
+                                    momsource.PreviousEdge.AddFlow(-f);
+                                    momsource.SetValid(true);
+                                    momsource.SetInFlow(momsource.InFlow + f);
+                                    momsource = momsource.PreviousNode;
+                                }
+                                fMax -= f;
+                            }
+                            break;
+                        }
+                        vuotoSink = momsink;
+                        momsink.SetValid(false);
+                    }
+                    momsink.SetInFlow(momsink.InFlow - f);
+                    momsink = momsink.NextNode;
+                }
+
             }
             return fMax;
 
