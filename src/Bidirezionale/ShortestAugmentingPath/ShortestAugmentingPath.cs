@@ -88,17 +88,18 @@ namespace Bidirezionale.ShortestAugmentingPath
             else
             {
                 Node mom = reached.NextNode;
+                reached.NextEdge.AddFlow(flow);
                 while (reached is not SourceNode)
                 {
                     m = reached;
-                    reached.AddFlow(flow);
+                    reached.PreviousEdge.AddFlow(flow);
                     reached = reached.PreviousNode;
                     m.Reset();
                 }
                 while (mom is not SinkNode)
                 {
                     m = mom;
-                    mom.AddFlow(flow);
+                    mom.NextEdge.AddFlow(flow);
                     mom = mom.NextNode;
                     m.Reset();
                 }
@@ -149,6 +150,7 @@ namespace Bidirezionale.ShortestAugmentingPath
                 else
                     break;
                 fMax += f;
+                //TODO valutare se è necessario fare un reset a tutti i nodi una volta trovato il percorso
             }
             return fMax;
         }
@@ -169,37 +171,19 @@ namespace Bidirezionale.ShortestAugmentingPath
                         sourceflow = Math.Min(sourceflow, e.Capacity);
                         //e.SetReversed(false);
                         n.SetPrevious(e);
-                        if (n is SinkNode || n.NextEdge != null)
+                        if (n is SinkNode)
+                            return (sourceflow, sinkflow, n, startSink);
+                        if (n.NextEdge != null)
                             return (sourceflow, sinkflow, n, n);
                         return SinkDfs(graph, n, startSink, sourceflow, sinkflow);
                     }
-                    /*                     else if (startSource == n && p.SinkDistance == (n.SinkDistance - 1) && e.Flow > 0)
-                                        {
-                                            sourceflow = Math.Min(sourceflow, e.Flow);
-                                            e.SetReversed(true);
-                                            p.SetPrevious(e);
-                                            if (p is SinkNode || p.NextEdge != null)
-                                                return (sourceflow, sinkflow, p, p);
-                                            return SinkDfs(graph, p, startSink, sourceflow, sinkflow);
-                                        }
-                     */                    //TODO da capire come si deve retreat
                 }
                 int min = int.MaxValue - 1;
                 foreach (var e in startSource.Edges)
-                {
-                    //TODO controllare
                     if (e.PreviousNode == startSource && e.Capacity > 0)
                         min = Math.Min(min, e.NextNode.SinkDistance);
-                    /*                     else
-                                            min = Math.Min(min, e.NextNode.SinkDistance);
-                     */
-                }
                 startSource.SetSinkDistance(min + 1);
-                Node mom;
-                if (startSource is SourceNode)
-                    mom = startSource;
-                else
-                    mom = startSource.PreviousNode;
+                Node mom = startSource is SourceNode ? startSource : startSource.PreviousNode;
                 startSource.Reset();
                 return Dfs(graph, mom, startSink, sourceflow, sinkflow);
             }
@@ -215,25 +199,17 @@ namespace Bidirezionale.ShortestAugmentingPath
                 {
                     Node n = e.NextNode;
                     Node p = e.PreviousNode;
-                    //TODO controllare che sia corretto
                     if (startSink == n && p.SourceDistance == (n.SourceDistance - 1) && e.Capacity > 0)
                     {
                         sinkflow = Math.Min(sinkflow, e.Capacity);
                         //e.SetReversed(false);
                         p.SetNext(e);
-                        if (p is SourceNode || p.PreviousEdge != null)
+                        if (p is SourceNode)
+                            return (sourceflow, sinkflow, startSource, p);
+                        if (p.PreviousEdge != null)
                             return (sourceflow, sinkflow, p, p);
                         return Dfs(graph, startSource, p, sourceflow, sinkflow);
                     }
-                    /*                     else if (startSink == p && n.SourceDistance == (p.SourceDistance - 1) && e.Flow > 0)
-                                        {
-                                            sinkflow = Math.Min(sinkflow, e.Flow);
-                                            e.SetReversed(true);
-                                            n.SetNext(e);
-                                            if (p is SourceNode || n.PreviousEdge != null)
-                                                return (sourceflow, sinkflow, n, n);
-                                        }
-                     */
                 }
                 //retreat
                 int min = int.MaxValue - 1;
@@ -241,9 +217,6 @@ namespace Bidirezionale.ShortestAugmentingPath
                 {
                     if (startSink == e.NextNode && e.Capacity > 0)
                         min = Math.Min(min, e.PreviousNode.SourceDistance);
-                    /*                     if (startSink == e.NextNode && e.Capacity > 0)
-                                            min = Math.Min(min, e.PreviousNode.SourceDistance);
-                     */
                 }
                 startSink.SetSourceDistance(min + 1);
                 Node mom;

@@ -1,0 +1,145 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{algorithm}
+%\usepackage{algorithmic}
+\usepackage{algcompatible}
+\usepackage{amsmath}
+
+\title{algoritmi bidirezionali}
+\author{Filippo Magi }
+
+\begin{document}
+
+\maketitle
+\section{ShortestAugmentingPath}
+\subsection{FlowFordFulkerson}
+\begin{algorithm}
+\caption{Ricerca del flusso massimo}
+\begin{algorithmic}[1]
+\REQUIRE grafo dei residui $\overset{\leftrightarrow}{G} = \{V(G),E(G) \cup \{ \overset{\leftarrow}{e} : e \in E(G) \}$, nodo Source $s$, nodo destinazione $t$ .
+\ENSURE valore del flusso massimo di $\overset{\leftrightarrow}{G}, E(\overset{\leftrightarrow}{G}) $ aggiornato
+\STATE $startSource \leftarrow s$
+\STATE $startSink \leftarrow t$
+\STATE $fMax \leftarrow$ Bfs(s)\Comment{faccio partire da s una bfs, cercando un percorso e sopratutto indicando la distanza che c'è fra un certo nodo e source}
+\STATE sendFlow($t,fMax$) \Comment{invio il flusso dal percorso indicato tramite previousNode da t verso s con il valore fMax,nel mentre che procedo cancello le informazioni nei nodi esplorati (tranne la distanza)}
+\STATE $f \leftarrow$ Bfs(t) \Comment{bfs da t verso s, trovo un percorso salvato da NextNode e sopratutto trovo la distanza tra un certo nodo e t}
+\STATE sendFlow$(s,f)$
+\STATE $fMax \leftarrow f + fMax$
+\FORALL{var n in $N(\overset{\leftrightarrow}{G})$}
+\STATE n.Reset() \Comment{cancello indicazioni su un possibile percorso da fare}
+\ENDFOR
+\STATE $fso \leftarrow +\infty, fsi \leftarrow +\infty$
+\WHILE  {$f \ne 0 $ AND distanza tra $s$ e $t$ $>$ nodi di $\overset{\leftrightarrow}{G}$, AND distanza tra $t$ ed $s$ $>$ nodi di $\overset{\leftrightarrow}{G}$}
+($fso,fsi,startSource,startSink) \leftarrow$ Dfs $(\overset{\leftrightarrow}{G},startSource,startSink,fso,fsi,s,t)$
+\IF{$startSink = startSource $ AND $startSink \ne null$}
+\STATE $f \leftarrow \min(fso,fsi)$
+\STATE sendFlow($startSink,f)$ 
+\STATE $fso \leftarrow +\infty, fsi \leftarrow +\infty$
+\STATE $startSource \leftarrow s, startSink \leftarrow t$
+\ELSIF{$startSink = s$}
+\STATE $f \leftarrow fsi$
+\STATE sendFlow($startSink,f$)
+\STATE $fsi \leftarrow +\infty$
+\STATE $startSink \leftarrow t$
+\ELSIF{$startSource = t$}
+\STATE $f \leftarrow fso$
+\STATE sendFlow($startSource,f$)
+\STATE $fso \leftarrow +\infty$
+\STATE $startsource \leftarrow s$
+\ELSE
+\STATE \textbf{break}
+\ENDIF
+\STATE $fMax \leftarrow f + fMax$
+\STATE \Comment{valutare se serve fare un reset per ogni nodo presente nel grafo}
+\ENDWHILE
+\STATE \textbf{return} fMax
+\end{algorithmic}
+\end{algorithm}
+\subsection{Dfs}
+\begin{algorithm}
+\caption{Dfs}
+\begin{algorithmic}[1]
+\REQUIRE grafo dei residui $\overset{\leftrightarrow}{G}$, $startSource$ e $startSink$ rispettivamente il nodo di partenza della parte di Source e di Sink, $sourceFlow$ e $sinkFlow$ rispettivamente il valore del flusso massimo inviabile dalla parte di Source e di Sink, nodo sorgente $s$, nodo destinazione $t$
+\ENSURE (massimo valore di flusso inviabile da parte di source, massimo valore di flusso inviabile da parte di Sink, Nodo di arrivo dalla parte di Source, nodo di arrivo dalla parte di Sink)
+\IF{$startSource = startSink$}
+\STATE \textbf{return} ($sourceFlow,sinkFlow,startSource,startSink)$ 
+\ENDIF
+\IF{distanza tra $startSink$ e $s <$ numero di nodi di $N(\overset{\leftrightarrow}{G})$ AND distanza tra $startSource$ e $t<$ numero di nodi di $N(\overset{\leftrightarrow}{G})$}
+\FORALL{arco $edge$ in $startSource.Edges$}
+\STATE $n \leftarrow edge.NextNode$
+\STATE $p \leftarrow edge.PreviousNode$
+\IF{$startSource = p $ AND (distanza tra $n$ e $t$) = ((distanza tra $p$ e $t$) - 1) AND capacità di $edge > 0$}
+\STATE $sourceFlow \leftarrow \min(sourceFlow,$ capacità di $edge)$
+\STATE arco precedente di $ n \leftarrow edge$ \Comment{salvo anche il nodo precedente}
+\IF{n è già stato precedentemente esplorato dalla parte di Sink}
+\STATE \textbf{return}  $(sourceFlow, sinkFlow,n,n)$
+\ENDIF
+\IF{$n = t$}
+\STATE \textbf{return} $(sourceFlow,sinkFlow,n,startSink)$
+\ENDIF
+\STATE \textbf{return} SinkDfs$(\overset{\leftrightarrow}{G},n, startSink, sourceFlow, sinkFlow,s,t)$
+\ENDIF
+\ENDFOR
+\STATE $minDistance \leftarrow +\infty$
+\FORALL{arco $edge \in startSource.Edges$}
+\IF{$edge.PreviousNode = startSource$ AND capacità di $edge > 0$}
+\STATE $minDistance \leftarrow \min(minDistance,$ distanza tra nodo successivo di $edge$ e $t$
+\ENDIF
+\ENDFOR
+\STATE distanza tra $startSource$ e $t \leftarrow minDistance+1$
+\IF{$startSource = s$}
+\STATE $mom \leftarrow startsource$
+\ELSE
+\STATE $mom \leftarrow $ nodo precedente di $startSource$ 
+\ENDIF
+\STATE $startSource.Reset()$
+\STATE \textbf{return} Dfs($\overset{\leftrightarrow}{G},mom, startSink, sourceFlow, sinkFlow,s,t$)
+\ENDIF 
+\STATE \textbf{return} $(0,0,null,null)$
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}
+\caption{SinkDfs}
+\begin{algorithmic}
+\REQUIRE grafo dei residui $\overset{\leftrightarrow}{G}$, $startSource$ e $startSink$ rispettivamente il nodo di partenza della parte di Source e di Sink, $sourceFlow$ e $sinkFlow$ rispettivamente il valore del flusso massimo inviabile dalla parte di Source e di Sink, nodo sorgente $s$, nodo destinazione $t$
+\ENSURE (massimo valore di flusso inviabile da parte di source, massimo valore di flusso inviabile da parte di Sink, Nodo di arrivo dalla parte di Source, nodo di arrivo dalla parte di Sink)
+\IF{$startSource = startSink$}
+\STATE \textbf{return} ($sourceFlow,sinkFlow,startSource,startSink)$ 
+\ENDIF
+\IF{distanza tra $startSink$ e $s <$ numero di nodi di $N(\overset{\leftrightarrow}{G})$ AND distanza tra $startSource$ e $t<$ numero di nodi di $N(\overset{\leftrightarrow}{G})$}
+\FORALL{arco $edge$ in $startSink.Edges$}
+\STATE $n \leftarrow edge.NextNode$
+\STATE $p \leftarrow edge.PreviousNode$
+\IF{$startSink = n $ AND (distanza tra $p$ e $t$) = ((distanza tra $n$ e $t$) - 1) AND capacità di $edge > 0$}
+\STATE $sourceFlow \leftarrow \min(sinkFlow,$ capacità di $edge)$
+\STATE arco precedente di $ p \leftarrow edge$ \Comment{salvo anche il nodo precedente}
+\IF{p è già stato precedentemente esplorato dalla parte di Sink}
+\STATE \textbf{return}  $(sourceFlow, sinkFlow,p,p)$
+\ENDIF
+\IF{$p = n$}
+\STATE \textbf{return} $(sourceFlow,sinkFlow,startSource,p)$
+\ENDIF
+\STATE \textbf{return} Dfs$(\overset{\leftrightarrow}{G},startSource, p, sourceFlow, sinkFlow,s,t)$
+\ENDIF
+\ENDFOR
+\STATE $minDistance \leftarrow +\infty$
+\FORALL{arco $edge \in startSink.Edges$}
+\IF{$edge.NextNode = startSink$ AND capacità di $edge > 0$}
+\STATE $minDistance \leftarrow \min(minDistance,$ distanza tra nodo precedente di $edge$ e $t$
+\ENDIF
+\ENDFOR
+\STATE distanza tra $startSink$ e $t \leftarrow minDistance+1$
+\IF{$startSink = t$}
+\STATE $mom \leftarrow startSink$
+\ELSE
+\STATE $mom \leftarrow $ nodo successore di $startSink$ 
+\ENDIF
+\STATE $startSink.Reset()$
+\STATE \textbf{return} SinkDfs($\overset{\leftrightarrow}{G},startSource, mom, sourceFlow, sinkFlow,s,t$)
+\ENDIF 
+\STATE \textbf{return} $(0,0,null,null)$
+
+\end{algorithmic}
+\end{algorithm}
+\end{document}
