@@ -221,9 +221,12 @@ namespace Bidirezionale.NodePropagation.LastLevelOpt
                         foreach (var n in graph.LastNodesSinkSide.Where(x => x.Valid))
                         {
                             int sourceFlow;
-                            if (sourceRepaired && GetFlow(noCapSource, n) != null)
-                                sourceFlow = n.InFlow;
-                            else
+                            if (sourceRepaired)
+                                if (GetFlow(noCapSource, n) != null)
+                                    sourceFlow = n.InFlow;
+                                else
+                                    continue;
+                            else// vuol dire che noCapSource == null
                                 sourceFlow = Math.Min(n.PreviousNode.InFlow, n.PreviousEdge.Reversed ? n.PreviousEdge.Flow : n.PreviousEdge.Capacity);
                             if (sourceFlow > 0 && GetFlow(noCapSink, n) != null && n.InFlow != 0)
                                 return (Math.Min(n.InFlow, sourceFlow), n);
@@ -479,41 +482,32 @@ namespace Bidirezionale.NodePropagation.LastLevelOpt
                     momsource = momsource.PreviousNode;
 
                 }
-                while (momsink != t)
-                {
-                    var x = momsink.NextEdge.AddFlow(f);
-                    if (x.Item1)
+                if (!removedFlow)
+                    while (momsink != t)
                     {
-                        if (x.Item2)
+                        var x = momsink.NextEdge.AddFlow(f);
+                        if (x.Item1)
                         {
-                            vuotoSink = momsink;
-                            momsink = n;
-                            while (momsink != vuotoSink)
+                            if (x.Item2)
                             {
-                                momsink.NextEdge.AddFlow(-f);
-                                momsink.SetValid(true);
-                                momsink.SetInFlow(momsink.InFlow + f);
-                                momsink = momsink.NextNode;
-                            }
-                            if (!removedFlow)
-                            {
-                                while (momsource != s)
+                                vuotoSink = momsink;
+                                momsink = n;
+                                while (momsink != vuotoSink)
                                 {
-                                    momsource.PreviousEdge.AddFlow(-f);
-                                    momsource.SetValid(true);
-                                    momsource.SetInFlow(momsource.InFlow + f);
-                                    momsource = momsource.PreviousNode;
+                                    momsink.NextEdge.AddFlow(-f);
+                                    momsink.SetValid(true);
+                                    momsink.SetInFlow(momsink.InFlow + f);
+                                    momsink = momsink.NextNode;
                                 }
                                 fMax -= f;
+                                break;
                             }
-                            break;
+                            vuotoSink = momsink;
+                            momsink.SetValid(false);
                         }
-                        vuotoSink = momsink;
-                        momsink.SetValid(false);
+                        momsink.SetInFlow(momsink.InFlow - f);
+                        momsink = momsink.NextNode;
                     }
-                    momsink.SetInFlow(momsink.InFlow - f);
-                    momsink = momsink.NextNode;
-                }
 
             }
             return fMax;

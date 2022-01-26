@@ -1,72 +1,76 @@
 \documentclass{article}
 \usepackage[utf8]{inputenc}
 \usepackage{algorithm}
-\usepackage{algorithmic}
+%\usepackage{algorithmic}
+\usepackage{algcompatible}
 \usepackage{amsmath}
 
-\title{Shortest Augmenting Path}
+\title{algoritmi bidirezionali}
 \author{Filippo Magi }
 
 \begin{document}
-
-\maketitle
 
 \section{Shortest Augmenting Path}
 \begin{algorithm}
 \caption{Shortest Augmenting Path}
 \begin{algorithmic}
-\REQUIRE grafo dei reisidui $\overset{\leftrightarrow}{G}$
-\ENSURE flusso massimo inviato, $\overset{\leftrightarrow}{G}$ aggiornato
-\STATE s $\leftarrow$ nodo sorgente di $\overset{\leftrightarrow}{G}$
-\STATE t $\leftarrow$ nodo destinazione di $\overset{\leftrightarrow}{G}$
-\STATE eseguo bfs, che parte da t, assegnando a ogni nodo la distanza da t 
-\STATE invio flusso nel percorso deciso dalla bfs
-\STATE flussoInviato $\leftarrow$ flusso inviato (dal percorso deciso dalla bfs)
-\WHILE{distanza tra t e s < numero di nodi di $\overset{\leftrightarrow}{G}$}
-\STATE f $\leftarrow$ Dfs$(\overset{\leftrightarrow}{G}, s, +\infty)$
-\IF{f $\ne 0$}
-\STATE invia flusso f nel grafo nel percorso indicato
+\REQUIRE Rete $(G,u,s,t)$
+\ENSURE flusso $s-t$ massimo $fMax$
+\STATE $fMax \leftarrow $BFS(t)\Comment{ assegnando a ogni nodo la distanza da t ,quindi $\forall n \in V(G) \not \in t| d(n) > 0$}
+\STATE sendFlow($fMax,s$)
+\FORALL{$n \in V(G)$}
+\STATE $n.reset()$ \Comment{elimino dati sul percorso da fare}
+\ENDFOR
+\WHILE{$d(s) < \#V(G)$}
+\STATE $f \leftarrow$ Dfs$(G, s, +\infty)$
+\IF{$f \ne 0$}
+\STATE sendFlow($f,t$)
 \ELSE
 \STATE \textbf{break}
 \ENDIF
-\STATE flussoInviato $\leftarrow$ f + flussoInviato 
+\STATE $fMax \leftarrow f + fMax $
+\STATE \Comment{valutare se qui devo inserire un reset per ogni nodo presente nel grafo}
 \ENDWHILE
-\RETURN flussoInviato
+\STATE \textbf{return} $fMax$
 \end{algorithmic}
 \end{algorithm}
+
 \begin{algorithm}
 \caption{Dfs per trovare il flusso massimo in Shortest Augmenting Path}
 \begin{algorithmic}
-\REQUIRE grafo dei residui  $\overset{\leftrightarrow}{G}$,Nodo start, valore f
-\ENSURE valore del flusso inviabile, percorso percoribile per poter inviare il flusso prima indicato
-\IF{distanza tra nodo start e t $<$ numero dei nodi presenti in $\overset{\leftrightarrow}{G}$}
-\FORALL{arco edge che entra o esce nel nodo start}
-\IF{edge è un arco uscente da start AND edge è ammissibile (distanza tra i nodi = 1 e capacità residua positiva)}
-\STATE arco precedente di n $\leftarrow$ edge ( di conseguenza salvo anche il nodo precedente)
-\STATE f $\leftarrow \min$(f,capacità di edge)
-\IF{n è il nodo di destinazione di $\overset{\leftrightarrow}{G}$}
-\RETURN f
+\REQUIRE Una rete $(G,u,s,t)$, nodo $start$, valore $f$
+\ENSURE valore del flusso inviabile \Comment{come effetto collaterale modifico le informazioni dei nodi indicando per ogni nodo la strada che deve seguire per collegare $s$ e $t$}
+\IF{$d(start)< \#V(G)$}
+\FORALL{arco $edge \in start.Edges$}
+\STATE $n \leftarrow edge.nextNode$
+\IF{$edge.previousNode = start $ AND $u(edge)>0$ AND $d(start)-1 = d(n)$}
+\STATE $n.setPrevious(edge)$ \Comment{aggiorno anche il previousNode di n}
+\STATE $f \leftarrow \min(f,u(e))$
+\IF{$n=t$}
+\STATE \textbf{return} $f$
 \ENDIF
-\RETURN Dfs($\overset{\leftrightarrow}{G}$,n,f)
+\STATE \textbf{return} Dfs($G,n,f$)
 \ENDIF
 \ENDFOR
-
 \STATE min $\leftarrow +\infty$
-\FORALL{arco edge che esce da start}
-\IF{capacità di edge è positiva}
-\STATE min $\leftarrow \min$(min, distanza del nodo entrante di edge)
+\FORALL{arco edge che entra in start}
+\IF{flusso di edge è positivo}
+\STATE min $\leftarrow \min$(min, flusso di edge)
 \ENDIF
 \ENDFOR
-\STATE distanza tra start e t $\leftarrow$ min
-\IF{start è nodo sorgente di $\overset{\leftrightarrow}{G}$}
-\RETURN Dfs($\overset{\leftrightarrow}{G}$,start,f)
+\FORALL{arco $edge$ che esce da $start$}
+\IF{$u(edge)>0$}
+\STATE $min \leftarrow \min(min, u(edge))$
+\ENDIF
+\ENDFOR
+\STATE $d(start)\leftarrow min$
+\IF{$start = s$}
+\STATE \textbf{return} Dfs($G,start,f$)
 \ELSE
-\STATE m $\leftarrow$ precedessore di start
-\STATE cancello dati contenuti in m (tranne distanza)
-\RETURN Dfs($\overset{\leftrightarrow}{G}$,m,f)
+\STATE \textbf{return} Dfs($G,start.previousNode,f$)
 \ENDIF
 \ENDIF
-\RETURN 0
+\STATE \textbf{return} 0
 \end{algorithmic}
 \end{algorithm}
 \end{document}

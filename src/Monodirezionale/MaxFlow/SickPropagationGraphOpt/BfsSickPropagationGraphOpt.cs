@@ -107,7 +107,7 @@ namespace Monodirezionale.MaxFlow.SickPropagationGraphOpt
             else
             {
                 Node t = grafo.Sink;
-                if (Repair(grafo, noCap, noCap.PreviousNode) && t.PreviousNode.InFlow != 0 && t.Edges.Single(x => x.PreviousNode == t.PreviousNode).Capacity > 0)
+                if (Repair(grafo, noCap, noCap.PreviousNode) && t.PreviousNode.InFlow != 0 && t.PreviousEdge.Capacity > 0)
                 {
                     return Math.Min(t.InFlow, noCap.InFlow);
                 }

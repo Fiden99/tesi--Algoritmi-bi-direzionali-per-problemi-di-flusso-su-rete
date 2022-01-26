@@ -99,13 +99,13 @@ namespace Monodirezionale.MaxFlow.LastLevelOpt
                 this.PreviousNode = e.NextNode;
         }
 
-        public bool AddFlow(int flow, Node n)
+        public (bool, bool) AddFlow(int flow, Node n)
         {
             BiEdge edge = this.Edges.Single(x => x.NextNode == n || x.PreviousNode == n);
             return AddFlow(flow, edge);
 
         }
-        public bool AddFlow(int flow, BiEdge edge)
+        public (bool, bool) AddFlow(int flow, BiEdge edge)
         {
             int f, c;
             if (edge.Reversed == false)
@@ -119,11 +119,11 @@ namespace Monodirezionale.MaxFlow.LastLevelOpt
                 c = edge.Capacity + flow;
             }
             if (f < 0 || c < 0)
-                throw new ArgumentException("valore di flusso non valido");
+                return (true, true);
             edge.SetCapacity(c);
             edge.SetFlow(f);
             this.SetInFlow(this.InFlow - flow);
-            return c == 0;
+            return (c == 0, false);
 
         }
         public void SetLabel(int label)

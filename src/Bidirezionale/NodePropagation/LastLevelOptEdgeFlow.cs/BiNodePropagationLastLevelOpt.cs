@@ -168,11 +168,8 @@ namespace Bidirezionale.NodePropagation.LastLevelOptEdgeFlow
                         {
                             if (!n.Valid)
                                 continue;
-                            bool sourceReached = false;
                             //TODO errore molto probabilmente qui, 
-                            if (sourceRepaired && Reached(noCapSource, n))
-                                sourceReached = true;
-                            if (sourceReached && Reached(noCapSink, n))
+                            if (sourceRepaired && Reached(noCapSource, n) && Reached(noCapSink, n))
                                 return n;
                         }
                     }

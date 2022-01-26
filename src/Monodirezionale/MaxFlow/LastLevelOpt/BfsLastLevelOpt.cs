@@ -34,12 +34,6 @@ namespace Monodirezionale.MaxFlow.LastLevelOpt
         }
 
         //TODO da capire se CorrectFlow deve arrivare fino a s oppure si può fermare prima
-        public static int CorrectFlow(Node node)
-        {
-            if (node.PreviousNode != null && node.InFlow > node.PreviousNode.InFlow)
-                node.SetInFlow(CorrectFlow(node.PreviousNode));
-            return node.InFlow;
-        }
 
         public static int doBfs(Graph grafo, Node noCap)
         {
@@ -51,38 +45,16 @@ namespace Monodirezionale.MaxFlow.LastLevelOpt
                 //grafo.ResetLabel(0);
                 coda = new Queue<Node>();
                 coda.Enqueue(grafo.Source);
-
-                /*                 if (grafo.InvalidNodes.Count == 0)
-                                {
-                                    grafo.ResetLabel(0);
-                                    coda = new Queue<Node>();
-                                    coda.Enqueue(grafo.Source);
-                                }
-                                else
-                                {
-
-                                    int x = grafo.InvalidNodes.Min(x => x.Label);
-                                    coda = new Queue<Node>(grafo.LabeledNode[x - 1]);
-                                    //grafo.ResetLabel(x);
-                                    grafo.ResetLabel(x);
-
-                                    //coda = new Queue<Node>(grafo.LabeledNode[startLabel - 1]);
-                                    //grafo.ResetLabel(startLabel);
-                                }
-                 */
             }
             else
             {
                 Node t = grafo.Sink;
-                if (Repair(grafo, noCap) && t.PreviousNode.InFlow != 0 && t.Edges.Single(x => x.PreviousNode == t.PreviousNode).Capacity > 0)
+                if (Repair(grafo, noCap) && t.PreviousNode.InFlow != 0 && t.PreviousEdge.Capacity > 0)
                 {
                     return Math.Min(t.InFlow, noCap.InFlow);
                 }
                 coda = new Queue<Node>(grafo.LabeledNode[noCap.Label - 1]);
                 grafo.ResetLabel(noCap.Label);
-                foreach (Node n in coda)
-                    n.SetInFlow(CorrectFlow(n));
-
             }
             while (coda.Count > 0)
             {
@@ -168,9 +140,25 @@ namespace Monodirezionale.MaxFlow.LastLevelOpt
                 Node mom = t;
                 while (mom != s)
                 {
-
-                    if (mom.PreviousNode.AddFlow(f, mom.PreviousEdge))
-                        vuoto = mom;
+                    var x = mom.PreviousNode.AddFlow(f, mom.PreviousEdge);
+                    if (x.Item1)
+                        if (x.Item2)
+                        {
+                            vuoto = mom;
+                            mom = t;
+                            while (mom != vuoto)
+                            {
+                                mom.PreviousNode.AddFlow(-f, mom.PreviousEdge);
+                                mom.SetValid(true);
+                                mom.SetInFlow(mom.InFlow + f);
+                                mom = mom.PreviousNode;
+                            }
+                            break;
+                        }
+                        else
+                        {
+                            vuoto = mom;
+                        }
                     mom = mom.PreviousNode;
 
                 }

@@ -6,7 +6,7 @@ namespace Monodirezionale.MaxFlow.NoOpt
 {
     public class BfsNoOpt
     {
-        public static int DoBfs(Graph grafo)
+        public static void DoBfs(Graph grafo)
         {
             grafo.ResetLabel();
             var coda = new Queue<Node>();
@@ -29,13 +29,13 @@ namespace Monodirezionale.MaxFlow.NoOpt
                         else
                             n.SetInFlow(Math.Min(element.InFlow, e.Capacity));
                         if (n is SinkNode)
-                            return n.InFlow;
+                            return;
                         else
                             coda.Enqueue(n);
                     }
                 }
             }
-            return 0;
+            return;
         }
 
         static void PrintGraph(Graph grafo)
@@ -59,14 +59,14 @@ namespace Monodirezionale.MaxFlow.NoOpt
             while (true)
             {
                 //ricordati di cambiarlo quando testi un nuovo programma
-                int f = DoBfs(grafo);
-                if (f == 0)
+                DoBfs(grafo);
+                if (t.InFlow == 0)
                     break;
                 //fMax += f;
                 Node mom = t;
                 while (mom != s)
                 {
-                    mom.PreviousNode.AddFlow(f, mom);
+                    mom.PreviousNode.AddFlow(t.InFlow, mom);
                     mom = mom.PreviousNode;
                 }
             }

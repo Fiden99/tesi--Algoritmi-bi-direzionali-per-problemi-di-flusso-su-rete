@@ -1,0 +1,124 @@
+
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{algorithm}
+%\usepackage{algorithmic}
+\usepackage{algcompatible}
+\usepackage{amsmath}
+
+\title{algoritmi bidirezionali}
+\author{Filippo Magi }
+
+\begin{document}
+\section{Propagazione della malattia}
+\begin{algorithm}
+\caption{Ricerca del massimo flusso con propagazione della malattia}
+\begin{algorithmic}
+\REQUIRE rete $(G,u,s,t)$
+\ENSURE valore del flusso massimo
+\STATE $noCap \leftarrow$ null
+\WHILE{TRUE}
+\STATE $f \leftarrow$ DoBfs($G,noCap$)
+\IF{ $f = 0$}
+\STATE \textbf{break}
+\ENDIF
+\STATE $mom \leftarrow t$
+\WHILE{ $mom \ne s$}
+\STATE $mom.$PreviousEdge.AddFlow($f$)
+\IF{$u(mom.PreviousEdge) < 0 $ OR $ f(mom.PreviousEdge) < 0$}
+\STATE $mom$.Reverse(t) \Comment{da t faccio tornare come le capacità e il flusso come prima di inviarle fino a mom}
+\STATE $noCap \leftarrow mom$
+\STATE \textbf{break}
+\ENDIF
+
+\IF{$u(mom$.PreviousEdge$ = 0$}
+\STATE $noCap \leftarrow mom$
+\ENDIF
+\STATE $mom \leftarrow mom.$PreviousNode
+\ENDWHILE
+\ENDWHILE
+\STATE \textbf{return} $s.$flussoUscente
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}
+\caption{DoBfs con propagazione della malattia}
+\begin{algorithmic}
+\REQUIRE rete $(G,u,s,t)$, nodo $noCap$
+\ENSURE flusso inviabile da s al nodo t
+\STATE $coda \leftarrow$ coda vuota di nodi
+\IF{$noCap =$ null}
+\STATE $coda$.enqueue(s)
+\ELSE
+\STATE Repair($noCap$) \COMMENT {controllo se c'è un nodo con label = noCap.label-1 e con capacità o flusso diversa da 0}
+\IF {$noCap$ è stato riparato AND $t.$PreviousNode.flussoPassante $> 0$ AND $u(t$.PreviousEdge$) > 0$}
+\STATE \textbf{return} $\min(t$.flussoPassante, $noCap$.flussoPassante) 
+\ENDIF
+\STATE $v \leftarrow$ SickPropagation($G,noCap,coda$)
+\IF{$v \ne 0$}
+\STATE \textbf{return} $v$
+\ENDIF
+\FORALL{$n \in N(G) | n.label \ge noCap.label$}
+\STATE $n$.Reset()
+\ENDFOR
+\IF{$coda$ è vuota}
+\STATE $coda \leftarrow  \{n \in N(G) | n.label = (noCap.label - 1)\}$
+\ENDIF
+\FORALL{ $n \in coda$}
+\STATE RecoverFlow($n$)
+\COMMENT{Dato che è possibile che il flusso entrante sia uguale a zero dovuto a SickPropagation, torno indietro fino al primo nodo con flusso entrante positivo, quindi, ricorsivamente, inserisco il flusso entrante per tutti i nodi che ho visitato}
+\ENDFOR
+\ENDIF
+\WHILE{$coda$ non è vuota}
+\STATE $element \leftarrow coda$.Dequeue()
+\FORALL{$edge \leftarrow element$.Edges}
+\STATE $n \leftarrow  edge.$nextNode
+\STATE $p \leftarrow edge.$previousNode
+\IF{$n$.visited AND $p$.visited (se il nodo è invalido è considerato non visitato)}
+\STATE \textbf{continue}
+\ENDIF
+\IF{$p = element$ AND $u(edge)>0$ AND ($n.label \ge p.label$ OR$\neg n.$valid OR $noCap =$ null)}
+\STATE $n$.update(edge,p) \Comment{ (label, flusso entrante, nodo precedente, nel caso riparo il nodo)}
+\IF{ $ n = t $}
+\STATE \textbf{return} $n$.flussoPassante
+\ELSE
+\STATE $coda$.enqueue($n$)
+\ENDIF
+\ELSIF{$n = element$ AND $f(edge)>0$ AND ($p.label \ge n.label$ OR$\neg p.$valid OR $noCap =$ null)}
+\STATE $p$.update(edge,n)
+\IF{ $p = t $}
+\STATE \textbf{return} $n$.flussoPassante
+\ELSE
+\STATE $coda.$enqueue($p$)
+\ENDIF
+\ENDIF
+\ENDFOR
+\ENDWHILE
+\STATE \textbf{return} 0
+
+\end{algorithmic}
+\end{algorithm}
+\begin{algorithm}
+\caption{SickPropagation}
+\begin{algorithmic}
+\REQUIRE rete $(G,u,s,t)$, Nodo $node$, $coda$
+\ENSURE possibile flusso inviato verso t (partendo da n,conoscendo i valori antecedenti a n), 0 altrimenti
+
+\STATE $malati \leftarrow$ coda di nodi
+\STATE $malati$.Enqueue($node$);
+\WHILE{$malati$ non è vuota}
+\STATE $m \leftarrow malati.$Dequeue()
+\STATE Repair(m)
+\IF{$m$ non è stato riparato}
+\STATE $malati$.enqueue(nodi con previousNode = $m$)
+\ELSIF{$ m = t $}
+\STATE $v \leftarrow$ GetFlow()
+\STATE \textbf{return} $v$
+\ELSE
+\STATE $coda$.enqueue($m$)
+\ENDIF
+\ENDWHILE
+\STATE \textbf{return} 0
+\end{algorithmic}
+\end{algorithm}
+\end{document}
