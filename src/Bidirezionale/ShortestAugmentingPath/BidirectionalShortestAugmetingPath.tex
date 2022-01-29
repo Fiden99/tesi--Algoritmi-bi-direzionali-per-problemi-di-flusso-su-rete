@@ -14,131 +14,131 @@
 \section{ShortestAugmentingPath}
 \subsection{FlowFordFulkerson}
 \begin{algorithm}
-\caption{Ricerca del flusso massimo}
-\begin{algorithmic}[1]
-\REQUIRE rete $(G,u,s,t$
-\ENSURE valore del flusso massimo
-\STATE $fMax \leftarrow$ Bfs$(s)$\Comment{faccio partire da s una bfs, cercando un percorso e sopratutto indicando la distanza $d_s$}
-\STATE sendFlow($t,fMax$) \Comment{invio il flusso dal percorso indicato tramite previousNode da t verso s con il valore fMax,nel mentre che procedo cancello le informazioni nei nodi esplorati (tranne la distanza)}
-\STATE $f \leftarrow$ Bfs($t$) \Comment{bfs da t verso s, trovo un percorso salvato da NextNode e sopratutto trovo la distanza $d_t$}
-\STATE sendFlow$(s,f)$
-\STATE $fMax \leftarrow f + fMax$
-\FORALL{$n \in V(G)$}
-\STATE $n.$Reset() \Comment{cancello indicazioni su un possibile percorso da fare}
-\ENDFOR
-\STATE $fso \leftarrow +\infty, fsi \leftarrow +\infty$
-\WHILE  {$f \ne 0 $ AND $d_s(t)> \#V(G)$ AND  $d_t(s)> \#V(G)$}
-\STATE ($fso,fsi,startSource,startSink) \leftarrow$ Dfs $(G,startSource,startSink,fso,fsi)$
-\IF{$startSink = startSource $ AND $startSink \ne null$}
-\STATE $f \leftarrow \min(fso,fsi)$
-\STATE sendFlow($startSink,f)$ 
-\STATE $fso \leftarrow +\infty, fsi \leftarrow +\infty$
-\STATE $startSource \leftarrow s, startSink \leftarrow t$
-\ELSIF{$startSink = s$}
-\STATE $f \leftarrow fsi$
-\STATE sendFlow($startSink,f$)
-\STATE $fsi \leftarrow +\infty$
-\STATE $startSink \leftarrow t$
-\ELSIF{$startSource = t$}
-\STATE $f \leftarrow fso$
-\STATE sendFlow($startSource,f$)
-\STATE $fso \leftarrow +\infty$
-\STATE $startsource \leftarrow s$
-\ELSE
-\STATE \textbf{break}
-\ENDIF
-\STATE $fMax \leftarrow f + fMax$
-\STATE \Comment{valutare se serve fare un reset per ogni nodo presente nel grafo}
-\ENDWHILE
-\STATE \textbf{return} fMax
-\end{algorithmic}
+    \caption{Ricerca del flusso massimo}
+    \begin{algorithmic}[1]
+        \REQUIRE rete $(G,u,s,t$
+        \ENSURE valore del flusso massimo
+        \STATE $fMax \leftarrow$ Bfs$(s)$\Comment{faccio partire da s una bfs, cercando un percorso e sopratutto indicando la distanza $d_s$}
+        \STATE sendFlow($t,fMax$) \Comment{invio il flusso dal percorso indicato tramite previousNode da t verso s con il valore fMax,nel mentre che procedo cancello le informazioni nei nodi esplorati (tranne la distanza)}
+        \STATE $f \leftarrow$ Bfs($t$) \Comment{bfs da t verso s, trovo un percorso salvato da NextNode e sopratutto trovo la distanza $d_t$}
+        \STATE sendFlow$(s,f)$
+        \STATE $fMax \leftarrow f + fMax$
+        \FORALL{$n \in V(G)$}
+        \STATE $n.$Reset() \Comment{cancello indicazioni su un possibile percorso da fare}
+        \ENDFOR
+        \STATE $fso \leftarrow +\infty, fsi \leftarrow +\infty$
+        \WHILE  {$f \ne 0 $ AND $d_s(t)> \#V(G)$ AND  $d_t(s)> \#V(G)$}
+        \STATE ($fso,fsi,startSource,startSink) \leftarrow$ Dfs $(G,startSource,startSink,fso,fsi)$
+            \IF{$startSink = startSource $ AND $startSink \ne null$}
+            \STATE $f \leftarrow \min(fso,fsi)$
+            \STATE sendFlow($startSink,f)$
+            \STATE $fso \leftarrow +\infty, fsi \leftarrow +\infty$
+            \STATE $startSource \leftarrow s, startSink \leftarrow t$
+            \ELSIF{$startSink = s$}
+            \STATE $f \leftarrow fsi$
+            \STATE sendFlow($startSink,f$)
+            \STATE $fsi \leftarrow +\infty$
+            \STATE $startSink \leftarrow t$
+            \ELSIF{$startSource = t$}
+            \STATE $f \leftarrow fso$
+            \STATE sendFlow($startSource,f$)
+            \STATE $fso \leftarrow +\infty$
+            \STATE $startsource \leftarrow s$
+            \ELSE
+            \STATE \textbf{break}
+            \ENDIF
+            \STATE $fMax \leftarrow f + fMax$
+        \STATE \Comment{valutare se serve fare un reset per ogni nodo presente nel grafo}
+        \ENDWHILE
+        \STATE \textbf{return} fMax
+    \end{algorithmic}
 \end{algorithm}
 
 \subsection{Dfs}
 \begin{algorithm}
-\caption{Dfs}
-\begin{algorithmic}[1]
-\REQUIRE rete $(G,u,s,t)$, $startSource$ e $startSink$ rispettivamente il nodo di partenza della parte di Source e di Sink, $sourceFlow$ e $sinkFlow$ rispettivamente il valore del flusso massimo inviabile dalla parte di Source e di Sink
-\ENSURE (massimo valore di flusso inviabile da parte di source, massimo valore di flusso inviabile da parte di Sink, Nodo di arrivo dalla parte di Source, nodo di arrivo dalla parte di Sink)
-\IF{$startSource = startSink$}
-\STATE \textbf{return} ($sourceFlow,sinkFlow,startSource,startSink)$ 
-\ENDIF
-\IF{$d_s(startSink)< \#V(G)$ AND $d_t(startSource)< \#V(G)$}
-\FORALL{$edge \in startSource.Edges$}
-\STATE $n \leftarrow edge.NextNode$
-\STATE $p \leftarrow edge.PreviousNode$
-\IF{$startSource = p $ AND $d_t(n)$ = $d_t(p)-1$ AND $u(edge) > 0$}
-\STATE $sourceFlow \leftarrow \min(sourceFlow,u(edge))$
-\STATE $ n.previousEdge \leftarrow edge$ \Comment{salvo anche il nodo precedente}
-\IF{$ n = t$}
-\STATE \textbf{return } $(sourceFlow, sinkFlow,n,startSink)$
-\ENDIF
-\IF{n è già stato precedentemente esplorato dalla parte di Sink}
-\STATE \textbf{return}  $(sourceFlow, sinkFlow,n,n)$
-\ENDIF
-\STATE \textbf{return} SinkDfs$(G,n, startSink, sourceFlow, sinkFlow)$
-\ENDIF
-\ENDFOR
-\STATE $minDistance \leftarrow +\infty$
-\FORALL{$edge \in startSource.Edges$}
-\IF{$edge.PreviousNode = startSource$ AND$u(edge) > 0$}
-\STATE $minDistance \leftarrow \min(minDistance, d_t(edge.nextNode))$ 
-\ENDIF
-\ENDFOR
-\STATE$d_t(startSource) \leftarrow minDistance+1$
-\IF{$startSource = s$}
-\STATE $mom \leftarrow startsource$
-\ELSE
-\STATE $mom \leftarrow startSource.previousNode$ 
-\ENDIF
-\STATE $startSource.Reset()$
-\STATE \textbf{return} Dfs($G,mom, startSink, sourceFlow, sinkFlow$)
-\ENDIF 
-\STATE \textbf{return} $(0,0,null,null)$
-\end{algorithmic}
+    \caption{Dfs}
+    \begin{algorithmic}[1]
+        \REQUIRE rete $(G,u,s,t)$, $startSource$ e $startSink$ rispettivamente il nodo di partenza della parte di Source e di Sink, $sourceFlow$ e $sinkFlow$ rispettivamente il valore del flusso massimo inviabile dalla parte di Source e di Sink
+        \ENSURE (massimo valore di flusso inviabile da parte di source, massimo valore di flusso inviabile da parte di Sink, Nodo di arrivo dalla parte di Source, nodo di arrivo dalla parte di Sink)
+        \IF{$startSource = startSink$}
+        \STATE \textbf{return} ($sourceFlow,sinkFlow,startSource,startSink)$
+            \ENDIF
+            \IF{$d_s(startSink)< \#V(G)$ AND $d_t(startSource)< \#V(G)$}
+            \FORALL{$edge \in startSource.Edges$}
+            \STATE $n \leftarrow edge.NextNode$
+            \STATE $p \leftarrow edge.PreviousNode$
+            \IF{$startSource = p $ AND $d_t(n)$ = $d_t(p)-1$ AND $u(edge) > 0$}
+            \STATE $sourceFlow \leftarrow \min(sourceFlow,u(edge))$
+            \STATE $ n.previousEdge \leftarrow edge$ \Comment{salvo anche il nodo precedente}
+            \IF{$ n = t$}
+            \STATE \textbf{return } $(sourceFlow, sinkFlow,n,startSink)$
+            \ENDIF
+            \IF{n è già stato precedentemente esplorato dalla parte di Sink}
+            \STATE \textbf{return}  $(sourceFlow, sinkFlow,n,n)$
+            \ENDIF
+            \STATE \textbf{return} SinkDfs$(G,n, startSink, sourceFlow, sinkFlow)$
+            \ENDIF
+            \ENDFOR
+            \STATE $minDistance \leftarrow +\infty$
+            \FORALL{$edge \in startSource.Edges$}
+            \IF{$edge.PreviousNode = startSource$ AND$u(edge) > 0$}
+            \STATE $minDistance \leftarrow \min(minDistance, d_t(edge.nextNode))$
+            \ENDIF
+            \ENDFOR
+            \STATE$d_t(startSource) \leftarrow minDistance+1$
+            \IF{$startSource = s$}
+            \STATE $mom \leftarrow startsource$
+            \ELSE
+            \STATE $mom \leftarrow startSource.previousNode$
+            \ENDIF
+            \STATE $startSource.Reset()$
+            \STATE \textbf{return} Dfs($G,mom, startSink, sourceFlow, sinkFlow$)
+            \ENDIF
+            \STATE \textbf{return} $(0,0,null,null)$
+    \end{algorithmic}
 \end{algorithm}
 
 \begin{algorithm}
-\caption{SinkDfs}
-\begin{algorithmic}
-\REQUIRE rete $(G,u,s,t)$, $startSource$ e $startSink$ rispettivamente il nodo di partenza della parte di Source e di Sink, $sourceFlow$ e $sinkFlow$ rispettivamente il valore del flusso massimo inviabile dalla parte di Source e di Sink
-\ENSURE (massimo valore di flusso inviabile da parte di source, massimo valore di flusso inviabile da parte di Sink, Nodo di arrivo dalla parte di Source, nodo di arrivo dalla parte di Sink)
-\IF{$startSource = startSink$}
-\STATE \textbf{return} ($sourceFlow,sinkFlow,startSource,startSink)$ 
-\ENDIF
-\IF{$d_s(startSink)< \# V(G)$ AND $d_t(startSource) < \#V(G)$}
-\FORALL{$edge \in startSink.Edges$}
-\STATE $n \leftarrow edge.NextNode$
-\STATE $p \leftarrow edge.PreviousNode$
-\IF{$startSink = n $ AND $d_s(p)$ = $d_s(n) - 1$ AND $u(edge) > 0$}
-\STATE $sourceFlow \leftarrow \min(sinkFlow, u(edge))$
-\STATE $ p.nextEdge \leftarrow edge$ \Comment{salvo anche il nodo precedente}
-\IF{$p = s$}
-\STATE \textbf{return} $(sourceFlow,sinkFlow,startSource,p)$
-\ENDIF
-\IF{p è già stato precedentemente esplorato dalla parte di Source}
-\STATE \textbf{return}  $(sourceFlow, sinkFlow,p,p)$
-\ENDIF
-\STATE \textbf{return} Dfs$G,startSource, p, sourceFlow, sinkFlow,s,t)$
-\ENDIF
-\ENDFOR
-\STATE $minDistance \leftarrow +\infty$
-\FORALL{$edge \in startSink.Edges$}
-\IF{$edge.NextNode = startSink$ AND $u(edge) > 0$}
-\STATE $minDistance \leftarrow \min(minDistance, d_s(edge.previousNode)$
-\ENDIF
-\ENDFOR
-\STATE $d_s(startSink) \leftarrow minDistance+1$
-\IF{$startSink = t$}
-\STATE $mom \leftarrow startSink$
-\ELSE
-\STATE $mom \leftarrow startSink.nextNode$ 
-\ENDIF
-\STATE $startSink.Reset()$
-\STATE \textbf{return} SinkDfs($G,startSource, mom, sourceFlow, sinkFlow$)
-\ENDIF 
-\STATE \textbf{return} $(0,0,null,null)$
+    \caption{SinkDfs}
+    \begin{algorithmic}
+        \REQUIRE rete $(G,u,s,t)$, $startSource$ e $startSink$ rispettivamente il nodo di partenza della parte di Source e di Sink, $sourceFlow$ e $sinkFlow$ rispettivamente il valore del flusso massimo inviabile dalla parte di Source e di Sink
+        \ENSURE (massimo valore di flusso inviabile da parte di source, massimo valore di flusso inviabile da parte di Sink, Nodo di arrivo dalla parte di Source, nodo di arrivo dalla parte di Sink)
+        \IF{$startSource = startSink$}
+        \STATE \textbf{return} ($sourceFlow,sinkFlow,startSource,startSink)$
+            \ENDIF
+            \IF{$d_s(startSink)< \# V(G)$ AND $d_t(startSource) < \#V(G)$}
+            \FORALL{$edge \in startSink.Edges$}
+            \STATE $n \leftarrow edge.NextNode$
+            \STATE $p \leftarrow edge.PreviousNode$
+            \IF{$startSink = n $ AND $d_s(p)$ = $d_s(n) - 1$ AND $u(edge) > 0$}
+            \STATE $sourceFlow \leftarrow \min(sinkFlow, u(edge))$
+            \STATE $ p.nextEdge \leftarrow edge$ \Comment{salvo anche il nodo precedente}
+            \IF{$p = s$}
+            \STATE \textbf{return} $(sourceFlow,sinkFlow,startSource,p)$
+            \ENDIF
+            \IF{p è già stato precedentemente esplorato dalla parte di Source}
+            \STATE \textbf{return}  $(sourceFlow, sinkFlow,p,p)$
+            \ENDIF
+            \STATE \textbf{return} Dfs$G,startSource, p, sourceFlow, sinkFlow,s,t)$
+            \ENDIF
+            \ENDFOR
+            \STATE $minDistance \leftarrow +\infty$
+            \FORALL{$edge \in startSink.Edges$}
+            \IF{$edge.NextNode = startSink$ AND $u(edge) > 0$}
+            \STATE $minDistance \leftarrow \min(minDistance, d_s(edge.previousNode)$
+            \ENDIF
+            \ENDFOR
+            \STATE $d_s(startSink) \leftarrow minDistance+1$
+            \IF{$startSink = t$}
+            \STATE $mom \leftarrow startSink$
+            \ELSE
+            \STATE $mom \leftarrow startSink.nextNode$
+            \ENDIF
+            \STATE $startSink.Reset()$
+            \STATE \textbf{return} SinkDfs($G,startSource, mom, sourceFlow, sinkFlow$)
+            \ENDIF
+            \STATE \textbf{return} $(0,0,null,null)$
 
-\end{algorithmic}
+    \end{algorithmic}
 \end{algorithm}
 \end{document}
