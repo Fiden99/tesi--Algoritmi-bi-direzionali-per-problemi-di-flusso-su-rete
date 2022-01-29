@@ -25,6 +25,7 @@ namespace Bidirezionale.NodePropagation.LastLevelOptEdgeFlow
                         node.SetPreviousEdge(e);
                         node.SetVisited(true);
                         e.SetReversed(false);
+                        node.SetValid(true);
                         return true;
                     }
                     if (node == previous && e.Flow > 0 && next.Label == (node.Label - 1) && next.Valid)
@@ -34,6 +35,7 @@ namespace Bidirezionale.NodePropagation.LastLevelOptEdgeFlow
                         node.SetPreviousEdge(e);
                         node.SetVisited(true);
                         e.SetReversed(true);
+                        node.SetValid(true);
                         return true;
                     }
                 }
