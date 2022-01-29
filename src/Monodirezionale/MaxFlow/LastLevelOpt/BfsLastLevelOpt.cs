@@ -18,6 +18,7 @@ namespace Monodirezionale.MaxFlow.LastLevelOpt
                     node.SetPreviousNode(previous);
                     node.SetInFlow(Math.Min(e.Capacity, previous.InFlow));
                     e.SetReversed(false);
+                    node.SetValid(true);
                     return true;
                 }
                 if (node == previous && e.Flow > 0 && next.Label == (node.Label - 1) && next.Valid == true)
@@ -26,6 +27,7 @@ namespace Monodirezionale.MaxFlow.LastLevelOpt
                     node.SetPreviousNode(next);
                     node.SetInFlow(Math.Min(e.Flow, next.InFlow));
                     e.SetReversed(true);
+                    node.SetValid(true);
                     return true;
                 }
             }
