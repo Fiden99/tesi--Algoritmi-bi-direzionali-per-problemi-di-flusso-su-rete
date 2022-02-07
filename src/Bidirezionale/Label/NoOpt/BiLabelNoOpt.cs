@@ -9,9 +9,8 @@ namespace Bidirezionale.Label.NoOpt
         private static Node DoBfs(Graph graph, bool sourceSide, bool sinkSide)
         {
             var codaSource = new Queue<Node>();
-            var codaSourceBuffer = new Queue<Node>();
+            var buffer = new Queue<Node>();
             var codaSink = new Queue<Node>();
-            var codaSinkBuffer = new Queue<Node>();
             if (sourceSide && sinkSide)
             {
                 graph.Reset();
@@ -65,7 +64,7 @@ namespace Bidirezionale.Label.NoOpt
                             n.SetPreviousNode(p);
                             n.SetPreviousEdge(e);
                             e.SetReversed(false);
-                            codaSourceBuffer.Enqueue(n);
+                            buffer.Enqueue(n);
                         }
                         else if (element == n && e.Flow > 0)
                         {
@@ -86,13 +85,13 @@ namespace Bidirezionale.Label.NoOpt
                             p.SetPreviousEdge(e);
                             p.SetPreviousNode(n);
                             e.SetReversed(true);
-                            codaSourceBuffer.Enqueue(p);
+                            buffer.Enqueue(p);
                         }
                     }
                 }
                 var mom = codaSource;
-                codaSource = codaSourceBuffer;
-                codaSourceBuffer = mom;
+                codaSource = buffer;
+                buffer = mom;
                 while (codaSink.Count > 0)
                 {
                     var element = codaSink.Dequeue();
@@ -124,7 +123,7 @@ namespace Bidirezionale.Label.NoOpt
                             p.SetNextNode(n);
                             p.SetLabel(n.Label - 1);
                             e.SetReversed(false);
-                            codaSinkBuffer.Enqueue(p);
+                            buffer.Enqueue(p);
                         }
                         else if (element == p && e.Flow > 0)
                         {
@@ -145,14 +144,14 @@ namespace Bidirezionale.Label.NoOpt
                             n.SetNextNode(p);
                             n.SetLabel(p.Label - 1);
                             e.SetReversed(true);
-                            codaSinkBuffer.Enqueue(n);
+                            buffer.Enqueue(n);
                         }
                     }
 
                 }
                 mom = codaSink;
-                codaSink = codaSinkBuffer;
-                codaSinkBuffer = mom;
+                codaSink = buffer;
+                buffer = mom;
             }
             return null;
         }
