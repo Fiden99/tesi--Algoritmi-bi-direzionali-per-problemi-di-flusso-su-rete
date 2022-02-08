@@ -75,7 +75,7 @@
 
 \subsection{DoBfs}
 \begin{algorithm}
-    \caption{DoBfs con ottimizzaione sugli ultimi livelli}
+    \caption{DoBfs con ottimizzazione sugli ultimi livelli}
     \begin{algorithmic}[1]
         \REQUIRE rete $(G,u,s,t)$, $noCapSource, noCapSink$, cioè nodi,rispettivamente della parte sorgente e della parte destinazione, che non sono più raggiungili dal percorso deciso precedentemente
         \ENSURE valore del flusso inviabile, nodo appartenente LastSinkNodes, cioè tutti i nodi che sono intermedi che fanno da ponte tra le due ricerche.
@@ -133,7 +133,7 @@
         \STATE $sourceFlow \leftarrow$ $\min$($n$.previousNode.flussoPassante,$u(n.PreviousEdge)$ \COMMENT{nel caso in cui arco.reversed = true, devo controllare il flusso e non la capacità residua} )
         \ENDIF
         \IF{$sourceFlow > 0$ AND n può retrocedere ricorsivamente verso noCapSink(Getflow) AND $n.$flussoPassante $> 0$ }
-        \STATE \textbf{retrun} ($\min(n.$flussoPassante$, sourceFlow),n)$
+        \STATE \textbf{return} ($\min(n.$flussoPassante$, sourceFlow),n)$
             \ENDIF
             \ENDFOR
             \ENDIF
