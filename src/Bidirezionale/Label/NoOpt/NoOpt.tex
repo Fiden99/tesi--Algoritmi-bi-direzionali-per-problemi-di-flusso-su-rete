@@ -1,0 +1,192 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{algorithm}
+%\usepackage{algorithmic}
+\usepackage{algcompatible}
+\usepackage{amsmath}
+
+\title{algoritmi bidirezionali}
+\author{Filippo Magi }
+
+\begin{document}
+
+\maketitle
+\section{Senza alcuna ottimizzazione}
+\subsection{FlowFordFulkerson}
+\begin{algorithm}
+    \caption{Ricerca del flusso massimo}
+    \begin{algorithmic}[1]
+        \REQUIRE rete $(G,u,s,t)$
+        \ENSURE valore del flusso massimo
+        \STATE $fMax \leftarrow 0$
+        \STATE$ vuotoSource \leftarrow$ true
+        \STATE $vuotoSource \leftarrow$ true
+        \WHILE{TRUE}
+        \STATE $(f, nodo) \leftarrow$ DoBfs(G,vuotoSource,vuotoSink)
+        \IF{$f = 0$}
+        \STATE \textbf{break}
+        \ENDIF
+        \STATE $vuotoSource \leftarrow$ false
+        \STATE $vuotoSource \leftarrow$ false
+        \STATE $fMax \leftarrow fMax + f$
+        \STATE $mom \leftarrow n$
+        \WHILE{$ n \ne s $}
+        \STATE $n$.PreviousEdge.AddFlow($f$)
+        \IF{$u(n$.PreviousEdge)$ = 0$}
+        \STATE $vuotoSource \leftarrow$ true
+        \ENDIF
+        \STATE $n.$update$(f)$ \COMMENT{n.InFlow -=f}
+        \STATE $n \leftarrow n.$previousNode
+        \ENDWHILE
+        \WHILE{$mom \ne t$}
+
+        \STATE $n.$nextEdge.addFlow$(f)$
+        \IF{$e(n.$nextEdge$) = 0 $}
+        \STATE $vuotoSink \leftarrow$ true
+        \ENDIF
+        \STATE $n.$update$(f)$ \COMMENT{n.InFlow -=f}
+        \STATE $n \leftarrow$ $n.$nextNode
+        \ENDWHILE
+        \ENDWHILE
+        %\RETURN fMax
+        \STATE \textbf{return} $fMax$
+    \end{algorithmic}
+\end{algorithm}
+\subsection{DoBfs}
+\begin{algorithm}
+    \caption{DoBfs : Ricerca un path tra s e x[], e da x[] a t, dove t[] sono i nodi intermedi dove si incontrano i due path}
+    \begin{algorithmic}[1]
+        \REQUIRE rete $(G,u,s,t)$, $sourceSide$ e $sinkSide$, che sono dei booleani che chiariscono in quale parte si dovrà operare
+        \ENSURE valore del flusso inviabile, nodo intermedio, cioè che tiene in memoria sia il nodo successivo, sia il nodo precedente
+        \STATE $codaSource \leftarrow$ coda di nodi
+        \STATE $codaSink \leftarrow$ coda di nodi
+        \STATE $buffer \leftarrow$ coda di nodi
+        \IF{$sourceSide$}
+        \FORALL{$n \in V(G) | n$ è stato esplorato da $s$}
+        \STATE $n.$Reset()
+        \ENDFOR
+        \STATE $codaSource.$enqueue($s$)
+        \ENDIF
+        \IF{$sinkSide$}
+        \FORALL{$n \in V(G) | n$ è stato esplorato da $t$}
+        \STATE $n.$Reset()
+        \ENDFOR
+        \STATE $codaSink$.enqueue($t$)
+        \ENDIF
+        \STATE\COMMENT{per motivi prestazioni si controlla nel codice se si hanno sia sinkSide sia sourceSide positivi per non analizzare tutti i nodi 2 volte}
+        \WHILE{$\neg codaSource$.isEmpty OR $\neg codaSink$.iSEmpty }
+        \WHILE{$\neg codaSource$.isEmpty}
+        \STATE $element \leftarrow codaSource$.dequeue()
+        \FORALL{$edge \in n.$Edges}
+        \STATE $p \leftarrow edge.$previousNode
+        \STATE $n \leftarrow edge.$nextNode
+        \IF{$element = p$ AND $u(edge) > 0 $}
+        \IF{$n.$visited}
+        \IF{n è stato esplorato dalla parte di Source}
+        \STATE \textbf{continue}
+        \ELSE
+        \STATE $f \leftarrow \min(u(edge),p.flussoPassante,n.flussoPassante)$
+        \IF{ $f = 0$}
+        \STATE \textbf{continue}
+        \ENDIF
+        \STATE $n.$update$(p,edge,n)$
+        \STATE $edge.$reversed = false
+        %\RETURN (f,n)
+        \STATE \textbf{return} $(f,n)$
+        \ENDIF
+        \ENDIF
+        \STATE $n.$update$(p,edge)$
+        \STATE $edge.$reversed = false
+        \STATE $buffer$.enqueue$(n)$
+        \ENDIF
+        \algstore{DoBfsNoOpt1}
+    \end{algorithmic}
+\end{algorithm}
+\newpage
+\begin{algorithm}
+    \begin{algorithmic}[1]
+        \algrestore{DoBfsNoOpt1}
+        \IF{$element = n$ AND $f(edge) > 0$}
+        \IF {$p$.visited}
+        \IF{p è stato già esplorato dalla parte di Source}
+        \STATE \textbf{continue}
+        \ELSE
+        \STATE $f \leftarrow \min(n.flussoPassante,p.flussoPassante,f(edge)$
+        \IF{$f  = 0$}
+        \STATE \textbf{continue}
+        \ENDIF
+        \STATE $p.$update$(n,edge,p)$
+        \STATE $edge.$reversed = true
+        \STATE \textbf{return} $(f,p)$
+        \ENDIF
+        \ENDIF
+        \STATE $p.$update$(n,edge)$
+        \STATE $edge.$reversed = true
+        \STATE $buffer.$enqueue$(p)$
+        \ENDIF
+
+        \ENDFOR
+        \ENDWHILE
+        \STATE $mom \leftarrow codaSource$
+        \STATE $codaSource \leftarrow buffer$
+        \STATE $buffer \leftarrow mom$
+        \WHILE{$\neg codaSink.$isEmpty}
+        \STATE $element \leftarrow codaSink.$dequeue()
+        \FORALL{$edge \in element.$Edges}
+        \STATE $p \leftarrow edge$.previousNode
+        \STATE $n \leftarrow n.$nextNode
+        \IF{$element = n$ AND  $u(edge) > 0$}
+        \IF{$p$.visited}
+        \IF{p è stato esplorato dalla parte di Sink}
+        \STATE \textbf{continue}
+        \ELSE
+        \STATE $f \leftarrow \min(p.flussoPassante,u(edge),n.flussoPassante)$
+        \IF{$f = 0$}
+        \STATE \textbf{continue}
+        \ENDIF
+        \STATE $n.$update$(p,edge,n)$
+        \STATE $edge.$Reversed = false
+        \STATE \textbf{return} $(f,n)$
+        \ENDIF
+        \ENDIF
+        \STATE $p.$update$(n,edge)$
+        \STATE $edge.$Reversed = false
+        \STATE $buffer.$enqueue$(p)$
+        \ENDIF
+        \algstore{DoBfsNoOpt2}
+    \end{algorithmic}
+\end{algorithm}
+\newpage
+\begin{algorithm}
+    \begin{algorithmic}[1]
+        \algrestore{DoBfsNoOpt2}
+        \IF{$element = p$ AND $f(edge) > 0 $}
+        \IF{$n$.visited}
+        \IF{n è stato esplorato da Sink}
+        \STATE \textbf{continue}
+        \ELSE
+        \STATE $f \leftarrow \min(n.flussoPassante,p.flussoPassante,f(edge)$
+        \IF{$f = 0$}
+        \STATE \textbf{continue}
+        \ENDIF
+        \STATE $p$.update$(n,edge,p)$
+        \STATE $edge$.reversed = true
+        \STATE \textbf{return} $(f,p)$
+        \ENDIF
+        \ENDIF
+        \STATE $n.$update$(p,edge)$
+        \STATE $edge$.reversed = true
+        \STATE $buffer.$enqueue$(n)$
+        \ENDIF
+        \ENDFOR
+        \ENDWHILE
+        \STATE $mom \leftarrow buffer$
+        \STATE $codaSink \leftarrow buffer$
+        \STATE $buffer \leftarrow mom$
+        \ENDWHILE
+        \STATE \textbf{return} $(0,null)$
+    \end{algorithmic}
+\end{algorithm}
+
+
+\end{document}
