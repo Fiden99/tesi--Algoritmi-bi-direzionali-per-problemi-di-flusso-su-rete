@@ -1,0 +1,177 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{algorithm}
+%\usepackage{algorithmic}
+\usepackage{algcompatible}
+\usepackage{amsmath}
+
+\title{algoritmi bidirezionali}
+\author{Filippo Magi }
+
+\begin{document}
+
+\maketitle
+\section{Senza alcuna ottimizzazione}
+\subsection{FlowFordFulkerson}
+\begin{algorithm}
+    \caption{Ricerca del flusso massimo}
+    \begin{algorithmic}[1]
+        \REQUIRE rete $(G,u,s,t)$
+        \ENSURE valore del flusso massimo
+        \STATE $fMax \leftarrow 0$
+        \STATE$ vuotoSource \leftarrow$ true
+        \STATE $vuotoSource \leftarrow$ true
+        \WHILE{TRUE}
+        \STATE $nodo \leftarrow$ DoBfs(G,vuotoSource,vuotoSink)
+        \IF{$nodo = null$}
+        \STATE \textbf{break}
+        \ENDIF
+        \STATE $f \leftarrow$ GetFlow$(nodo)$ \COMMENT{ripercorre da n verso s e t per recuperare il flusso}
+        \IF{$f = 0$}
+        \STATE \textbf{break}
+        \ENDIF
+        \STATE $vuotoSource \leftarrow$ false
+        \STATE $vuotoSink \leftarrow$ false
+        \STATE $fMax \leftarrow fMax + f$
+        \STATE $mom \leftarrow n$
+        \WHILE{$ n \ne s $}
+        \STATE $n$.PreviousEdge.AddFlow($f$)
+        \IF{$u(n$.PreviousEdge)$ = 0$}
+        \STATE $vuotoSource \leftarrow$ true
+        \ENDIF
+        \STATE $n \leftarrow n.$previousNode
+        \ENDWHILE
+        \WHILE{$mom \ne t$}
+        \STATE $n.$nextEdge.addFlow$(f)$
+        \IF{$u(n.$nextEdge$) = 0 $}
+        \STATE $vuotoSink \leftarrow$ true
+        \ENDIF
+        \STATE $n.$update$(f)$ \COMMENT{n.InFlow -=f}
+        \STATE $n \leftarrow$ $n.$nextNode
+        \ENDWHILE
+        \ENDWHILE
+        %\RETURN fMax
+        \STATE \textbf{return} $fMax$
+    \end{algorithmic}
+\end{algorithm}
+\subsection{DoBfs}
+\begin{algorithm}
+    \caption{DoBfs}
+    \begin{algorithmic}[1]
+        \REQUIRE rete $(G,u,s,t),$ booleano $sourceSide$ , booleano $sinkSide$, per capire in quale parte del grafo devo operare
+        \ENSURE nodo dove si incontrano i nodi esplorati da sink e quelli esplorati da source
+        \STATE $codaSource \leftarrow $ coda vuota di nodi
+        \STATE $codaSink \leftarrow$ coda vuota di nodi
+        \STATE $codaEgeSource \leftarrow$ coda vuota di archi
+        \STATE $codaEdgeSink \leftarrow$ coda vuota di archi
+        \IF{$sourceSide \land sinkSide$}
+        \FORALL{$n \in V(G)$}
+        \STATE $n.$reset
+        \ENDFOR
+        \STATE $codaSource$.enqueue$(s)$
+        \STATE $codaSink.$enqueue$(t)$
+        \ELSIF{$souceSide$}
+        \STATE $codaSource$.enqueue$(s)$
+        \FORALL{$n \in V(G) | n.sourceSide$  }
+        \STATE $n.$Reset()
+        \ENDFOR
+        \STATE $codaEdgeSink$.enqueue$(null)$
+        \ELSIF{$sinkSide$}
+        \STATE $codaSink.$enqueue$(t)$
+        \FORALL{$n \in V(G) | \neg n.sourceSide$}
+        \STATE $n.$Reset()
+        \ENDFOR
+        \STATE $codaEdgeSource.$enqueue$(null)$
+        \ENDIF
+        \WHILE{$ \neg codaSink.isEmpty \lor \neg codaSource.isEmpty$}
+        \IF{($\neg codaSource.isEmpty \land codaEdgeSource.isEmpty) \lor (codaSink.isEmpty \land codaEdgeSink.isEmpty$}
+        \STATE $elementSource \leftarrow codaSource.$dequeue()
+        \STATE $codaEdgeSource.$enqueue$(\delta^+(elementSource))$
+        \ENDIF
+        \IF{$(\neg codaSink.isEmpty \land codaEdgeSink.isEmpty) \lor (codaSource.isEmpty \land codaEdgeSink.isEmpty)$}
+        \STATE $elementSink \leftarrow codaSink.dequeueu$
+        \STATE $codaEdgeSink.$enqueue$(\delta^-(elementSink)$
+        \ENDIF
+        \algstore{endInit}
+    \end{algorithmic}
+\end{algorithm}
+\newpage
+\begin{algorithm}
+    \begin{algorithmic}
+        \algrestore{endInit}
+        \WHILE{$ \neg codaEdgeSource.isEmpty \land \neg codaEdgeSink.isEmpty$}
+        \IF{$sourceSide$}
+        \STATE $sourceEdge \leftarrow codaEdgeSource.$dequeue
+        \STATE $p \leftarrow sourceEdge.previousNode$
+        \STATE $n \leftarrow sourceEdge.nextNode$
+        \IF{$elementSource = p \land u_f(sourceEdge)>0$}
+        \IF{$n.visited$}
+        \IF{$\neg n.sourceSide$}
+        \STATE $n.$update$(p,sourceEdge)$
+        \STATE $sourceEdge$.Reversed$\leftarrow$ false
+        \STATE\textbf{return} $n$
+        \ENDIF
+        \ELSE
+        \STATE $n.$update$(p,sourceEdge)$
+        \STATE $sourceEdge$.Reversed$\leftarrow$ false
+        \STATE $codaSource.$enqueue$(n)$
+        \ENDIF
+        \ELSIF{$elementSource =  n \land f(sourceEdge) > 0$}
+        \IF{$p.visited$}
+        \IF{$\neg p.sourceSide $}
+        \STATE $p.$update$(n,sourceEdge)$
+        \STATE $sourceEdge.$reversed $\leftarrow$ false
+        \STATE \textbf{return} p
+        \ENDIF
+        \ELSE
+        \STATE $p.$update$(n,sourceEdge)$
+        \STATE $sourceEdge.$reversed $\leftarrow$ false
+        \STATE$codaSource.$enqueue$(p)$
+        \ENDIF
+        \ENDIF
+        \ENDIF
+        \algstore{endSourceSide}
+    \end{algorithmic}
+\end{algorithm}
+\newpage
+\begin{algorithm}
+    \begin{algorithmic}
+        \algrestore{endSourceSide}
+        \IF{$sinkSide$}
+        \STATE $edgeSink \leftarrow codaEdgeSink.$dequeue
+        \STATE $p \leftarrow edgeSink.previousNode$
+        \STATE $n \leftarrow edgeSink.nextNode$
+        \IF{$elementSink = n \land u_f(edgeSink)>0$}
+        \IF{$p.visited$}
+        \IF{$\neg p.sourceSide$}
+        \STATE \textbf{continue}
+        \ELSE
+        \STATE $n.$update$(p,edgeSink)$
+        \STATE $edgeSink.reversed \leftarrow $false
+        \STATE \textbf{return} n
+        \ENDIF
+        \ENDIF
+        \STATE $p.$update$(n,edgeSource)$
+        \STATE$edgeSink.reversed \leftarrow$ false
+        \STATE $codaSink.$enqueue$(p)$
+        \ELSIF{$elementSink = p \land f(elementSink)>0$}
+        \IF{$n.visited$}
+        \IF{$\neg n.sourceSide$}
+        \STATE \textbf{continue}
+        \ELSE
+        \STATE $p.$update$(n,edgeSink)$
+        \STATE \textbf{return} p
+        \ENDIF
+        \ENDIF
+        \STATE $n.$update$(p,edgeSink)$
+        \STATE $edgeSink.reversed \leftarrow$ true
+        \STATE $codaSink.$enqueue$(n)$
+        \ENDIF
+        \ENDIF
+        \ENDWHILE
+        \ENDWHILE
+        \STATE \textbf{return} $null$
+    \end{algorithmic}
+\end{algorithm}
+
+\end{document}
