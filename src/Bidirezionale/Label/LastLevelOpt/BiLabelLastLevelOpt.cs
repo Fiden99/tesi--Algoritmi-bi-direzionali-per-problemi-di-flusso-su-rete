@@ -466,7 +466,6 @@ namespace Bidirezionale.Label.LastLevelOpt
                 Node momsink = n;
                 while (momsource != s)
                 {
-
                     var x = momsource.PreviousEdge.AddFlow(f);
                     if (x.Item1)
                     {
@@ -502,6 +501,7 @@ namespace Bidirezionale.Label.LastLevelOpt
                             {
                                 vuotoSink = momsink;
                                 momsink = n;
+                                n.SetInFlow(n.InFlow - f);
                                 while (momsink != vuotoSink)
                                 {
                                     momsink.NextEdge.AddFlow(-f);
@@ -509,6 +509,14 @@ namespace Bidirezionale.Label.LastLevelOpt
                                     momsink.SetInFlow(momsink.InFlow + f);
                                     momsink = momsink.NextNode;
                                 }
+                                while (n is not SourceNode)
+                                {
+                                    n.NextEdge.AddFlow(-f);
+                                    n.SetValid(true);
+                                    n.SetInFlow(n.InFlow + f);
+                                    n = n.NextNode;
+                                }
+
                                 fMax -= f;
                                 break;
                             }

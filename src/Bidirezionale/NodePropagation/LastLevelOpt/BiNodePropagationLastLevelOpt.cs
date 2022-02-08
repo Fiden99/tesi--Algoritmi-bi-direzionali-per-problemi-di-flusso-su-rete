@@ -492,12 +492,20 @@ namespace Bidirezionale.NodePropagation.LastLevelOpt
                             {
                                 vuotoSink = momsink;
                                 momsink = n;
+                                n.SetInFlow(n.InFlow - f);
                                 while (momsink != vuotoSink)
                                 {
                                     momsink.NextEdge.AddFlow(-f);
                                     momsink.SetValid(true);
                                     momsink.SetInFlow(momsink.InFlow + f);
                                     momsink = momsink.NextNode;
+                                }
+                                while (n is not SourceNode)
+                                {
+                                    n.NextEdge.AddFlow(-f);
+                                    n.SetValid(true);
+                                    n.SetInFlow(n.InFlow + f);
+                                    n = n.NextNode;
                                 }
                                 fMax -= f;
                                 break;
