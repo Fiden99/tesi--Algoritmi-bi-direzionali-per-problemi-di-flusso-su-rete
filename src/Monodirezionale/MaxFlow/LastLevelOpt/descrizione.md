@@ -25,7 +25,17 @@ nel caso sia riuscito a riparare il nodo, calcolo quanto flusso posso inviare ne
 se non sono riuscito a riparare **malato**, posso procedo a inserire tutti i nodi tale per cui la loro label è pari a **malato**.label-1 (in Graph salvo i nodi ivi contenuti in delle insiemi (da capire se si dovranno cambiare da HashSet in List per motivi prestazionali)) nella coda che verrà utilizzata per fare la bfs.
 Controllo che i nodi che vado a esplorare non siano già stati esplorati (o che non siano validi), in tal modo mi assicuro che proceda solo da s verso t.
 
-### strutture dati utilizzate
+## strutture dati utilizzate
 
-sono stati usate i nodi, degli oggetti, collegati da arco BiEdge, tale che contiene le informazioni sia da chi esce sia verso chi entra, senza dover aver bisogno di modificare, durante l'invio del flusso, due archi ma solo uno.
-Graph è rappresentato da un Lista di vari insiemi, ogni insieme contiene i nodi che hanno una certa label, oltre ad avere un insieme di nodi non validi,
+### BiEdge
+
+I nodi vengono collegatitra di loro da archi BiEdge, che contiene le informazioni da quale nodo esce e in quale nodo entra, in maniera tale da non dover aver bisogno di modificare, durante l'invio del flusso, due archi ma solo uno.
+Ovviamente conserva in memoria la quantità di flusso che passa e la sua capacità residua, oltre a un booleano che mi indica che quel arco, durante l'invio del flusso, dovrà inviarlo o ritirarlo.
+
+### Graph
+
+Graph è rappresentato da un Lista di vari insiemi, ogni insieme contiene i nodi che hanno una certa label, oltre ad avere un insieme di nodi non validi.
+
+### Node
+
+node contiene al suo interno informazioni sugli archi a lui collegati (Lista di BiEdge), un booleano che indica se il nodo è valido o meno,le indicazioni sul percorso che deve fare, quindi sia previousNode e previousEdge, oltre ad avere quanto flusso gli arriva dal percorso indicato, indicato come InFlow
