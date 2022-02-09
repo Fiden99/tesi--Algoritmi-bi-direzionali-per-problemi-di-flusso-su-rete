@@ -1,5 +1,0 @@
-algoritmo di edmond karp che per ogni iterazione fa una nuova BFS
-
-il grafo ha solo nodi monodirezionali, ma viene salvato all'interno dei nodi
-(in maniera sbagliata, andarebbe salvata a parte, all'interno di BfsNoOpt, rendendo il metodo non statico)
-il nodo precedentemente utilizzato per far sì che la sappia la via fatta dall'algoritmo che dovrò fare Ford-Fulkenson

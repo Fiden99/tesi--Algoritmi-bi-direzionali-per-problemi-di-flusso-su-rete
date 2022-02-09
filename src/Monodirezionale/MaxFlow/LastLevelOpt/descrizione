@@ -1,6 +1,0 @@
-miglioria della BFS per l'algoritmo di Edmond-Karp
-
-la BFS parte dalla label n-1, dove n è il valore della label dove un nodo è diventato malato/non valido
-
-Possibile problema --> duplicazione dei dati
-attributo label del nodo  e lista di appartenza nel grafo rappresentano la stessa cosa, vanno modificati e consumano più memoria, ma riesco a impedire di ricercare ogni volta in tutto il grafo lo stesso nodo.
