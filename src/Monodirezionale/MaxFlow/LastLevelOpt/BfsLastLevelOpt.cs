@@ -37,6 +37,7 @@ namespace Monodirezionale.MaxFlow.LastLevelOpt
 
         //TODO da capire se CorrectFlow deve arrivare fino a s oppure si può fermare prima
 
+
         public static int doBfs(Graph grafo, Node noCap)
         {
 
@@ -50,10 +51,10 @@ namespace Monodirezionale.MaxFlow.LastLevelOpt
             }
             else
             {
-                Node t = grafo.Sink;
-                if (Repair(grafo, noCap) && t.PreviousNode.InFlow != 0 && t.PreviousEdge.Capacity > 0)
+                int f = GetPathFlow(grafo.Sink);
+                if (Repair(grafo, noCap) && f != 0)
                 {
-                    return Math.Min(t.InFlow, noCap.InFlow);
+                    return f;
                 }
                 coda = new Queue<Node>(grafo.LabeledNode[noCap.Label - 1]);
                 grafo.ResetLabel(noCap.Label);
@@ -104,6 +105,20 @@ namespace Monodirezionale.MaxFlow.LastLevelOpt
                 }
             }
             return 0;
+        }
+
+        private static int GetPathFlow(Node t)
+        {
+            int f = int.MaxValue;
+            while (t is not SourceNode)
+            {
+                f = Math.Min(f, t.PreviousEdge.Reversed ? t.PreviousEdge.Flow : t.PreviousEdge.Capacity);
+                if (f == 0)
+                    return 0;
+                t = t.PreviousNode;
+            }
+            return 0;
+
         }
 
         public static void PrintGraph(Graph grafo)

@@ -40,9 +40,9 @@ namespace Monodirezionale.MaxFlow.LastLevelOpt
         {
             get
             {
-                Node sink = this.InvalidNodes.SingleOrDefault(x => x is SinkNode);
+                Node sink = this.LabeledNode.Last().SingleOrDefault(x => x is SinkNode);
                 if (sink is null)
-                    sink = this.LabeledNode.Last().Single(x => x is SinkNode);
+                    sink = this.InvalidNodes.Single(x => x is SinkNode);
                 return sink;
             }
         }
