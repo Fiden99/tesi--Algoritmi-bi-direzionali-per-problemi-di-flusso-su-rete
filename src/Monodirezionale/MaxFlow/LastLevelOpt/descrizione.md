@@ -29,8 +29,8 @@ Controllo che i nodi che vado a esplorare non siano già stati esplorati (o che 
 
 ### BiEdge
 
-I nodi vengono collegatitra di loro da archi BiEdge, che contiene le informazioni da quale nodo esce e in quale nodo entra, in maniera tale da non dover aver bisogno di modificare, durante l'invio del flusso, due archi ma solo uno.
-Ovviamente conserva in memoria la quantità di flusso che passa e la sua capacità residua, oltre a un booleano che mi indica che quel arco, durante l'invio del flusso, dovrà inviarlo o ritirarlo.
+I nodi vengono collegati tra di loro da archi BiEdge, che contiene le informazioni da quale nodo esce e in quale nodo entra, in maniera tale da non dover aver bisogno di modificare, durante l'invio del flusso, due archi ma solo uno.
+Ovviamente conserva in memoria la quantità di flusso che passa e la sua capacità residua, oltre a un booleano (reversed) che mi indica che quel arco, durante l'invio del flusso, dovrà inviarlo o ritirarlo.
 
 ### Graph
 
