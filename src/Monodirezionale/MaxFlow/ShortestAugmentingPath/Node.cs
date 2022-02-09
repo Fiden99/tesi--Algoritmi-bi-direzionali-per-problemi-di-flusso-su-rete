@@ -10,14 +10,12 @@ namespace Monodirezionale.MaxFlow.ShortestAugmentingPath
         public Node PreviousNode { get; private set; }
         public int Flow { get; private set; }
         public int Capacity { get; private set; }
-        public bool Reversed { get; private set; }
         public BiEdge(Node previous, Node next, int cap)
         {
             this.NextNode = next;
             this.PreviousNode = previous;
             this.Capacity = cap;
             this.Flow = 0;
-            this.Reversed = false;
         }
         public void SetFlow(int flow)
         {
@@ -27,10 +25,7 @@ namespace Monodirezionale.MaxFlow.ShortestAugmentingPath
         {
             this.Capacity = cap;
         }
-        public void SetReversed(bool rev)
-        {
-            this.Reversed = rev;
-        }
+
     }
     public class Node
     {
