@@ -1,6 +1,0 @@
-algoritmo che, se un nodo è malato, lo preleva, insieme ai suoi successori, e li analliza per vedere se
-il nodo considerato sia ancora valido (con label giusta) o meno
-in fase di controllo, vengono anche inseriti la label precedente e la quantità di flusso che entra (inFlow)
-
-
-da controllare se viene effettuato anche un taglio tra i nodi validi e quelli non validi

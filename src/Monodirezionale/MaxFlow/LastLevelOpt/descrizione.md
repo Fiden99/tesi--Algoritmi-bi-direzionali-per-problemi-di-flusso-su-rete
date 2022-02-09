@@ -38,4 +38,4 @@ Graph è rappresentato da un Lista di vari insiemi, ogni insieme contiene i nodi
 
 ### Node
 
-node contiene al suo interno informazioni sugli archi a lui collegati (Lista di BiEdge), un booleano che indica se il nodo è valido o meno,le indicazioni sul percorso che deve fare, quindi sia previousNode e previousEdge, oltre ad avere quanto flusso gli arriva dal percorso indicato, indicato come InFlow
+node contiene al suo interno informazioni sugli archi a lui collegati (Lista di BiEdge), la label, cioè la distanza tra lui e il nodo sorgente *s*, un booleano che indica se il nodo è valido o meno,le indicazioni sul percorso che deve fare, quindi sia previousNode e previousEdge, oltre ad avere quanto flusso gli arriva dal percorso indicato, indicato come InFlow
