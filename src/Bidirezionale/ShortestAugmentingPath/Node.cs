@@ -9,14 +9,12 @@ namespace Bidirezionale.ShortestAugmentingPath
         public Node PreviousNode { get; private set; }
         public int Flow { get; private set; }
         public int Capacity { get; private set; }
-        public bool Reversed { get; private set; }
         public BiEdge(Node previous, Node next, int cap)
         {
             this.NextNode = next;
             this.PreviousNode = previous;
             this.Capacity = cap;
             this.Flow = 0;
-            this.Reversed = false;
         }
         public void SetFlow(int flow)
         {
@@ -26,15 +24,11 @@ namespace Bidirezionale.ShortestAugmentingPath
         {
             this.Capacity = cap;
         }
-        public void SetReversed(bool rev)
-        {
-            this.Reversed = rev;
-        }
 
         public bool AddFlow(int flow)
         {
-            int f = this.Reversed ? (this.Flow - flow) : (this.Flow + flow);
-            int c = this.Reversed ? (this.Capacity + flow) : (this.Capacity - flow);
+            int f = this.Flow + flow;
+            int c = this.Capacity - flow;
             if (f < 0 || c < 0)
                 throw new ArgumentException("valore di flusso non valido");
             this.Capacity = c;
