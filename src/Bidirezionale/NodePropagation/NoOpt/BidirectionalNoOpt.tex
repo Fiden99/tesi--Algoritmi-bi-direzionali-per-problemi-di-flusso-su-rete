@@ -81,7 +81,7 @@
         \STATE $n \leftarrow edge.$nextNode
         \IF{$element = p$ AND $u(edge) > 0 $}
         \IF{$n.$visited}
-        \IF{n è stato esplorato dalla parte di Source}
+        \IF{n.sourceSide}
         \STATE \textbf{continue}
         \ELSE
         \STATE $f \leftarrow \min(u(edge),p.flussoPassante,n.flussoPassante)$
@@ -107,7 +107,7 @@
         \algrestore{DoBfsNoOpt1}
         \IF{$element = n$ AND $f(edge) > 0$}
         \IF {$p$.visited}
-        \IF{p è stato già esplorato dalla parte di Source}
+        \IF{p.sourceSide}
         \STATE \textbf{continue}
         \ELSE
         \STATE $f \leftarrow \min(n.flussoPassante,p.flussoPassante,f(edge)$
@@ -134,7 +134,7 @@
         \STATE $n \leftarrow n.$nextNode
         \IF{$element = n$ AND  $u(edge) > 0$}
         \IF{$p$.visited}
-        \IF{p è stato esplorato dalla parte di Sink}
+        \IF{$\neg p.sourceSide$}
         \STATE \textbf{continue}
         \ELSE
         \STATE $f \leftarrow \min(p.flussoPassante,u(edge),n.flussoPassante)$
@@ -159,7 +159,7 @@
         \algrestore{DoBfsNoOpt2}
         \IF{$element = p$ AND $f(edge) > 0 $}
         \IF{$n$.visited}
-        \IF{n è stato esplorato da Sink}
+        \IF{$\neg n.sourceSide$}
         \STATE \textbf{continue}
         \ELSE
         \STATE $f \leftarrow \min(n.flussoPassante,p.flussoPassante,f(edge)$

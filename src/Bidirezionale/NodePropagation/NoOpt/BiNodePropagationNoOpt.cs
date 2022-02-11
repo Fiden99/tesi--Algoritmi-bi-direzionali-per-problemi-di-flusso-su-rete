@@ -48,7 +48,7 @@ namespace Bidirezionale.NodePropagation.NoOpt
                         if (element == p && e.Capacity > 0)
                         {
                             if (n.InFlow != 0)
-                                if (n.NextNode is null)
+                                if (n.SourceSide)
                                     continue;
                                 else
                                 {
@@ -59,11 +59,11 @@ namespace Bidirezionale.NodePropagation.NoOpt
                                     n.SetPreviousNode(p);
                                     n.SetPreviousEdge(e);
                                     //TODO capire dove e come aggiornare le label dei nodi trovati da t
-                                    graph.SetMeanLabel(n.Label - 1);
                                     e.SetReversed(false);
                                     //n.SetInFlow(f);
                                     return (f, n);
                                 }
+                            graph.SetSide(n, true);
                             n.SetInFlow(Math.Min(p.InFlow, e.Capacity));
                             n.SetLabel(p.Label + 1);
                             n.SetPreviousNode(p);
@@ -74,7 +74,7 @@ namespace Bidirezionale.NodePropagation.NoOpt
                         else if (element == n && e.Flow > 0)
                         {
                             if (p.InFlow != 0)
-                                if (p.NextNode is null)
+                                if (p.SourceSide)
                                     continue;
                                 else
                                 {
@@ -84,11 +84,11 @@ namespace Bidirezionale.NodePropagation.NoOpt
                                         continue;
                                     p.SetPreviousNode(n);
                                     p.SetPreviousEdge(e);
-                                    graph.SetMeanLabel(p.Label - 1);
                                     e.SetReversed(true);
                                     //p.SetInFlow(f);
                                     return (f, p);
                                 }
+                            graph.SetSide(p, true);
                             p.SetInFlow(Math.Min(n.InFlow, e.Flow));
                             p.SetLabel(n.Label + 1);
                             p.SetPreviousEdge(e);
@@ -112,7 +112,7 @@ namespace Bidirezionale.NodePropagation.NoOpt
                         if (element == n && e.Capacity > 0)
                         {
                             if (p.InFlow != 0)
-                                if (p.PreviousEdge is null)
+                                if (!p.SourceSide)
                                     continue;
                                 else
                                 {
@@ -123,11 +123,11 @@ namespace Bidirezionale.NodePropagation.NoOpt
                                     n.SetPreviousEdge(e);
                                     n.SetPreviousNode(p);
                                     //TODO valutare se inserire come meanLabel n.label+1 oppure p.label
-                                    graph.SetMeanLabel(n.Label - 1);
                                     e.SetReversed(false);
                                     //p.SetInFlow(f);
                                     return (f, n);
                                 }
+                            graph.SetSide(p, false);
                             p.SetInFlow(Math.Min(e.Capacity, n.InFlow));
                             p.SetNextEdge(e);
                             p.SetNextNode(n);
@@ -138,7 +138,7 @@ namespace Bidirezionale.NodePropagation.NoOpt
                         else if (element == p && e.Flow > 0)
                         {
                             if (n.InFlow != 0)
-                                if (n.PreviousEdge is null)
+                                if (!n.SourceSide)
                                     continue;
                                 else
                                 {
@@ -148,11 +148,11 @@ namespace Bidirezionale.NodePropagation.NoOpt
                                         continue;
                                     p.SetPreviousEdge(e);
                                     p.SetPreviousNode(n);
-                                    graph.SetMeanLabel(p.Label - 1);
                                     e.SetReversed(true);
                                     //n.SetInFlow(f);
                                     return (f, p);
                                 }
+                            graph.SetSide(n, false);
                             n.SetInFlow(Math.Min(e.Flow, p.InFlow));
                             n.SetNextEdge(e);
                             n.SetNextNode(p);

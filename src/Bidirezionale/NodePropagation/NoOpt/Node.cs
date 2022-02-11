@@ -66,6 +66,7 @@ namespace Bidirezionale.NodePropagation.NoOpt
         public Node NextNode { get; private set; }
         public BiEdge NextEdge { get; private set; }
         public BiEdge PreviousEdge { get; private set; }
+        public bool SourceSide { get; protected set; }
 
         public Node(string name)
         {
@@ -77,6 +78,7 @@ namespace Bidirezionale.NodePropagation.NoOpt
             this.NextNode = null;
             this.PreviousEdge = null;
             this.NextEdge = null;
+            this.SourceSide = true;
         }
         public void AddEdge(Node node, int cap)
         {
@@ -92,6 +94,7 @@ namespace Bidirezionale.NodePropagation.NoOpt
         }
         public void SetLabel(int label) => this.Label = label;
         public void SetInFlow(int f) => this.InFlow = f;
+        public void SetSourceSide(bool sourceSide) => this.SourceSide = sourceSide;
         public void SetPreviousNode(Node n) => this.PreviousNode = n;
         public void SetNextNode(Node n) => this.NextNode = n;
         public void SetPreviousEdge(BiEdge e) => this.PreviousEdge = e;

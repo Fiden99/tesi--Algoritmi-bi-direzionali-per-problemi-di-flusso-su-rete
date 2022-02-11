@@ -6,6 +6,7 @@ namespace Bidirezionale.NodePropagation.NoOpt
         {
             this.Label = int.MaxValue;
             this.InFlow = int.MaxValue;
+            this.SourceSide = false;
         }
 
         public override void Reset()
