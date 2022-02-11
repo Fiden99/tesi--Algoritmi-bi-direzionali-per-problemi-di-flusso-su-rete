@@ -9,7 +9,8 @@ arco BiEdge che collega due nodi, che ha le informazioni sulla capacità residua
 ### Node
 
 Il nodo node contiene tutti gli archi a lui collegato come una lista di BiEdge, inoltre contiene informazioni per quanto riguarda il proprio indirizzamento per l'invio del flusso, tramite gli attributi previousNode e previousEdge per quanto riguarda la parte esplorata dal nodo sorgente *s*, e nextNode e nextEdge per quanto riguarda la parte esplorata dal nodo destinazione *t*, e un booleano sourceSide, per capire da chi è stato esplorato.
-Inoltre tiene conto della label, quindi di quanto è distante o da *s* o da *t* (a seconda da chi è stato esplorato).
+Inoltre tiene conto della label, con la distanza da *s* (*t* ha il valore massimo consentito, e esplorando faccio diminuire il valore, i valori andrebbero corretti).
+
 Infine contiene un attributo per tenere traccia del flusso passante per quel nodo, cioè InFlow (usato anche per vedere se è stato esplorato o meno).
 
 ### Graph
