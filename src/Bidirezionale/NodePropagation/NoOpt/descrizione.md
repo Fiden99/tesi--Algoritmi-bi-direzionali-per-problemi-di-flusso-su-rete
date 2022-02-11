@@ -27,4 +27,5 @@ Finché riesco a trovare un percorso proseguo ripeto la Bfs e l'invio del flusso
 ### Ricerca del percorso tra *s* e *t*
 
 Analizzo quale delle due parti devo analizzare, faccio un reset (elimino informazioni di indirizzamento e InFlow) di quella parte (o di entrambe se necessario) e aggiungo il nodo iniziale alla coda (*s*,*t* o entrambi).
-Finché entrambe le code non sono vuote, procedo ad analizzare tutti i nodi,non precedentemente esplorati, collegati al nodo che ho ottenuto dalla dequeue della coda interessata (per poi accodarli alla coda usata per ottenere quel valore), per poi passare all'altra coda, se possibile.
+Finché entrambe le code non sono vuote, procedo ad analizzare tutti i nodi,ancora da esplorare, collegati al nodo che ho ottenuto dalla dequeue della coda interessata (per poi accodarli alla coda usata per ottenere quel valore), per poi passare all'altra coda, se possibile.
+Quando un nodo incontra un nodo esplorato "dall'altra parte", restituisco il valore del nodo (aggiornato) appartenente ai nodi esplorati da Sink (scelta arbitraria fatta).
