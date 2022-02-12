@@ -123,6 +123,7 @@ namespace Bidirezionale.NodeCount.LastLevelOpt
                         node.SetPreviousNode(previous);
                         node.SetPreviousEdge(e);
                         node.SetInFlow(Math.Min(e.Capacity, previous.InFlow));
+                        node.SetValid(true);
                         e.SetReversed(false);
                         return true;
                     }
@@ -132,6 +133,7 @@ namespace Bidirezionale.NodeCount.LastLevelOpt
                         node.SetPreviousNode(next);
                         node.SetPreviousEdge(e);
                         node.SetInFlow(Math.Min(e.Flow, next.InFlow));
+                        node.SetValid(true);
                         e.SetReversed(true);
                         return true;
                     }

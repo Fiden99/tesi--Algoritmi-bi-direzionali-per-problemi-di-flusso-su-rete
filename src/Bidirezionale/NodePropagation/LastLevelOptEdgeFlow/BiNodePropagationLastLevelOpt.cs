@@ -102,6 +102,8 @@ namespace Bidirezionale.NodePropagation.LastLevelOptEdgeFlow
             {
                 while (target.Label < n.Label || !n.SourceSide)
                 {
+                    if (!n.Valid)
+                        return false;
                     n = n.PreviousNode;
                     if (n == target)
                         return true;
@@ -111,6 +113,8 @@ namespace Bidirezionale.NodePropagation.LastLevelOptEdgeFlow
             {
                 while (target.Label < n.Label)
                 {
+                    if (!n.Valid)
+                        return false;
                     n = n.NextNode;
                     if (n == target)
                         return true;
@@ -302,10 +306,6 @@ namespace Bidirezionale.NodePropagation.LastLevelOptEdgeFlow
                                     }
                                     else
                                     {
-                                        if (sourceRepaired && Reached(noCapSource, n))
-                                        {
-                                            return n;
-                                        }
                                         n.SetVisited(true);
                                         n.SetPreviousEdge(e);
                                         n.SetPreviousNode(p);
@@ -336,8 +336,6 @@ namespace Bidirezionale.NodePropagation.LastLevelOptEdgeFlow
                                     }
                                     else
                                     {
-                                        if (sourceRepaired && Reached(noCapSource, p))
-                                            return p;
                                         //TODO capire come fare in caso getflow ritorni null                                        
                                         p.SetVisited(true);
                                         p.SetPreviousEdge(e);
