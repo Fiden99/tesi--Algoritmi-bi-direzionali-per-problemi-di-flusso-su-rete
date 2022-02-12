@@ -6,6 +6,7 @@ namespace Bidirezionale.Label.NoOpt
         {
             this.Label = int.MaxValue;
             this.Visited = true;
+            this.SourceSide = false;
         }
 
         public override void Reset()

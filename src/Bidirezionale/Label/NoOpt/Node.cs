@@ -66,6 +66,7 @@ namespace Bidirezionale.Label.NoOpt
         public Node NextNode { get; private set; }
         public BiEdge NextEdge { get; private set; }
         public BiEdge PreviousEdge { get; private set; }
+        public bool SourceSide { get; protected set; }
 
         public Node(string name)
         {
@@ -77,6 +78,7 @@ namespace Bidirezionale.Label.NoOpt
             this.NextNode = null;
             this.PreviousEdge = null;
             this.NextEdge = null;
+            this.SourceSide = true;
         }
         public void AddEdge(Node node, int cap)
         {
@@ -96,6 +98,7 @@ namespace Bidirezionale.Label.NoOpt
         public void SetNextNode(Node n) => this.NextNode = n;
         public void SetPreviousEdge(BiEdge e) => this.PreviousEdge = e;
         public void SetNextEdge(BiEdge e) => this.NextEdge = e;
+        public void SetSourceSide(bool sourceSide) => this.SourceSide = sourceSide;
 
         public static bool AddFlow(Node n, int flow)
         {

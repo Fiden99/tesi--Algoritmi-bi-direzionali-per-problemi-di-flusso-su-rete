@@ -47,18 +47,17 @@ namespace Bidirezionale.Label.NoOpt
                         if (element == p && e.Capacity > 0)
                         {
                             if (n.Visited)
-                                if (n.NextNode is null)
+                                if (n.SourceSide)
                                     continue;
                                 else
                                 {
                                     n.SetPreviousNode(p);
                                     n.SetPreviousEdge(e);
-                                    //TODO capire dove e come aggiornare le label dei nodi trovati da t
-                                    graph.SetMeanLabel(n.Label - 1);
                                     e.SetReversed(false);
                                     //n.SetInFlow(f);
                                     return n;
                                 }
+                            n.SetSourceSide(true);
                             n.SetVisited(true);
                             n.SetLabel(p.Label + 1);
                             n.SetPreviousNode(p);
@@ -69,17 +68,17 @@ namespace Bidirezionale.Label.NoOpt
                         else if (element == n && e.Flow > 0)
                         {
                             if (p.Visited)
-                                if (p.NextNode is null)
+                                if (p.SourceSide)
                                     continue;
                                 else
                                 {
                                     p.SetPreviousNode(n);
                                     p.SetPreviousEdge(e);
-                                    graph.SetMeanLabel(p.Label - 1);
                                     e.SetReversed(true);
                                     //p.SetInFlow(f);
                                     return p;
                                 }
+                            p.SetSourceSide(true);
                             p.SetVisited(true);
                             p.SetLabel(n.Label + 1);
                             p.SetPreviousEdge(e);
@@ -106,18 +105,17 @@ namespace Bidirezionale.Label.NoOpt
                         if (element == n && e.Capacity > 0)
                         {
                             if (p.Visited)
-                                if (p.PreviousEdge is null)
+                                if (!n.SourceSide)
                                     continue;
                                 else
                                 {
                                     n.SetPreviousEdge(e);
                                     n.SetPreviousNode(p);
-                                    //TODO valutare se inserire come meanLabel n.label+1 oppure p.label
-                                    graph.SetMeanLabel(n.Label - 1);
                                     e.SetReversed(false);
                                     //p.SetInFlow(f);
                                     return n;
                                 }
+                            p.SetSourceSide(false);
                             p.SetVisited(true);
                             p.SetNextEdge(e);
                             p.SetNextNode(n);
@@ -128,17 +126,17 @@ namespace Bidirezionale.Label.NoOpt
                         else if (element == p && e.Flow > 0)
                         {
                             if (n.Visited)
-                                if (n.PreviousEdge is null)
+                                if (!n.SourceSide)
                                     continue;
                                 else
                                 {
                                     p.SetPreviousEdge(e);
                                     p.SetPreviousNode(n);
-                                    graph.SetMeanLabel(p.Label - 1);
                                     e.SetReversed(true);
                                     //n.SetInFlow(f);
                                     return p;
                                 }
+                            n.SetSourceSide(false);
                             n.SetVisited(true);
                             n.SetNextEdge(e);
                             n.SetNextNode(p);
