@@ -84,13 +84,17 @@
         \STATE $codaEdgeSource.$enqueue$(null)$
         \ENDIF
         \WHILE{$ \neg codaSink.isEmpty \lor \neg codaSource.isEmpty$}
-        \IF{($\neg codaSource.isEmpty \land codaEdgeSource.isEmpty) \lor (codaSink.isEmpty \land codaEdgeSink.isEmpty$}
+        \IF{($\neg codaSource.isEmpty \land (codaEdgeSource.isEmpty \lor (codaSink.isEmpty \land codaEdgeSink.isEmpty))$}
         \STATE $elementSource \leftarrow codaSource.$dequeue()
-        \STATE $codaEdgeSource.$enqueue$(\delta^+(elementSource))$
+        \FORALL{$n \in V(G) | n $è esplorabile da $elementSource$} \COMMENT{ arco $x | (x.PreviousNode == elementSource \land x.Capacity > 0 \land (!x.NextNode.Visited \lor !x.NextNode.SourceSide)) \lor (x.NextNode == elementSource \land x.Flow > 0 \land (!x.PreviousNode.Visited \lor !x.PreviousNode.SourceSide)$}
+        \STATE $codaEdgeSource.$enqueue$(n)$
+        \ENDFOR
         \ENDIF
-        \IF{$(\neg codaSink.isEmpty \land codaEdgeSink.isEmpty) \lor (codaSource.isEmpty \land codaEdgeSink.isEmpty)$}
+        \IF{$(\neg codaSink.isEmpty \land (codaEdgeSink.isEmpty \lor (codaSource.isEmpty \land codaEdgeSink.isEmpty)$}
         \STATE $elementSink \leftarrow codaSink.dequeueu$
-        \STATE $codaEdgeSink.$enqueue$(\delta^-(elementSink)$
+        \FORALL{$n \in V(G) | n$ è esplorabile da $elementSink$} \COMMENT{ arco $x | (x.NextNode == elementSink \land x.Capacity > 0 \land (!x.PreviousNode.Visited \lor x.PreviousNode.SourceSide)) \lor( x.PreviousNode == elementSink \land x.Flow > 0 \land (!x.NextNode.Visited \lor x.NextNode.SourceSide))$}
+        \STATE $codaEdgeSink.$enqueue$(n)$
+        \ENDFOR
         \ENDIF
         \algstore{endInit}
     \end{algorithmic}

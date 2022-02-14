@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Bidirezionale.NodeCount.NoOpt
 {
@@ -38,16 +39,16 @@ namespace Bidirezionale.NodeCount.NoOpt
 #endif
             while (codaSink.Count > 0 || codaSource.Count > 0)
             {
-                if ((codaEdgeSource.Count == 0 && codaSource.Count > 0) || (codaSink.Count == 0 && codaEdgeSink.Count == 0))
+                if (codaSource.Count > 0 && (codaEdgeSource.Count == 0 || (codaSink.Count == 0 && codaEdgeSink.Count == 0)))
                 {
                     elementSource = codaSource.Dequeue();
-                    foreach (var e in elementSource.Edges)
+                    foreach (var e in elementSource.Edges.Where(x => (x.PreviousNode == elementSource && x.Capacity > 0 && (!x.NextNode.Visited || !x.NextNode.SourceSide)) || (x.NextNode == elementSource && x.Flow > 0 && (!x.PreviousNode.Visited || !x.PreviousNode.SourceSide))))
                         codaEdgeSource.Enqueue(e);
                 }
-                if ((codaEdgeSink.Count == 0 && codaSink.Count > 0) || (codaSource.Count == 0 && codaEdgeSource.Count == 0))
+                if (codaSink.Count > 0 && (codaEdgeSink.Count == 0 || (codaSource.Count == 0 && codaEdgeSource.Count == 0)))
                 {
                     elementSink = codaSink.Dequeue();
-                    foreach (var e in elementSink.Edges)
+                    foreach (var e in elementSink.Edges.Where(x => (x.NextNode == elementSink && x.Capacity > 0 && (!x.PreviousNode.Visited || x.PreviousNode.SourceSide)) || (x.PreviousNode == elementSink && x.Flow > 0 && (!x.NextNode.Visited || x.NextNode.SourceSide))))
                         codaEdgeSink.Enqueue(e);
                 }
                 while (codaEdgeSink.Count > 0 && codaEdgeSource.Count > 0)
