@@ -8,7 +8,7 @@ L'arco BiEdge che collega due nodi, che ha le informazioni sulla capacità resid
 
 ### Node
 
-Il nodo contiene le informazioni sugli archi a lui collegati con una lista di biEdge.
+Il nodo contiene le informazioni sugli archi a lui collegati con una lista di BiEdge.
 Inoltre salva la propria distanza dal nodo sorgente *s* (il nodo destinazione *t* ha il valore massimo consentito (int.MaxValue), quindi c'è un gap tra i due dati, andrebbe, in fase finale, andrebbero corrette le label), le informazioni per l'indirizzamento (previousEdge e previousNode per la parte esplorata da *s*, nextEdge e nextNode per la parte esplorata da *t*).
 Infine, ci sono due booleani, uni che mi indica se il nodo è stato precedentemente esplorato o meno, l'altro se è stato esplorato da *s* o da *t*.
 
