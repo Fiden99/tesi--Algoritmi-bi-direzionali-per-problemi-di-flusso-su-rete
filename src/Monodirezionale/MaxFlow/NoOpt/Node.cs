@@ -39,13 +39,11 @@ namespace Monodirezionale.MaxFlow.NoOpt
         public int InFlow { get; protected set; }
         public uint Label { get; private set; }
         public List<MonoEdge> Next { get; private set; }
-        public bool Valid { get; private set; }
         public string Name { get; private set; }
         public Node PreviousNode { get; private set; }
 
         public Node(string name)
         {
-            Valid = true;
             this.Label = 0;
             this.Next = new List<MonoEdge>();
             this.Name = name;
@@ -93,15 +91,7 @@ namespace Monodirezionale.MaxFlow.NoOpt
         {
             this.Label = label;
         }
-        public void RepairInValid(uint label)
-        {
-            this.Label = label;
-            this.Valid = true;
-        }
-        public void InValidNode()
-        {
-            this.Valid = false;
-        }
+
         //permette di modificare il flusso, se il flusso ha valore negativo aumento la capacità
         public void AddFlow(int flow, Node n)
         {

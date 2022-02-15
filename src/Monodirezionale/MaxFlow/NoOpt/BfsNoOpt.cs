@@ -24,10 +24,7 @@ namespace Monodirezionale.MaxFlow.NoOpt
                     {
                         n.SetPreviousNode(element);
                         n.InitLabel(element.Label + 1);
-                        if (e is ReversedMonoEdge)
-                            n.SetInFlow(Math.Min(element.InFlow, e.Flow));
-                        else
-                            n.SetInFlow(Math.Min(element.InFlow, e.Capacity));
+                        n.SetInFlow(Math.Min(element.InFlow, (e is ReversedMonoEdge) ? e.Flow : e.Capacity));
                         if (n is SinkNode)
                             return;
                         else

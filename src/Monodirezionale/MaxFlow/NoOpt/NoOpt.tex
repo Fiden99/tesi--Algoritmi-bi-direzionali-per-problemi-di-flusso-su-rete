@@ -14,47 +14,52 @@
 \section{Algoritmo senza ottimizzazione}
 
 \begin{algorithm}
-\caption{Ricerca del massimo flusso senza alcuna ottimizzazione}
-\begin{algorithmic}
-\REQUIRE Una rete  $(G,u,s,t)$ .
-\ENSURE valore del flusso massimo 
-\WHILE{TRUE}
-\STATE DoBfs(G)
-\IF{ $t$.flussoPassante$=0$}
-\STATE \textbf{break}
-\ENDIF
-\STATE sendFlow($t$)
-\ENDWHILE
-\STATE \textbf{return} $s.$flussoUscente
+    \caption{Ricerca del massimo flusso senza alcuna ottimizzazione}
+    \begin{algorithmic}
+        \REQUIRE Una rete  $(G,u,s,t)$ .
+        \ENSURE valore del flusso massimo
+        \WHILE{TRUE}
+        \STATE DoBfs(G)
+        \IF{ $t$.flussoPassante$=0$}
+        \STATE \textbf{break}
+        \ENDIF
+        \STATE sendFlow($t$)
+        \ENDWHILE
+        \STATE \textbf{return} $s.$flussoUscente
 
-\end{algorithmic}
+    \end{algorithmic}
 \end{algorithm}
 
 \begin{algorithm}
-\caption{Algoritmo DoBfs senza alcuna ottimizzazione}
-\begin{algorithmic}
-\REQUIRE rete $(G,u,s,t)$
-\ENSURE Ricerca del percorso di $G$ e aggiornamento delle informazioni contenute in $N(G)$
-\FORALL{$n \in V(G)$}
-\STATE $n$.Reset()
-\ENDFOR
-\STATE $coda \leftarrow$ Coda di nodi
-\STATE $coda$.Enqueue(s)
-\WHILE{$coda$ non è vuota }
-\STATE $element \leftarrow coda$.Dequeue()
-\FORALL{$edge$ che esce da $element$}
-\STATE $n \leftarrow$ $edge$.NextNode
-\IF{$n$ è stato visitato AND $u(e)> 0$ }
-\STATE $n$.update($edge,edge$.PreviousNode)
-\STATE$n.$flussoPassante $\leftarrow u(e)$
-\IF{$n = t $}
-\STATE \textbf{return}
-\ELSE
-\STATE $coda$.Enqueue(n)
-\ENDIF
-\ENDIF
-\ENDFOR
-\ENDWHILE
-\end{algorithmic}
+    \caption{Algoritmo DoBfs senza alcuna ottimizzazione}
+    \begin{algorithmic}
+        \REQUIRE rete $(G,u,s,t)$
+        \ENSURE Ricerca del percorso di $G$ e aggiornamento delle informazioni contenute in $N(G)$
+        \FORALL{$n \in V(G)$}
+        \STATE $n$.Reset()
+        \ENDFOR
+        \STATE $coda \leftarrow$ Coda di nodi
+        \STATE $coda$.Enqueue(s)
+        \WHILE{$\neg coda.isEmpty$}
+        \STATE $element \leftarrow coda$.Dequeue()
+        \FORALL{$edge \in \delta(element)$}
+        \STATE $n \leftarrow element.next$ \COMMENT{si fa notrae che con next qui si intende il nodo di $e$ che non è $element$}
+        \IF{$n.flussoPassante = 0 \land ((u_t(edge)> 0 \land \neg e.reversed) \lor (f(edge)> 0 \land e.reversed))$ }
+        \STATE \COMMENT{per il codice reversed è un oggetto diverso che, in fase di invio del flusso, va cercato insieme all'arco che effettivamente si usa, per questo motivo ho optato di non usare più questa tipologia di archi}
+        \STATE $n$.update($edge,element$)
+        \IF{$edge.reversed$}
+        \STATE $n.$flussoPassante $\leftarrow \min(u_t(e),element.flussoPassante)$
+        \ELSE
+        \STATE $n.$flussoPassante $\leftarrow \min(f(e),element.flussoPassante)$
+        \ENDIF
+        \IF{$n = t $}
+        \STATE \textbf{return}
+        \ELSE
+        \STATE $coda$.Enqueue(n)
+        \ENDIF
+        \ENDIF
+        \ENDFOR
+        \ENDWHILE
+    \end{algorithmic}
 \end{algorithm}
 \end{document}

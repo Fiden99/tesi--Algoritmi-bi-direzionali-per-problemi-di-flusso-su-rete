@@ -1,0 +1,38 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+
+\title{Presentazione algoritmo di ricerca del flusso massimo senza ottimizzazione}
+\author{Filippo Magi }
+\begin{document}
+
+\maketitle
+
+\section{strutture dati}
+\subsection{MonoEdge}
+
+Contiene l'indicazione del nodo successivo, la capacità residua e il flusso inviato.
+È inoltre presente una sottoclasse \textbf{ReversedMonoEdge} per l'arco contrario.
+Per l'invio del flusso devo trovare entrambi gli archi tra quelli collegati al nodo di invio.
+
+\subsection{Node}
+
+Node ha le seguenti proprietà
+\begin{enumerate}
+    \item la lista di archi a lui connessi (in fase di inserimento inserisca sia MonoEdge sia ReversedMonoEdge)
+    \item label, per indicare la distanza dal nodo sorgente \textit{s}
+    \item PreviousNode, che mi indica il nodo precedente per tornare da \textit{s}, in maniera da indicarmi il percorso
+    \item il flussoPassante (InFlow nel codice), che mi indica, attraverso il percorso dato, fino a quel nodo quanto flusso è inviabile (proseguendo potrebbe diminuire)
+\end{enumerate}
+%per motivi di compressione e debug, è presente anche un nome
+
+\subsection {Graph}
+
+Insieme di Node presenti nel grafo.
+
+\section{descrizione}
+
+Ricerco, tramite una BFS, un flusso da inviare, facendo sì che ogni nodo salvi quello da cui è arrivato e la quantità di flusso inviabile da quello specifico percorso.
+Una volta che tramite la Bfs e trovato il nodo destinazione t, invio il flusso indicatomi, e ricomincio finché o non è più possibile trovare un percorso che collega il s e t.
+
+\end{document}
