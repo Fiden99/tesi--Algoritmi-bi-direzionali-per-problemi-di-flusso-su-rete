@@ -1,0 +1,51 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{algorithm}
+%\usepackage{algorithmic}
+\usepackage{algcompatible}
+\usepackage{amsmath}
+
+\title{Presentazioni dell'algoritmo di ricerca del flusso massimo monodirezionale con ottimizzazione agli ultimi livelli  }
+\author{Filippo Magi }
+
+\begin{document}
+
+\maketitle
+
+\section{strutture dati utilizzate}
+\subsection{BiEdge}
+I nodi vengono collegati tra di loro da archi BiEdge, che contiene le informazioni da quale nodo esce e in quale nodo entra, in maniera tale da non dover aver bisogno di modificare, durante l'invio del flusso, due archi ma solo uno.
+Ovviamente conserva in memoria la quantità di flusso che passa e la sua capacità residua, oltre a un booleano (reversed) che mi indica che quel arco, durante l'invio del flusso, dovrà inviarlo o ritirarlo.
+\subsection{Node}
+Node contiene al suo interno informazioni sugli archi a lui collegati (Lista di BiEdge), la label, cioè la distanza tra lui e il nodo sorgente \textit{s}, un booleano che indica se il nodo è valido o meno,le indicazioni sul percorso che deve fare, quindi sia previousNode e previousEdge, oltre ad avere quanto flusso gli arriva dal percorso indicato, indicato come InFlow.
+\subsection{Graph}
+Graph è rappresentato da un Lista di vari insiemi, ogni insieme contiene i nodi che hanno una certa label, oltre ad avere un insieme di nodi non validi.
+\section{descrizione}
+
+Dopo aver trovato un cammino tra il nodo sorgente $s$ e il nodo destinazione $t$, mentre invio il flusso, controllo che la capacità residua degli archi sia maggiore
+di zero, in caso la capacità sia pari a 0, il nodo successivo viene marcato salvato in una pila qui chiamata \textbf{malati}.
+Poi effettuo la ricerca del cammino
+\subsection{Ricerca del cammino}
+Controllo se la pila \textbf{malati} è vuota, in cancello tutte le informazioni di indirizzamento (previousNode,previousEdge e InFlow) e accodo alla coda \textbf{coda} il nodo sorgente \textit{s}.
+Se la pila non è vuota, provo a riparare i nodi di \textbf{malati}, da qui abbiamo due possibilità:
+\begin{itemize}
+    \item tutti i nodi di \textbf{malati} vengono riparati, così facendo ho già trovato un percorso da \textit{s} a \textit{t}, usando informazioni conosciute precedentemente.
+    \item trovo un nodo $n \in  \textbf{malati}$ che non è possibile riparare, in tal caso cancello tutte le informazioni di indirizzamento dei nodi con label pari o maggiore a quella di $n$, e inserisco in \textbf{coda} tutti i nodi $m \in V(G) | m.label = n.label-1$
+\end{itemize}
+Nel caso in cui non abbia già trovato il cammino, procedo con la ricerca di $t$ partendo dai nodi presenti in \textbf{coda}.
+
+\subsection{RepairNode}
+
+È possibile "guarire il nodo" \textbf{malato}, cioè cercare un nodo \textbf{sostituto} a lui collegato con le seguenti proprietà
+\begin{enumerate}
+    \item l'arco tra \textbf{malato} e \textbf{sostituto} deve avere capacità (o flusso,nel caso \textbf{malato} sia nodo uscente dell'arco) positivo, cioè maggiore di zero
+    \item la label di \textbf{sostituto} deve essere uguale alla label di \textbf{malato} -1, cioè
+          \textbf{sostituto}.Label = \textbf{malato}.Label-1
+    \item \textbf{sostituto} deve essere un nodo valido
+    \item il valore del flusso passante per \textbf{sostituto} deve essere positivo
+\end{enumerate}
+se \textbf{sostituto} rispetta queste qualità, aggiorno \textbf{malato} e confermo di essere riuscito a ripararlo.
+
+
+
+\end{document}

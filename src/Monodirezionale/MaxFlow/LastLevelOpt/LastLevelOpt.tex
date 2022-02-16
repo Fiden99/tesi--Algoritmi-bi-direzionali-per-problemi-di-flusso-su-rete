@@ -19,6 +19,7 @@
         \REQUIRE Rete $(G,u,s,t)$ .
         \ENSURE valore del flusso massimo
         \STATE $noCap \leftarrow$ null
+        \STATE $malati \leftarrow$ pila di nodi vuota
         \WHILE{TRUE}
         \STATE $f \leftarrow$ DoBfs($G,noCap$)
         \IF{ $f = 0$}
@@ -27,13 +28,8 @@
         \STATE $mom \leftarrow t$
         \WHILE{ $mom \ne s$}
         \STATE $mom.PreviousEdge.AddFlow(t.flussoPassante)$
-        \IF{$u(mom.PreviousEdge) < 0 $ OR $ f(mom.PreviousEdge) < 0$}
-        \STATE $mom$.Reverse(t) \Comment{da t faccio tornare come le capacità e il flusso come prima di inviarle fino a mom}
-        \STATE $noCap \leftarrow mom$
-        \STATE \textbf{break}
-        \ENDIF
         \IF{$u(mom.PreviousEdge) = 0$}
-        \STATE $noCap \leftarrow mom$
+        \STATE $malati.$push$(mom)$
         \ENDIF
         \STATE $mom \leftarrow mom$.previousNode
         \ENDWHILE
@@ -46,51 +42,71 @@
 \begin{algorithm}
     \caption{Algoritmo DoBfs con ottimizzazione solo nelle ultime label}
     \begin{algorithmic}
-        \REQUIRE rete $(G,u,s,t)$, nodo $noCap$
+        \REQUIRE rete $(G,u,s,t)$, pila di nodi $malati$
         \ENSURE valore del flusso inviato a $t$, $N(G)$ aggiornati con informazioni sul percorso da fare
         \STATE $coda \leftarrow$ coda vuota di nodi
-        \IF{$noCap = $null}
+        \IF{$malati.isEmpty$ }
         \STATE $coda.$Enqueue$(s)$
+        \FORALL{$n \in V(G)$}
+        \STATE $n.$Reset()
+        \ENDFOR
         \ELSE
-        \STATE $noCap$.Valid = false
-        \STATE Repair($noCap$)\Comment{controllo se c'è un nodo con label = noCap.label-1 e con capacità o flusso diversa da 0}
-        \STATE $f \leftarrow $ GetPathFlow$(t)$
-        \IF {$noCap$.Valid $\land f \ne 0$}
+        \STATE $repaired \leftarrow$ true
+        \STATE $ p \leftarrow $ null
+        \WHILE{$\neg malati.isEmpty$}
+        \STATE $n \leftarrow malati.$pop()
+        \STATE UpdateInFlow($n,p$) \COMMENT{se $p \ne null$, aggiorno i nodi tra p ed n con il nuovo valore di InFlow, passando da 0 a un valore positivo}
+        \STATE Repair($n$)\Comment{controllo se c'è un nodo con label = noCap.label-1 e con capacità o flusso diversa da 0}
+        \IF{non sono riuscito a riparare $n$}
+        \STATE $repaired \leftarrow $false
+        \STATE \textbf{break}
+        \ENDIF
+        \STATE $p \leftarrow n$
+        \ENDWHILE
+        \IF{$repaired$}
+        \STATE $f \leftarrow $ UpdateInFlow $(t,n)$
         \STATE \textbf{return} f
         \ENDIF
         %capire se quello che ho scritto è giusto o meno
-        \STATE coda $\leftarrow n \in N(G) \|  n.label = (noCap.label - 1)$
-        \FORALL{$n \in N(G) \| n.label \ge noCap.label$}
-        \STATE $n$.Reset()
+        \STATE coda $\leftarrow x \in V(G) \|  x.label = (n.label - 1)$
+        \FORALL{$x \in V(G) \| x.label \ge n.label$}
+        \STATE $x$.Reset()
         \ENDFOR
         \ENDIF
-        \WHILE{la coda non è vuota}
-        \STATE $element  \leftarrow coda$.dequeue()
-        \IF{$element$.valid} \Comment{label valida}
-        \FORALL{$edge \in element.Edges$}
-        \STATE $n \leftarrow edge.$nextNode
-        \STATE $p \leftarrow edge$.previousNode
-        \IF{ $p = element$  AND $ u(edge) > 0$ AND ($\neg n.visited$ OR $\neg n.valid$)}
-        \STATE $n$.update(p,edge) \COMMENT{label, flusso entrante e nodo precedente, nel caso sia necessario "riparo" il nodo}
-        \STATE $edge$.Reversed = false \Comment{per capire se devo inviare o ricevere flusso}
-        \IF {$n = t$}
-        \STATE \textbf{return} $n$.flussoPassante
-        \ELSE
-        \STATE $coda$.Enqueue($n$)
-        \ENDIF
-        \ELSIF{$n = element$ AND $f(edge) > 0$ AND ($\neg p.visited$ OR $\neg p.valid$)}
-        \STATE $p$.update(n,edge)
-        \STATE $edge$.reversed = true
-        \IF{$p = t$}
-        \STATE \textbf{return} $p$.flussoPassante
-        \ELSE
-        \STATE $coda$.Enqueue($p$)
-        \ENDIF
-        \ENDIF
-        \ENDFOR
-        \ENDIF
-        \ENDWHILE
-        \STATE \textbf{return} 0
+        \algstore{finishedInit}
     \end{algorithmic}
+\end{algorithm}
+\newpage
+\begin {algorithm}
+\begin{algorithmic}
+    \algrestore{finishedInit}
+    \WHILE{la coda non è vuota}
+    \STATE $element  \leftarrow coda$.dequeue()
+    \IF{$element$.valid} \Comment{label valida}
+    \FORALL{$edge \in element.Edges$}
+    \STATE $n \leftarrow edge.$nextNode
+    \STATE $p \leftarrow edge$.previousNode
+    \IF{ $p = element \land u_t(edge) > 0 \land (\neg n.visited \lor \neg n.valid$)} \COMMENT{per capire se il nodo è stato visitato o meno, controllo che $inflow > 0$}
+    \STATE $n$.update(p,edge) \COMMENT{label, flusso entrante e nodo precedente, nel caso sia necessario "riparo" il nodo}
+    \STATE $edge$.Reversed = false \Comment{per capire se devo inviare o ricevere flusso}
+    \IF {$n = t$}
+    \STATE \textbf{return} $n$.flussoPassante
+    \ELSE
+    \STATE $coda$.Enqueue($n$)
+    \ENDIF
+    \ELSIF{$n = element \land f(edge) > 0 \land (\neg p.visited \lor \neg p.valid)$}
+    \STATE $p$.update(n,edge)
+    \STATE $edge$.reversed = true
+    \IF{$p = t$}
+    \STATE \textbf{return} $p$.flussoPassante
+    \ELSE
+    \STATE $coda$.Enqueue($p$)
+    \ENDIF
+    \ENDIF
+    \ENDFOR
+    \ENDIF
+    \ENDWHILE
+    \STATE \textbf{return} 0
+\end{algorithmic}
 \end{algorithm}
 \end{document}
