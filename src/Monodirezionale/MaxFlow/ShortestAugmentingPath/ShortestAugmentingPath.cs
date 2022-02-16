@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 
 namespace Monodirezionale.MaxFlow.ShortestAugmentingPath
@@ -8,22 +9,17 @@ namespace Monodirezionale.MaxFlow.ShortestAugmentingPath
     {
         public static void SendFlow(int flow, Node from)
         {
-            Node m;
             if (from is SourceNode)
                 while (from is not SinkNode)
                 {
-                    m = from;
                     Node.AddFlow(flow, from.PreviousEdge);
                     from = from.PreviousNode;
-                    m.Reset();
                 }
             else
                 while (from is not SourceNode)
                 {
-                    m = from;
                     Node.AddFlow(flow, from.PreviousEdge);
                     from = from.PreviousNode;
-                    m.Reset();
                 }
         }
         public static int Bfs(Graph graph)
@@ -55,7 +51,7 @@ namespace Monodirezionale.MaxFlow.ShortestAugmentingPath
             }
             return f;
         }
-        public static int Dfs(Graph graph, Node start, int f)
+        public static int Dfs(Graph graph, Node start, int f, Queue<Node> esplorati)
         {
             if (start.Distance < graph.Nodes.Count)
             {
@@ -67,9 +63,10 @@ namespace Monodirezionale.MaxFlow.ShortestAugmentingPath
                     {
                         f = Math.Min(f, e.Capacity);
                         n.SetPrevious(e);
+                        esplorati.Enqueue(n);
                         if (n is SinkNode)
                             return f;
-                        return Dfs(graph, n, f);
+                        return Dfs(graph, n, f, esplorati);
                     }
                     /*else if (start == n && p.Distance == (n.Distance - 1) && e.Flow > 0)
                     {
@@ -96,8 +93,7 @@ namespace Monodirezionale.MaxFlow.ShortestAugmentingPath
                 else
                     mom = start.PreviousNode;
                 start.SetDistance(min + 1);
-                start.Reset();
-                return Dfs(graph, mom, f);
+                return Dfs(graph, mom, f, esplorati);
             }
             return 0;
 
@@ -118,6 +114,7 @@ namespace Monodirezionale.MaxFlow.ShortestAugmentingPath
             Node s = graph.Source;
             Node t = graph.Sink;
             int fMax = Bfs(graph);
+            Queue<Node> esplorati = new();
             //primo flusso inviato (già ottenuto grazie a Bfs, servita per avere le distanze)
 
             SendFlow(fMax, s);
@@ -127,11 +124,16 @@ namespace Monodirezionale.MaxFlow.ShortestAugmentingPath
 
             while (s.Distance < graph.Nodes.Count)
             {
-                int f = Dfs(graph, s, int.MaxValue);
+                int f = Dfs(graph, s, int.MaxValue, esplorati);
                 fMax += f;
                 if (f == 0)
                     break;
                 SendFlow(f, t);
+                while (esplorati.Count > 0)
+                {
+                    var n = esplorati.Dequeue();
+                    n.Reset();
+                }
             }
             //PrintGraph(graph);
             return fMax;

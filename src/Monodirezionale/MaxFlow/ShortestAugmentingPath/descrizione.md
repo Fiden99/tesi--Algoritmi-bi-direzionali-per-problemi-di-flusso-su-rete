@@ -32,5 +32,7 @@ iniziamo con una bfs da *t* esplora tutti i nodi, indicando la distanza da lui, 
 
 ### dfs
 
-algoritmo ricorsivo che cerca di procedere da s verso t, attraverso procede, cioè se il nodo **p** che sto analizzando ha un arco che lo collega con un nodo **n** tale che **p**.distance = **n**.distance +1, e con capacità positiva, allora procedo ad analizzare **n**, a meno che non sia  il nodo cercato *t*.
-Se non è possibile procedere, procedo a fare il retreat, cioè cerco tra i nodi che escono da **p** quello con distanza minore, e rendo la distanza di **p** il valore di quella distanza +1, cancello i dati per l'esplorazione (previousNode e previousEdge) ,per poi analizzare il nodo che avevo analizzato antecedente, nel caso il non lo abbia (cioè **p** è il nodo sorgente *s*), ripeto con **p**.
+algoritmo ricorsivo che cerca di procedere da s verso t, attraverso procede, cioè se il nodo **p** che sto analizzando ha un arco che lo collega con un nodo **n** tale che **p**.distance = **n**.distance +1, e con capacità positiva, allora procedo ad salvare in una apposita coda e analizzare **n**,  a meno che non sia  il nodo cercato *t* (che verrà comunque salvato nella coda).
+Se non è possibile procedere, procedo a fare il retreat, cioè cerco tra i nodi che escono da **p** quello con distanza minore, e rendo la distanza di **p** il valore di quella distanza +1 ,per poi analizzare il nodo che avevo analizzato antecedente, nel caso il non lo abbia (cioè **p** è il nodo sorgente *s*), ripeto con **p**.
+Appena trovo il nodo t, invio il flusso trovato.
+Per ogni nodo esplorato, lo inserisco in una coda, in maniera tale, dopo aver inviato il flusso, di cancellare tutti i dati dei nodi esplorati.
