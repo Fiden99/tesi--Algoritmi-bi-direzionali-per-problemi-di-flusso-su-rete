@@ -21,5 +21,5 @@ il funzionamento è molto simile a quello di LastLevelOpt, con una differenza in
 Dopo aver controllato che non è possibile riparare il nodo non valido **noCap**  e trovare un percorso senza nodi non validi, procedo con SickPropagation, nel caso riesco a trovare un percorso, restituisco il valore, altrimenti cancello tutte le informazioni dai nodi con label pari o maggiori a quella **noCap** e, nel caso in cui SickPropagation non abbia già inserito dei nodi in coda, inserisco i nodi con label = **noCap**.label-1, poi procedo come se fosse LastLevelOpt
 
 ### SickPropagation
-
+<!-- da correggere in seguito all'aggiunta di multipli nodi-->
 provo a riparare il nodo che mi è stato indicato, per primo proprio **noCap**, nel caso non si riesca a ripararlo, inserisco in una coda tutti i nodi che lo hanno come predecessore, se invece riesco a ripararlo lo inserisco nella coda che userò per esplorare il grafo, a meno che non sia *t*, in tal caso ritorno il valore del flusso che riesco a inviare.

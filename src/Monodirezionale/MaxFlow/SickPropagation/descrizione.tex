@@ -1,0 +1,54 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{algorithm}
+\usepackage{algcompatible}
+\usepackage{amsmath}
+
+\title{Presentazioni dell'algoritmo di ricerca del flusso massimo monodirezionale con propagazione della malattia  }
+\author{Filippo Magi }
+
+\begin{document}
+
+\maketitle
+
+\section{Strutture dati}
+\subsection{BiEdge}
+I nodi vengono collegati tra di loro da archi BiEdge, che contiene le informazioni da quale nodo esce e in quale nodo entra.
+Ovviamente conserva in memoria la quantità di flusso che passa e la sua capacità residua, oltre a un booleano (reversed) che mi indica che quel arco, durante l'invio del flusso, dovrà inviarlo o ritirarlo.
+
+\subsection{Node}
+
+Node contiene al suo interno informazioni sugli archi a lui collegati (Lista di BiEdge),
+un booleano che indica se il nodo è valido o meno,
+le indicazioni sul percorso che deve fare, quindi sia previousNode e previousEdge,
+la label, cioè la distanza tra lui e il nodo sorgente \textit{s},
+oltre a un booleano che mi indica se è stato visitato o meno.
+\subsection{Graph}
+Contiene un insieme per i nodi non validi
+e una lista di insiemi, tale che ogni insieme contiene i nodi
+con una certa label.
+
+\section{Descrizione}
+
+il funzionamento è molto simile a quello di LastLevelOpt,
+con una differenza in fase di "inizializzazione".
+Provo a riparare tutti i nodi malati di \textbf{noCaps},
+se riesco a ripararli tutti, procedo dichiarando di aver trovato il percorso,
+nel caso in cui un nodo non sia riparabile, lo inserisco in una coda di \textbf{malati}.
+Per ogni nodo $\in$ \textbf{malati}, procedo a sottoporlo a SickPropagation,
+nel caso riesco a trovare un percorso, restituisco il valore del flusso inviabile, altrimenti procedo con il nuovo nodo.
+Se nessuna propagazione della malattia mi ha portato a un percorso, controllo se \textit{t} è valido, nel caso lo sia, ho automaticamente trovato un percorso.
+Nel caso in cui \textit{t} non sia più valido cancello tutte le informazioni dai nodi con label pari o maggiore
+a quella del primo nodo \textbf{first} esplorato dalla coda di \textbf{malati} .
+Nel caso in cui SickPropagation non abbia già inserito dei nodi in coda, vi inserisco i nodi $n | n.label = first.label -1$,
+poi procedo con la ricerca di \textit{t} normalmente, come in LastLevelOpt.
+
+\subsection{SickPropagation}
+
+Datomi il nodo $n$, lo inserisco in una coda $malati$.
+Provo a ripararlo, nel caso in cui riesca, lo inserisco nella coda, che verrà poi utilizzata per la ricerca del cammino, a meno che non sia il nodo destinazione \textit{t}, in tal caso restituisco il valore del flusso inviabile attraverso il cammino descritto dai previousNode.
+Nel caso non sia possibile ripararlo,inserisco tutti i nodi adiacenti che sono stati precedentemente esplorati da lui, cioè con $malati.enqueue( x \in A(n) | x.previousNode = n)$.
+Ripeto finché o riparo il nodo $t$, o si esaurisce la coda di $malati$.
+
+
+\end{document}
