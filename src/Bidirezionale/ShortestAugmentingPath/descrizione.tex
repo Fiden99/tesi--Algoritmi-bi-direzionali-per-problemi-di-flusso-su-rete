@@ -1,0 +1,51 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+
+\title{Presentazione algoritmo bidirezionale ShortestAugmentingPath}
+\author{Filippo Magi }
+
+\begin{document}
+\maketitle
+
+\section{Strutture Dati}
+
+\subsection{BiEdge}
+
+l'arco BiEdge contiene le informazioni dei due nodi che collega, oltre alla capacità residua di quell'arco e il flusso passante.
+
+\subsection{Node}
+
+Il nodo node contiene una lista con tutti gli archi a lui collegati, oltre a informazioni utili per l'indirizzamento durante l'invio del flusso (nextEdge e nextNode per i nodi proveniente dal nodo destinazione \textit{t} e previousNode e previousEdge per i nodi provenienti da \textit{s}), oltre a salvarsi le informazioni sulla distanza che intercorre tra lui e i nodi \textit{s} e \textit{t}.
+
+\subsection{Graph}
+
+insieme di nodi.
+
+\section{Descrizione}
+
+l'algoritmo effettua due BFS, una che parte da \textit{s}, mentre l'altra da \textit{t}, questo affinché ogni sappia la propria distanza da questi due nodi.
+invio il flusso trovato dal percorso di queste due BFS.
+cancello le informazioni di indirizzamento all'interno di ogni nodo.
+uso l'algoritmo Shortest Augmenting Path, chiamato nel codice Dfs( e SinkDfs per la parte che da sink cerca source).
+Trovato un percorso, restituisco dove sono arrivati i nodi (stesso nodo oppure un nodo potrebbe essere arrivato a \textit{t} o \textit{s}).
+Invio il flusso e, a seconda se ci sono incontrati a metà strada o uno è arrivato a \textit{s/t}, resetto i nodi (o il nodo nel caso solo uno sia arrivato a destinazione) di partenza.
+ripeto ciò finché i nodi che mi restituisce Dfs sono null, in tal caso so che la distanza tra s e t è maggiore al numero di nodi del grafo, quindi non sono più raggiungibili e l'algoritmo è terminato.
+
+\subsection{Dfs e SinkDfs}
+
+Dfs e SinkDfs hanno lo stesso funzionamento, con l'unica differenza di quali nodi vado ad esplorare, nel caso di Dfs quelli che escono dal nodo che sto esplorando, nel caso di SinkDfs quelli che entrano.
+Prendiamo come esempio Dfs per descriverle entrambe.
+Chiamiamo il nodo che sto cercando \textbf{startSource}
+
+Esploro i nodi uscenti dal \textbf{startSource}, se sono idonei (quindi se hanno capacità positiva e la distanza da Sink del nodo esplorato è quella di \textbf{startSource}-1)
+in tal caso aggiorno i dati di \textbf{startSource}, e nel caso il nodo esplorato  sia \textit{t} o già esplorato dalla parte di Sink, ritorno il nodo e il valore che mi sono salvato del flusso inviabile, altrimenti chiamo SinkDfs, con nodo esplorato come nuovo \textbf{startSource}.
+Nel caso non trovi nessun arco valido, procede con il retreat.
+
+\subsubsection{Retreat}
+
+cerco l'arco che esce da \textbf{startSource} con distanza minima da sink, quindi faccio diventare la distanza tra \textbf{startSource} pari a quel valore +1.
+nel caso in cui \textbf{startSource} = \textit{s} allora salvo \textbf{startSource} in una variabile momentanea,altrimenti salvo in quella variabile il predecessore di \textbf{startSource}
+cancello le informazioni per l'indirizzamento di \textbf{startSource}, per poi richiamare la stessa funzione Dfs con la variabile temporanea.
+
+\end{document}
