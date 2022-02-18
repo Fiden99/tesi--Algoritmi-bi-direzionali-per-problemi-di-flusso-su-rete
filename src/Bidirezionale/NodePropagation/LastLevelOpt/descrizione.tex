@@ -1,0 +1,94 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+
+\title{Presentazione algoritmo di ricerca bidirezionale di flusso con divisione per label}
+\author{Filippo Magi }
+
+\begin{document}
+\maketitle
+
+\section{strutture dati}
+\subsection{BiEdge}
+
+L'arco BiEdge che collega due nodi, che ha le informazioni sulla capacità residua e sulla quantità di flusso inviata, oltre a un booleano per capire se durante l'invio del flusso deve inviarlo o ritirarlo.
+
+\subsection{Node}
+
+Il nodo contiene le informazioni sugli archi a lui collegati con una lista di BiEdge.
+Contiene un intero InFlow, che rappresenta il valore di flusso che è possibile inviare nel percorso predefinito, oltre a un intero Label, che rappresenta la distanza tra quel nodo e $s$ o $t$, a seconda da quale parte è stato esplorato.
+Due booleani, il primo mi rappresentano se è stato esplorato da $s$ o da $t$, il secondo se l'arco che lo collega con il nodo precedente (e quindi più vicino a $s$/$t$) ha capacità =  0.
+Inoltre ci sono le informazioni di indirizzamento (nextNode e nextEdge per i nodi esplorati da $t$, previousNode e previousEdge per i nodi esplorati da $s$).
+\subsection{graph}
+Graph è rappresentato da una lista di insiemi di nodi, cioè i nodi esplorati da $s$ e da $t$, divisi per label, oltre ad avere due insiemi che contengono i nodi di confine fino a quel momento scoperti, sia dalla parte di $s$, sia dalla parte di $t$.
+
+\section{Descrizione}
+
+La fase di invio del flusso e il tentativo di recuperare il percorso riparando i nodi contenuti in noCapsSource o noCapsSink è come in NodePropagation. %copia e incolla di quello già scritto
+
+Finché riesco a trovare un percorso $s$ e $t$, cerco il percorso tramite la Bfs ricercata,e poi inviare il flusso.
+Nell'invio del flusso, seleziono, se presente, il nodo che ha come capacità residua = 0,e uso quel nodo per la Bfs (questo per entrambi i lati esplorati).
+
+Dato che analizzo l'InFlow presente, è possibile che non sia adeguatamente aggiornato, quindi nel caso in cui non è possibile inviare il flusso indicato, per i nodi già modificati gli inserisco la differenza, per il resto faccio con il valore aggiornato.
+
+\subsection{Bfs con ottimizzazione sugli ultimi livelli}
+gli passo in input, oltre al grafo, anche due  pile di nodi \textbf{noCapSource} e \textbf{noCapSink}.
+
+\subsection{riparazione dei nodi di source}
+Nel caso in cui \textbf{noCapsSource} non sia vuoto, analizzo i nodi ivi contenuti.
+Provo a riparare il nodo \textbf{noCapSource}, ricavato dalla pop di \textbf{noCapsSource},
+nel caso in cui riesca, aggiorno i dati e procedo con il nodo successivo,
+altrimenti inserisco nuovamente il nodo nella pila e smetto di smetto di provarli a ripararli.
+Nel caso in cui sia riuscito a ripararli tutti e \textbf{noCapsSink} sia vuota,
+cerco un "nodo di confine" valido, nel caso raggiunga l'ultimo nodo riparato, restituisco il percorso.
+Nel caso non sia riuscito a riparare il nodo, analizzo il nodo che non è stato possibile riparare, qui chiamato $notValidNode$:
+\begin{itemize}
+    \item nel caso in cui $notValidNode$ sia il nodo sorgente $s$, lo inserisco nella coda dei nodi da esplorare di source
+    \item nel caso in cui $notValidNode$ sia un nodo di confine, e quindi esplorato da $t$, inserisco nella coda tutti i nodi di confine, recuperabili attraverso il grafo
+    \item altrimenti inserisco nella coda tutti i nodi $m | m.label +1 = notValidNode.label$, oltre a cancellare tutti le informazioni di indirizzamento di tutti i nodi con label pari o maggiore di $notValidNode$
+\end{itemize}
+\subsection{riparazione dei nodi di sink}
+Nel caso in cui \textbf{noCapsSink} non sia vuota, analizzo i nodi ivi contenuti.
+Provo a riparare il nodo \textbf{noCapSink}, ricavato dalla pop di \textbf{noCapsSink},
+nel caso riesca a ripararlo, aggiorno i dati e procedo col nodo successivo, finché la coda non è vuota.
+Nel caso in cui trovi un nodo non riparabile, lo inserisco di nuovo dentro la pila, e smetto di provarli a ripararli.
+Nel caso sia riuscito a riparare tutti i nodi di sink e \textbf{noCapSource} sia vuoto, cerco un possibile percorso già presente.
+Per ogni nodo di confine, capisco se è possibile raggiungere l'ultimo nodo riparato, nel caso sia possibile
+e il valore del flusso inviabile sia maggiore di 0,
+analizzo quanto flusso potrei inviare da parte di source,
+analizzando il valore di InFlow del nodo precedente e
+la capacità/flusso dell'arco.
+Nel caso siano entrambi positivi, ho trovato un percorso.
+
+Nel caso in cui non sia riuscito a riparare tutti i nodi, analizzo il nodo che non è stato possibile riparare $noValidNode$:
+se è il nodo destinazione $t$, lo inserisco nella coda, altrimenti, inserisco nella coda tutti i nodi $m | m.label +1 = noValidNode.label$,e cancello le informazioni di indirizzamento tutti i nodi con label pari o superiore a $noValidNode$
+
+\subsection{ricerca del percorso}
+
+Finché entrambe le code non sono vuote, procedo ad analizzare prima
+un elemento della coda di source, cerco se tra i nodi a lui collegati (tramite gli archi contenuti in edges),
+ce ne sia qualcuno non visitato, in tal caso lo aggiorno e lo inserisco nella coda di source.
+Procedo nella stessa maniera con la coda di sink.
+Nel caso in cui trovi un nodo valido esplorato dalla parte opposta , significa che ho trovato un cammino.
+
+
+\subsection{RepairNode}
+
+prendo in input un nodo e un booleano per capire da quale parte deve essere considerato nel caso in cui tratto un nodo "di confine"
+
+nel caso un cui node sia stato esplorato da source, cerco tra i nodi a lui collegati un nodo tale che sia valido, con InFlow positivo, con capacità/flusso positivo e label uguale a quella del nodo -1 (nodeInput.label = nodoEsplorato.label + 1)
+nel caso lo trovo, salvo, aggiorno i dati e confermo che ho riparato il nodo.
+
+nel caso in cui il nodo in input sia stato esplorato da sink, devo controllare anche il booleano nel caso il valore sia di confine.
+
+Se il nodo era di confine e il booleano mi dice che deve esplorare la parte di source, cerco se tra i nodi appartenenti a lastSourceNodes è possibile ripararlo,
+altrimenti cerco un nodo valido, con InFlow positivo, con flusso/capacità positiva e con label pari a quella del nodo in ingresso -1 (nodeInput.label = nodoEsplorato.label+1)
+
+nel caso riesco a trovarlo, aggiorno i dati e confermo di averlo trovato.
+
+
+\end{document}
+
+
+
+

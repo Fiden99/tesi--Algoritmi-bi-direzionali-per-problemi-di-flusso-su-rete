@@ -103,9 +103,8 @@
         \STATE $codaSource \leftarrow$ coda di nodi vuota
         \STATE $codaSink \leftarrow$ coda di nodi vuota
         \STATE $buffer \leftarrow$ coda di nodi vuota
-        \STATE $sourceRepaired \leftarrow$ false
         \STATE $sinkRepaired \leftarrow$ false
-        \IF{$noCapsSource.isEmpty$}
+        \IF{$ \neg noCapsSource.isEmpty$}
         \STATE $p \leftarrow $ null
         \STATE $repaired \leftarrow $ true
         \WHILE{$\neg noCapsSource.isEmpty$}
@@ -138,7 +137,6 @@
         \ENDIF
         \ENDFOR
         \ENDIF
-        \STATE $sourceRepaired \leftarrow repaired$
         \IF{$\neg repaired$}
         \IF{$noCapSource = s$}
         \STATE $codaSource.$enqueue($noCapSource$)

@@ -109,8 +109,8 @@ namespace Bidirezionale.Label.LastLevelOpt
                     return null;
                 if (target == n.PreviousNode)
                 {
-                    target.SetInFlow(Math.Min(n.PreviousEdge.Capacity, target.InFlow));
-                    return target;
+                    n.SetInFlow(Math.Min(n.PreviousEdge.Reversed ? n.PreviousEdge.Flow : n.PreviousEdge.Capacity, target.InFlow));
+                    return n;
                 }
                 else if (n is not SourceNode)
                 {
@@ -144,8 +144,8 @@ namespace Bidirezionale.Label.LastLevelOpt
             {
                 if (target == n.NextNode)
                 {
-                    target.SetInFlow(Math.Min(n.NextEdge.Capacity, target.InFlow));
-                    return target;
+                    n.SetInFlow(Math.Min(n.NextEdge.Reversed ? n.NextEdge.Flow : n.NextEdge.Capacity, target.InFlow));
+                    return n;
                 }
                 else if (n is not SinkNode)
                 {
