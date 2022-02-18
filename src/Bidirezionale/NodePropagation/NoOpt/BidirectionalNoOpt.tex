@@ -61,41 +61,40 @@
         \STATE $codaSource \leftarrow$ coda di nodi
         \STATE $codaSink \leftarrow$ coda di nodi
         \IF{$sourceSide$}
-        \FORALL{$n \in V(G) | n$ è stato esplorato da $s$}
+        \FORALL{$n \in V(G) | n.sourceSide$}
         \STATE $n.$Reset()
         \ENDFOR
         \STATE $codaSource.$enqueue($s$)
         \ENDIF
         \IF{$sinkSide$}
-        \FORALL{$n \in V(G) | n$ è stato esplorato da $t$}
+        \FORALL{$n \in V(G) | \neg n.sourceSide$}
         \STATE $n.$Reset()
         \ENDFOR
         \STATE $codaSink$.enqueue($t$)
         \ENDIF
-        \STATE\COMMENT{per motivi prestazioni si controlla nel codice se si hanno sia sinkSide sia sourceSide positivi per non analizzare tutti i nodi 2 volte}
-        \WHILE{$\neg codaSource$.isEmpty OR $\neg codaSink$.iSEmpty }
-        \IF{$codaSource$.isEmpty}
+        \WHILE{$\neg codaSource.isEmpty \lor \neg codaSink.isEmpty$ }
+        \IF{$codaSource.isEmpty$}
         \STATE $element \leftarrow codaSource$.dequeue()
         \FORALL{$edge \in n.$Edges}
         \STATE $p \leftarrow edge.$previousNode
         \STATE $n \leftarrow edge.$nextNode
-        \IF{$element = p$ AND $u(edge) > 0 $}
-        \IF{$n.$visited}
-        \IF{n.sourceSide}
+        \IF{$element = p \land u_f(edge) > 0 $}
+        \IF{$n.flussoPassante \ne 0$} \COMMENT{vuol dire che è stato precedentemente esplorato}
+        \IF{$n.sourceSide$}
         \STATE \textbf{continue}
         \ELSE
-        \STATE $f \leftarrow \min(u(edge),p.flussoPassante,n.flussoPassante)$
+        \STATE $f \leftarrow \min(u_f(edge),p.flussoPassante,n.flussoPassante)$
         \IF{ $f = 0$}
         \STATE \textbf{continue}
         \ENDIF
         \STATE $n.$update$(p,edge,n)$
-        \STATE $edge.$reversed = false
+        \STATE $edge.reversed \leftarrow$ false
         %\RETURN (f,n)
         \STATE \textbf{return} $(f,n)$
         \ENDIF
         \ENDIF
         \STATE $n.$update$(p,edge)$
-        \STATE $edge.$reversed = false
+        \STATE $edge.reversed \leftarrow$ false
         \STATE $codaSource$.enqueue$(n)$
         \ENDIF
         \algstore{DoBfsNoOpt1}
@@ -105,9 +104,9 @@
 \begin{algorithm}
     \begin{algorithmic}[1]
         \algrestore{DoBfsNoOpt1}
-        \IF{$element = n$ AND $f(edge) > 0$}
-        \IF {$p$.visited}
-        \IF{p.sourceSide}
+        \IF{$element = n \land f(edge) > 0$}
+        \IF {$p.flussoPassante \ne 0$}
+        \IF{$p.sourceSide$}
         \STATE \textbf{continue}
         \ELSE
         \STATE $f \leftarrow \min(n.flussoPassante,p.flussoPassante,f(edge)$
@@ -115,39 +114,39 @@
         \STATE \textbf{continue}
         \ENDIF
         \STATE $p.$update$(n,edge,p)$
-        \STATE $edge.$reversed = true
+        \STATE $edge.reversed \leftarrow $true
         \STATE \textbf{return} $(f,p)$
         \ENDIF
         \ENDIF
         \STATE $p.$update$(n,edge)$
-        \STATE $edge.$reversed = true
+        \STATE $edge.reversed \leftarrow $true
         \STATE $codaSource.$enqueue$(p)$
         \ENDIF
 
         \ENDFOR
         \ENDIF
 
-        \IF{$\neg codaSink.$isEmpty}
+        \IF{$\neg codaSink.isEmpty$}
         \STATE $element \leftarrow codaSink.$dequeue()
         \FORALL{$edge \in element.$Edges}
         \STATE $p \leftarrow edge$.previousNode
-        \STATE $n \leftarrow n.$nextNode
-        \IF{$element = n$ AND  $u(edge) > 0$}
-        \IF{$p$.visited}
+        \STATE $n \leftarrow edge.$nextNode
+        \IF{$element = n \land u_f(edge) > 0$}
+        \IF{$p.flussoPassante \ne 0 $}
         \IF{$\neg p.sourceSide$}
         \STATE \textbf{continue}
         \ELSE
-        \STATE $f \leftarrow \min(p.flussoPassante,u(edge),n.flussoPassante)$
+        \STATE $f \leftarrow \min(p.flussoPassante,u_f(edge),n.flussoPassante)$
         \IF{$f = 0$}
         \STATE \textbf{continue}
         \ENDIF
         \STATE $n.$update$(p,edge,n)$
-        \STATE $edge.$Reversed = false
+        \STATE $edge.reversed \leftarrow $false
         \STATE \textbf{return} $(f,n)$
         \ENDIF
         \ENDIF
         \STATE $p.$update$(n,edge)$
-        \STATE $edge.$Reversed = false
+        \STATE $edge.reversed \leftarrow $false
         \STATE $codaSink.$enqueue$(p)$
         \ENDIF
         \algstore{DoBfsNoOpt2}
@@ -157,8 +156,8 @@
 \begin{algorithm}
     \begin{algorithmic}[1]
         \algrestore{DoBfsNoOpt2}
-        \IF{$element = p$ AND $f(edge) > 0 $}
-        \IF{$n$.visited}
+        \IF{$element = p \land f(edge) > 0 $}
+        \IF{$n.flussoPassante \ne 0$}
         \IF{$\neg n.sourceSide$}
         \STATE \textbf{continue}
         \ELSE
@@ -167,12 +166,12 @@
         \STATE \textbf{continue}
         \ENDIF
         \STATE $p$.update$(n,edge,p)$
-        \STATE $edge$.reversed = true
+        \STATE $edge.reversed \leftarrow $true
         \STATE \textbf{return} $(f,p)$
         \ENDIF
         \ENDIF
         \STATE $n.$update$(p,edge)$
-        \STATE $edge$.reversed = true
+        \STATE $edge.reversed \leftarrow $true
         \STATE $codaSink.$enqueue$(n)$
         \ENDIF
         \ENDFOR

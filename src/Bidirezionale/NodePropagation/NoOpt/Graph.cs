@@ -45,11 +45,6 @@ namespace Bidirezionale.NodePropagation.NoOpt
                 if (!n.SourceSide)
                     n.Reset();
         }
-        public void Reset()
-        {
-            ResetSinkSide();
-            ResetSourceSide();
-        }
         public void SetSide(Node n, bool sourceSide)
         {
             if (n.SourceSide == sourceSide)

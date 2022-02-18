@@ -12,18 +12,12 @@ namespace Bidirezionale.NodePropagation.NoOpt
         {
             var codaSource = new Queue<Node>();
             var codaSink = new Queue<Node>();
-            if (sourceSide && sinkSide)
-            {
-                graph.Reset();
-                codaSource.Enqueue(graph.Source);
-                codaSink.Enqueue(graph.Sink);
-            }
-            else if (sourceSide)
+            if (sourceSide)
             {
                 graph.ResetSourceSide();
                 codaSource.Enqueue(graph.Source);
             }
-            else if (sinkSide)
+            if (sinkSide)
             {
                 graph.ResetSinkSide();
                 codaSink.Enqueue(graph.Sink);
