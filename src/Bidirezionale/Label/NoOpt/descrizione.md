@@ -18,7 +18,7 @@ Il grafo è rappresentato da due insieme di nodi, in uno sono presenti quelli es
 
 ## Descrizione  
 
-effettuo una bfs che sia basa sulla label (descritta in seguito), dicendogli se deve lavorare sulla parte di source o su quella di sink (o su entrambe), per poi inviare il flusso capire la quantità di flusso inviabile e, successivamente, inviarlo, salvando dove un arco non può più inviare flusso.
+effettuo una bfs che sia basa sulla label (descritta in seguito), dicendogli se deve lavorare sulla parte di source o su quella di sink (o su entrambe), per poi capire la quantità di flusso inviabile e, se diversa da 0, inviarlo, salvandomi dove ci sono archi con capacità residua pari a zero (quindi se devo esplorare la parte source o la parte sink).
 Se non trovo il percorso o il flusso inviabile è pari a 0, termino l'algoritmo.
 
 ### Bfs

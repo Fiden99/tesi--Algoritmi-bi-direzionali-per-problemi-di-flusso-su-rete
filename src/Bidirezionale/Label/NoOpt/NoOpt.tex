@@ -22,7 +22,8 @@
         \STATE$ vuotoSource \leftarrow$ true
         \STATE $vuotoSource \leftarrow$ true
         \WHILE{TRUE}
-        \STATE $(f, nodo) \leftarrow$ DoBfs(G,vuotoSource,vuotoSink)
+        \STATE $n \leftarrow$ DoBfs$(G,vuotoSource,vuotoSink)$
+        \STATE $f \leftarrow $GetFlow$(n)$ \COMMENT{mi calcola il flusso massimo invabile nel percorso}
         \IF{$f = 0$}
         \STATE \textbf{break}
         \ENDIF
@@ -32,20 +33,18 @@
         \STATE $mom \leftarrow n$
         \WHILE{$ n \ne s $}
         \STATE $n$.PreviousEdge.AddFlow($f$)
-        \IF{$u(n$.PreviousEdge)$ = 0$}
+        \IF{$u_f(n$.PreviousEdge)$ = 0$}
         \STATE $vuotoSource \leftarrow$ true
         \ENDIF
-        \STATE $n.$update$(f)$ \COMMENT{n.InFlow -=f}
         \STATE $n \leftarrow n.$previousNode
         \ENDWHILE
         \WHILE{$mom \ne t$}
 
-        \STATE $n.$nextEdge.addFlow$(f)$
-        \IF{$e(n.$nextEdge$) = 0 $}
+        \STATE $mom.$nextEdge.addFlow$(f)$
+        \IF{$u_f(mom.$nextEdge$) = 0 $}
         \STATE $vuotoSink \leftarrow$ true
         \ENDIF
-        \STATE $n.$update$(f)$ \COMMENT{n.InFlow -=f}
-        \STATE $n \leftarrow$ $n.$nextNode
+        \STATE $mom \leftarrow$ $mom.$nextNode
         \ENDWHILE
         \ENDWHILE
         %\RETURN fMax
@@ -73,30 +72,25 @@
         \ENDFOR
         \STATE $codaSink$.enqueue($t$)
         \ENDIF
-        \STATE\COMMENT{per motivi prestazioni si controlla nel codice se si hanno sia sinkSide sia sourceSide positivi per non analizzare tutti i nodi 2 volte}
-        \WHILE{$\neg codaSource$.isEmpty OR $\neg codaSink$.iSEmpty }
-        \WHILE{$\neg codaSource$.isEmpty}
+        \WHILE{$\neg codaSource.isEmpty \lor \neg codaSink.iSEmpty$ }
+        \WHILE{$\neg codaSource.isEmpty$}
         \STATE $element \leftarrow codaSource$.dequeue()
         \FORALL{$edge \in n.$Edges}
         \STATE $p \leftarrow edge.$previousNode
         \STATE $n \leftarrow edge.$nextNode
-        \IF{$element = p$ AND $u(edge) > 0 $}
+        \IF{$element = p \land u_f(edge) > 0 $}
         \IF{$n.$visited}
-        \IF{n è stato esplorato dalla parte di Source}
+        \IF{$n.sourceSide$}
         \STATE \textbf{continue}
         \ELSE
-        \STATE $f \leftarrow \min(u(edge),p.flussoPassante,n.flussoPassante)$
-        \IF{ $f = 0$}
-        \STATE \textbf{continue}
-        \ENDIF
         \STATE $n.$update$(p,edge,n)$
-        \STATE $edge.$reversed = false
+        \STATE $edge.reversed \leftarrow$ false
         %\RETURN (f,n)
         \STATE \textbf{return} $(f,n)$
         \ENDIF
         \ENDIF
         \STATE $n.$update$(p,edge)$
-        \STATE $edge.$reversed = false
+        \STATE $edge.reversed \leftarrow$ false
         \STATE $buffer$.enqueue$(n)$
         \ENDIF
         \algstore{DoBfsNoOpt1}
@@ -106,22 +100,18 @@
 \begin{algorithm}
     \begin{algorithmic}[1]
         \algrestore{DoBfsNoOpt1}
-        \IF{$element = n$ AND $f(edge) > 0$}
+        \IF{$element = n \land f(edge) > 0$}
         \IF {$p$.visited}
-        \IF{p è stato già esplorato dalla parte di Source}
+        \IF{$p.sourceSide$}
         \STATE \textbf{continue}
         \ELSE
-        \STATE $f \leftarrow \min(n.flussoPassante,p.flussoPassante,f(edge)$
-        \IF{$f  = 0$}
-        \STATE \textbf{continue}
-        \ENDIF
         \STATE $p.$update$(n,edge,p)$
-        \STATE $edge.$reversed = true
+        \STATE $edge.reversed \leftarrow $true
         \STATE \textbf{return} $(f,p)$
         \ENDIF
         \ENDIF
         \STATE $p.$update$(n,edge)$
-        \STATE $edge.$reversed = true
+        \STATE $edge.reversed \leftarrow$ true
         \STATE $buffer.$enqueue$(p)$
         \ENDIF
 
@@ -130,27 +120,23 @@
         \STATE $mom \leftarrow codaSource$
         \STATE $codaSource \leftarrow buffer$
         \STATE $buffer \leftarrow mom$
-        \WHILE{$\neg codaSink.$isEmpty}
+        \WHILE{$\neg codaSink.isEmpty$}
         \STATE $element \leftarrow codaSink.$dequeue()
         \FORALL{$edge \in element.$Edges}
         \STATE $p \leftarrow edge$.previousNode
-        \STATE $n \leftarrow n.$nextNode
-        \IF{$element = n$ AND  $u(edge) > 0$}
+        \STATE $n \leftarrow edge.$nextNode
+        \IF{$element = n \land u_f(edge) > 0$}
         \IF{$p$.visited}
-        \IF{p è stato esplorato dalla parte di Sink}
+        \IF{$\neg p.sourceSide$}
         \STATE \textbf{continue}
         \ELSE
-        \STATE $f \leftarrow \min(p.flussoPassante,u(edge),n.flussoPassante)$
-        \IF{$f = 0$}
-        \STATE \textbf{continue}
-        \ENDIF
         \STATE $n.$update$(p,edge,n)$
-        \STATE $edge.$Reversed = false
+        \STATE $edge.Reversed \leftarrow $false
         \STATE \textbf{return} $(f,n)$
         \ENDIF
         \ENDIF
         \STATE $p.$update$(n,edge)$
-        \STATE $edge.$Reversed = false
+        \STATE $edge.Reversed \leftarrow$ false
         \STATE $buffer.$enqueue$(p)$
         \ENDIF
         \algstore{DoBfsNoOpt2}
@@ -160,22 +146,18 @@
 \begin{algorithm}
     \begin{algorithmic}[1]
         \algrestore{DoBfsNoOpt2}
-        \IF{$element = p$ AND $f(edge) > 0 $}
+        \IF{$element = p \land f(edge) > 0 $}
         \IF{$n$.visited}
-        \IF{n è stato esplorato da Sink}
+        \IF{$\neg n.sourceSide$}
         \STATE \textbf{continue}
         \ELSE
-        \STATE $f \leftarrow \min(n.flussoPassante,p.flussoPassante,f(edge)$
-        \IF{$f = 0$}
-        \STATE \textbf{continue}
-        \ENDIF
         \STATE $p$.update$(n,edge,p)$
-        \STATE $edge$.reversed = true
+        \STATE $edge.reversed \leftarrow $true
         \STATE \textbf{return} $(f,p)$
         \ENDIF
         \ENDIF
         \STATE $n.$update$(p,edge)$
-        \STATE $edge$.reversed = true
+        \STATE $edge.reversed \leftarrow $true
         \STATE $buffer.$enqueue$(n)$
         \ENDIF
         \ENDFOR
