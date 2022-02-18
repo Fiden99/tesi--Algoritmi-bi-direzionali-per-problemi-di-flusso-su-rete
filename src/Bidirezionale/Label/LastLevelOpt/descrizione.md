@@ -10,7 +10,7 @@ L'arco BiEdge che collega due nodi, che ha le informazioni sulla capacità resid
 
 Il nodo contiene le informazioni sugli archi a lui collegati con una lista di BiEdge.
 Contiene un intero InFlow, che rappresenta il valore di flusso che è possibile inviare nel percorso predefinito, oltre a un intero Label, che rappresenta la distanza tra quel nodo e *s* o *t*, a seconda da quale parte è stato esplorato.
-Due booleani, il primo mi rappresentano se è stato esplorato, il secondo se l'arco che lo collega con il nodo precedente (e quindi più vicino a *s*/*t*) ha capacità =  0.
+Due booleani, il primo mi rappresentano se è stato esplorato da *s* o da *t*, il secondo se l'arco che lo collega con il nodo precedente (e quindi più vicino a *s*/*t*) ha capacità =  0.
 Inoltre ci sono le informazioni di indirizzamento (nextNode e nextEdge per i nodi esplorati da *t*, previousNode e previousEdge per i nodi esplorati da *s*).
 
 ### Graph
