@@ -390,7 +390,6 @@ namespace Bidirezionale.Label.LastLevelOptEdgeFlow
             int fMax = 0;
             while (true)
             {
-
                 var n = DoBfs(graph, vuotiSource, vuotiSink);
                 if (n == null)
                     return fMax;

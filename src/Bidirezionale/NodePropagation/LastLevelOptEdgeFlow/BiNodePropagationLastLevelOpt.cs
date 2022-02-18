@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Bidirezionale.NodePropagation.LastLevelOptEdgeFlow
 {
@@ -98,6 +99,8 @@ namespace Bidirezionale.NodePropagation.LastLevelOptEdgeFlow
 
         public static bool Reached(Node target, Node n)
         {
+            if (target == n)
+                return true;
             if (target.SourceSide)
             {
                 while (target.Label < n.Label || !n.SourceSide)
@@ -122,82 +125,90 @@ namespace Bidirezionale.NodePropagation.LastLevelOptEdgeFlow
             }
             return false;
         }
-        public static Node DoBfs(Graph graph, Node noCapSource, Node noCapSink)
+        public static Node DoBfs(Graph graph, Stack<Node> noCapsSource, Stack<Node> noCapsSink)
         {
             Queue<Node> codaSource = new();
             Queue<Node> codaSink = new();
-            bool sourceRepaired = false;
-            bool sinkRepaired = false;
-            if (noCapSource != null)
+            Queue<Node> buffer = new();
+            Node noCapSource = null;
+            Node noCapSink = null;
+            if (noCapsSource.Count > 0)
             {
-                if (RepairNode(graph, noCapSource, false))
+                bool repaired = true;
+                while (noCapsSource.Count > 0)
                 {
-                    if (noCapSink == null)
-                        foreach (var n in graph.LastNodesSinkSide)
-                        {
-                            //TODO capire se devo fare un controllo di inflow tra n, il predecessore e il successore ( con nodi)
-                            if (!n.Valid)
-                                continue;
-                            if (Reached(noCapSource, n))
-                                return n;
-                        }
-                    else
-                        sourceRepaired = true;
-                    //TODO è possibile che nel percorso ci sia un nuovo nodo invalido
-                    //da capire se devo fare un GetFlow qui, ma da quale nodo devo partire?
-
-                }
-                if (noCapSource is SourceNode)
-                {
-                    codaSource = new();
-                    codaSource.Enqueue(graph.Source);
-                }
-                else if (!noCapSource.SourceSide)
-                {
-                    codaSource = new(graph.LastNodesSourceSide);
-                }
-                else
-                {
-                    codaSource = new(graph.LabeledNodeSourceSide[noCapSource.Label - 1]);
-                    graph.ResetSourceSide(noCapSource.Label);
-                }
-            }
-            if (noCapSink != null)
-            {
-                //TODO da testare questa parte 
-                if (RepairNode(graph, noCapSink, true))
-                {
-                    sinkRepaired = true;
-                    if (noCapSource == null || sourceRepaired)
-                    {
-                        foreach (var n in graph.LastNodesSinkSide)
-                        {
-                            if (!n.Valid)
-                                continue;
-                            //TODO errore molto probabilmente qui, 
-                            if (sourceRepaired && Reached(noCapSource, n) && Reached(noCapSink, n))
-                                return n;
-                        }
+                    noCapSource = noCapsSource.Pop();
+                    if (!RepairNode(graph, noCapSource, false))
+                    {// sere per confermare che ho riparato tutti i nodi
+                        noCapsSource.Push(noCapSource);
+                        repaired = false;
+                        break;
                     }
                 }
-                if (noCapSink is SinkNode)
+                if (repaired && noCapsSink.Count == 0)
+                    foreach (var n in graph.LastNodesSinkSide.Where(x => x.Valid))
+                        if (Reached(noCapSource, n))
+                            return n;
+                if (!repaired)
                 {
-                    codaSink = new();
-                    codaSink.Enqueue(graph.Sink);
-                }
-                else
-                {
-                    codaSink = new(graph.LabeledNodeSinkSide[noCapSink.Label - 1]);
-                    graph.ResetSinkSide(noCapSink.Label);
+                    if (noCapSource is SourceNode)
+                    {
+                        codaSource.Enqueue(noCapSource);
+                    }
+                    else if (!noCapSource.SourceSide)
+                    {
+                        foreach (var n in graph.LastNodesSourceSide)
+                            codaSource.Enqueue(n);
+                    }
+                    else
+                    {
+                        foreach (var n in graph.LabeledNodeSourceSide[noCapSource.Label - 1])
+                            codaSource.Enqueue(n);
+                        graph.ResetSourceSide(noCapSource.Label);
+                    }
                 }
             }
+            if (noCapsSink.Count > 0)
+            {
+                bool repaired = true;
+                while (noCapsSink.Count > 0)
+                {
+                    noCapSink = noCapsSink.Pop();
+                    if (!RepairNode(graph, noCapSink, true))
+                    {
+                        noCapsSink.Push(noCapSink);
+                        repaired = false;
+                        break;
+                    }
+                }
+                if (repaired && noCapsSource.Count == 0)
+                {
+                    foreach (var n in graph.LastNodesSinkSide.Where(x => x.Valid))
+                    {
+                        if (Reached(noCapSink, n))
+                            return n;
+                    }
+                }
+                if (!repaired)
+                    if (noCapSink is SinkNode)
+                    {
+                        codaSink.Enqueue(noCapSink);
+                    }
+                    else
+                    {
+                        foreach (var n in graph.LabeledNodeSinkSide[noCapSink.Label - 1])
+                            codaSink.Enqueue(n);
+                        graph.ResetSinkSide(noCapSink.Label);
+                    }
+            }
+
 #if DEBUG
             if (noCapSink == null && noCapSource == null)
                 throw new InvalidOperationException("non ho nessun arco senza capacità residua");
 #endif
             while (codaSink.Count > 0 || codaSource.Count > 0)
             {
-                if (codaSource.Count > 0 && (noCapSource != null || !sourceRepaired))
+                if (codaSource.Count > 0 && noCapsSource.Count > 0)
                 {
                     var element = codaSource.Dequeue();
                     if (!element.SourceSide || !element.Visited)
@@ -228,14 +239,6 @@ namespace Bidirezionale.NodePropagation.LastLevelOptEdgeFlow
                                         //n.SetInFlow(f);
                                         return n;
                                     }
-                                if (!n.SourceSide && n is not SinkNode)
-                                {
-                                    sinkRepaired = false;
-                                    foreach (var node in graph.LabeledNodeSinkSide[n.Label - 1])
-                                        codaSink.Enqueue(node);
-                                    graph.ResetSinkSide(n.Label);
-                                    continue;
-                                }
                                 //n.SetSourceSide(true);
                                 n.SetVisited(true);
                                 graph.ChangeLabel(n, true, p.Label + 1);
@@ -264,14 +267,6 @@ namespace Bidirezionale.NodePropagation.LastLevelOptEdgeFlow
                                         return p;
                                     }
                                 //p.SetSourceSide(true);
-                                if (!p.SourceSide && p is not SinkNode)
-                                {
-                                    sinkRepaired = false;
-                                    foreach (var node in graph.LabeledNodeSinkSide[p.Label - 1])
-                                        codaSink.Enqueue(node);
-                                    graph.ResetSinkSide(n.Label);
-                                    continue;
-                                }
                                 p.SetVisited(true);
                                 graph.ChangeLabel(p, true, n.Label + 1);
                                 p.SetPreviousEdge(e);
@@ -282,7 +277,7 @@ namespace Bidirezionale.NodePropagation.LastLevelOptEdgeFlow
                             }
                         }
                 }
-                if (codaSink.Count > 0 && (noCapSink != null || !sinkRepaired))
+                if (codaSink.Count > 0 && noCapsSink.Count > 0)
                 {
                     var element = codaSink.Dequeue();
                     if (element.SourceSide || !element.Visited)
@@ -317,8 +312,6 @@ namespace Bidirezionale.NodePropagation.LastLevelOptEdgeFlow
                                     }
                                 }
                                 //p.SetSourceSide(false);
-                                if (p.SourceSide && noCapSink is not SinkNode)
-                                    continue;
                                 p.SetVisited(true);
                                 p.SetNextEdge(e);
                                 p.SetNextNode(n);
@@ -347,8 +340,6 @@ namespace Bidirezionale.NodePropagation.LastLevelOptEdgeFlow
                                         return p;
                                     }
                                 //n.SetSourceSide(false);
-                                if (n.SourceSide && n is not SinkNode)
-                                    continue;
                                 n.SetVisited(true);
                                 n.SetNextEdge(e);
                                 n.SetNextNode(p);
@@ -392,25 +383,29 @@ namespace Bidirezionale.NodePropagation.LastLevelOptEdgeFlow
         {
             Node s = graph.Source;
             Node t = graph.Sink;
-            Node vuotoSource = s;
-            Node vuotoSink = t;
+            Stack<Node> vuotiSource = new();
+            vuotiSource.Push(s);
+            Stack<Node> vuotiSink = new();
+            vuotiSink.Push(t);
             int fMax = 0;
             while (true)
             {
 
-                var n = DoBfs(graph, vuotoSource, vuotoSink);
+                var n = DoBfs(graph, vuotiSource, vuotiSink);
+                if (n == null)
+                    return fMax;
                 int f = GetFlow(n);
                 if (f == 0)
-                    break;
+                    return fMax;
                 fMax += f;
-                vuotoSink = null;
-                vuotoSource = null;
+                vuotiSink.Clear();
+                vuotiSource.Clear();
                 Node mom = n;
                 while (n != s)
                 {
                     if (n.PreviousEdge.AddFlow(f))
                     {
-                        vuotoSource = n;
+                        vuotiSource.Push(n);
                         n.SetValid(false);
                     }
                     n = n.PreviousNode;
@@ -420,15 +415,13 @@ namespace Bidirezionale.NodePropagation.LastLevelOptEdgeFlow
                 {
                     if (mom.NextEdge.AddFlow(f))
                     {
-                        vuotoSink = mom;
+                        vuotiSink.Push(mom);
                         mom.SetValid(false);
                     }
                     mom = mom.NextNode;
 
                 }
             }
-            return fMax;
-
         }
     }
 }
