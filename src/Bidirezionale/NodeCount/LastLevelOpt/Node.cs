@@ -124,10 +124,10 @@ namespace Bidirezionale.NodeCount.LastLevelOpt
         public virtual void Reset()
         {
             this.SetInFlow(0);
-            /* this.SetPreviousEdge(null);
+            this.SetPreviousEdge(null);
             this.SetPreviousNode(null);
             this.SetNextEdge(null);
-            this.SetNextNode(null); */
+            this.SetNextNode(null);
         }
         public void SetSourceSide(bool sourceside) => this.SourceSide = sourceside;
         public void SetValid(bool valid) => this.Valid = valid;

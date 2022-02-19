@@ -5,7 +5,7 @@ using Xunit;
 
 namespace Bidirezionale.NodeCount.Tests;
 
-public class LastLevelOptEdgeTests
+public class BiNodeCountLastLevelOptEdgeTests
 {
     [Fact]
     public void TestBase()
