@@ -286,7 +286,6 @@ namespace Bidirezionale.NodeCount.LastLevelOpt
                 }
                 while ((codaEdgeSource.Count > 0 || noCapsSource.Count == 0) && (codaEdgeSink.Count > 0 || noCapsSink.Count == 0))
                 {
-
                     if (codaEdgeSource.Count > 0)
                     {
                         var e = codaEdgeSource.Dequeue();
