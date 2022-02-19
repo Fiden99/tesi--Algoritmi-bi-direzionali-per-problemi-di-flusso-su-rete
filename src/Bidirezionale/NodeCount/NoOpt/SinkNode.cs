@@ -7,7 +7,6 @@ namespace Bidirezionale.NodeCount.NoOpt
             this.Label = int.MaxValue;
             this.Visited = true;
             this.SourceSide = false;
-            this.Label = int.MaxValue;
         }
 
         public override void Reset()

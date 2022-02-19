@@ -15,23 +15,15 @@ namespace Bidirezionale.NodeCount.NoOpt
             var codaEdgeSink = new Queue<BiEdge>();
             Node elementSource = null;
             Node elementSink = null;
-            if (sourceSide && sinkSide)
-            {
-                graph.Reset();
-                codaSource.Enqueue(graph.Source);
-                codaSink.Enqueue(graph.Sink);
-            }
-            else if (sourceSide)
+            if (sourceSide)
             {
                 graph.ResetSourceSide();
                 codaSource.Enqueue(graph.Source);
-                codaEdgeSink.Enqueue(null);
             }
-            else if (sinkSide)
+            if (sinkSide)
             {
                 graph.ResetSinkSide();
                 codaSink.Enqueue(graph.Sink);
-                codaEdgeSource.Enqueue(null);
             }
 #if DEBUG
             else if (!sourceSide && !sinkSide)
@@ -51,7 +43,7 @@ namespace Bidirezionale.NodeCount.NoOpt
                     foreach (var e in elementSink.Edges.Where(x => (x.NextNode == elementSink && x.Capacity > 0 && (!x.PreviousNode.Visited || x.PreviousNode.SourceSide)) || (x.PreviousNode == elementSink && x.Flow > 0 && (!x.NextNode.Visited || x.NextNode.SourceSide))))
                         codaEdgeSink.Enqueue(e);
                 }
-                while (codaEdgeSink.Count > 0 && codaEdgeSource.Count > 0)
+                while ((codaEdgeSink.Count > 0 || !sinkSide) && (codaEdgeSource.Count > 0 || !sourceSide))
                 {
                     if (sourceSide)
                     {
@@ -70,7 +62,6 @@ namespace Bidirezionale.NodeCount.NoOpt
                                 {
                                     n.SetPreviousNode(p);
                                     n.SetPreviousEdge(sourceEdge);
-                                    n.SetSourceSide(false);
                                     //TODO capire dove e come aggiornare le label dei nodi trovati da t
                                     sourceEdge.SetReversed(false);
                                     //n.SetInFlow(f);
@@ -81,7 +72,7 @@ namespace Bidirezionale.NodeCount.NoOpt
                             {
                                 n.SetVisited(true);
                                 n.SetLabel(p.Label + 1);
-                                n.SetSourceSide(true);
+                                graph.ChangeSide(n, true);
                                 n.SetPreviousNode(p);
                                 n.SetPreviousEdge(sourceEdge);
                                 sourceEdge.SetReversed(false);
@@ -96,7 +87,6 @@ namespace Bidirezionale.NodeCount.NoOpt
                                 {
                                     p.SetPreviousNode(n);
                                     p.SetPreviousEdge(sourceEdge);
-                                    p.SetSourceSide(false);
                                     sourceEdge.SetReversed(true);
                                     //p.SetInFlow(f);
                                     return p;
@@ -106,7 +96,7 @@ namespace Bidirezionale.NodeCount.NoOpt
                             {
                                 p.SetVisited(true);
                                 p.SetLabel(n.Label + 1);
-                                p.SetSourceSide(true);
+                                graph.ChangeSide(p, true);
                                 p.SetPreviousEdge(sourceEdge);
                                 p.SetPreviousNode(n);
                                 sourceEdge.SetReversed(true);
@@ -130,7 +120,6 @@ namespace Bidirezionale.NodeCount.NoOpt
                                     continue;
                                 else
                                 {
-                                    n.SetSourceSide(false);
                                     n.SetPreviousEdge(edgeSink);
                                     n.SetPreviousNode(p);
                                     //TODO valutare se inserire come meanLabel n.label+1 oppure p.label
@@ -139,7 +128,7 @@ namespace Bidirezionale.NodeCount.NoOpt
                                     return n;
                                 }
                             p.SetVisited(true);
-                            p.SetSourceSide(false);
+                            graph.ChangeSide(p, false);
                             p.SetNextEdge(edgeSink);
                             p.SetNextNode(n);
                             p.SetLabel(n.Label - 1);
@@ -162,7 +151,7 @@ namespace Bidirezionale.NodeCount.NoOpt
                                 }
                             n.SetVisited(true);
                             n.SetNextEdge(edgeSink);
-                            n.SetSourceSide(false);
+                            graph.ChangeSide(n, false);
                             n.SetNextNode(p);
                             n.SetLabel(p.Label - 1);
                             edgeSink.SetReversed(true);

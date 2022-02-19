@@ -20,7 +20,7 @@ Contiene un intero InFlow, che rappresenta il valore di flusso che è possibile 
 Due booleani, il primo mi rappresentano se è stato esplorato da $s$ o da $t$, il secondo se l'arco che lo collega con il nodo precedente (e quindi più vicino a $s$/$t$) ha capacità =  0.
 Inoltre ci sono le informazioni di indirizzamento (nextNode e nextEdge per i nodi esplorati da $t$, previousNode e previousEdge per i nodi esplorati da $s$).
 \subsection{graph}
-Graph è rappresentato da una lista di insiemi di nodi, cioè i nodi esplorati da $s$ e da $t$, divisi per label, oltre ad avere due insiemi che contengono i nodi di confine fino a quel momento scoperti, sia dalla parte di $s$, sia dalla parte di $t$.
+Graph è rappresentato da due liste di insiemi di nodi, cioè i nodi esplorati da $s$ e da $t$, divisi per label, oltre ad avere due insiemi che contengono i nodi di confine fino a quel momento scoperti, sia dalla parte di $s$, sia dalla parte di $t$.
 
 \section{Descrizione}
 
