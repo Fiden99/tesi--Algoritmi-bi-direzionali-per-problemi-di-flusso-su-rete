@@ -18,171 +18,140 @@
     \begin{algorithmic}[1]
         \REQUIRE rete $(G,u,s,t)$
         \ENSURE valore del flusso massimo
-        \STATE $vuotoSouce \leftarrow s $
-        \STATE $vuotoSink \leftarrow t$
-        \STATE $(fmax,node) \leftarrow$ FirstBfs($G$)
-        \STATE sendFlow(node,fMax)
+        \STATE $vuotiSouce \leftarrow  $ pila di nodi
+        \STATE $vuotiSink \leftarrow $ pila di nodi
+        \STATE $fMax \leftarrow 0$
+        \STATE $vuotiSouce.push(s)$
+        \STATE $vuotiSink.push(t)$
         \WHILE{TRUE}
-        \STATE $(f,n) \leftarrow$ DoBfs(G, vuotoSource,vuotoSink)
+        \STATE $(f,n) \leftarrow$ DoBfs(G, vuotiSource,vuotiSink)
         \IF{$f = 0$}
         \STATE \textbf{break}
         \ENDIF
-        \STATE $fMax \leftarrow fMax + f$
-        \STATE ($vuotoSource,vuotoSink,b) \leftarrow sendFlow(n,f)$
-            \ENDWHILE
-            %TODO migliorare questo stato, spiegando meglio e in meno parole la seguente istruzione n.SetInFlow(n.InFlow + f);
-            \STATE \textbf{return} $fMax$
-    \end{algorithmic}
-\end{algorithm}
-
-\subsection{sendFlow}
-\begin{algorithm}
-    \caption{sendFlow}
-    \begin{algorithmic}
-        \REQUIRE rete $(G,u,s,t)$, nodo $n$ intermedio con le indicazioni riguardanti dove inviare il flusso, quantità di flusso da inviare$f$
-        \ENSURE ultimo nodo trovato (quindi il più vicino a $s$ o $t$ dalla parte di source e di sink non più raggiungibile causa capacità residua = 0, booleano che mi informa se un arco selezionato $\forall e \in $percorso selezionato $u(e)> f \land f(e)>f$
-        \STATE $n$.flussoPassante $\leftarrow n.$flussoPassante + $n$.flussoPassante
+        \STATE $vuotiSouce.$Clear()
+        \STATE $vuotiSink.$Clear()
+        %TODO migliorare questo stato, spiegando meglio e in meno parole la seguente istruzione n.SetInFlow(n.InFlow + f);
+        \STATE $n$.flussoPassante $\leftarrow n.$flussoPassante + f
         \STATE $momSource \leftarrow n$
         \STATE $momSink \leftarrow n$
         \WHILE{$momSource \ne s$}
         \STATE $momSource$.previousEdge.addFlow$(f)$
-        \IF{$u(momSource$.previousEdge $) < 0$ OR $f(momSource$.previousEdge )$ < 0$ }
-        \STATE $vuotoSource \leftarrow momsource$
-        \STATE $momsource$.revert() \COMMENT{faccio tornare i dati a come erano prima dell'aggiornamento (fMax, valori di flusso passante e archi modificati)}
-        \STATE $fMax \leftarrow fMax - f$
-        \STATE \textbf{return} $(vuotoSource,null,$true)
-        \ELSE
-        \IF{$u(momSource$.previousEdge$) = 0$}
-        \STATE $momSource$.valid = false
-        \STATE $vuotoSource \leftarrow momSource$
-        \STATE \textbf{break}
+        \IF{$u_f(momSource$.previousEdge $) < 0 \lor f(momSource$.previousEdge )$ < 0$ }
+        \STATE $vuotiSource.$Clear()
+        \STATE $flowError \leftarrow $GetFlow$(s,n).$flussoPassante
+        \STATE $mom \leftarrow n$
+        \WHILE{$ mom \ne momsource$}
+        \STATE $mom.$flussoPassante $\leftarrow mom.$flussoPassante - flowError
+        \STATE $mom.$PreviousEdge.addFlow$(flowError)$
+        \STATE $mom \leftarrow mom.$previousNode
+        \ENDWHILE
+        \STATE $vuotiSource.$push(momSource)
+        \STATE $momSource.valid \leftarrow$ false
+        \STATE $f \leftarrow f + flowError$
+        \ELSIF{$u_f(momSource$.previousEdge$) = 0$}
+        \STATE $momSource.valid \leftarrow$ false
+        \STATE $vuotiSource.push(momSource)$
         \ENDIF
         \STATE $momSource.$flussoPassante $\leftarrow momSource.$flussoPassante-f
         \STATE $momSource \leftarrow momSource.$previousNode
-        \ENDIF
         \ENDWHILE
-
+        \algstore{finishedSourceSideSendFlow}
+    \end{algorithmic}
+\end{algorithm}
+\begin{algorithm}
+    \begin{algorithmic}
+        \algrestore{finishedSourceSideSendFlow}
         \WHILE{ $momSink \ne t$}
         \STATE $momSink$.nextEdge.addFlow($f$)
-        \IF{$u(momSink.$nextEdge)$ <0$ OR $f(momSink.$nextEdge)$ <0$ }
-        \STATE $vuotoSink \leftarrow momSink$
-        \STATE $momSink$.revert() \COMMENT{anche quello già fatto dalla parte di source va fatto tornare come era prima}
-        \STATE \textbf{return} $(null,vuotoSink,false)$
-        \ELSE
-        \IF{ $u(momSink.$nextEdge$) = 0$}
-        \STATE $momSink.$valid $\leftarrow$ false
-        \STATE $vuotoSink \leftarrow momSink$
-        \STATE $fMax \leftarrow fMax - f$
+        \IF{$u_f(momSink.$nextEdge)$ <0 \lor f(momSink.$nextEdge)$ <0$ }
+        \STATE $vuotiSink.$Clear()
+        \STATE $flowError \leftarrow $GetFlow$(t,n).$flussoPassante
+        \STATE $mom \leftarrow n$
+        \WHILE{$ mom \ne momsink$}
+        \STATE $mom.$flussoPassante $\leftarrow mom.$flussoPassante - flowError
+        \STATE $mom.$nextEdge.addFlow$(flowError)$
+        \STATE $mom \leftarrow mom.$nextNode
+        \ENDWHILE
+        \STATE $mom \leftarrow n$
+        \WHILE{$ mom \ne s$}
+        \STATE $mom.$flussoPassante $\leftarrow mom.$flussoPassante - flowError
+        \STATE $mom.$PreviousEdge.addFlow$(flowError)$
+        \STATE $mom \leftarrow mom.$previousNode
+        \ENDWHILE
+        \STATE $vuotiSink.$Push(momSink)
+        \STATE $momSink.valid \leftarrow$ false
+        \STATE $f \leftarrow f + flowError$
+        \ELSIF{$u_f(momSink$.nextEdge$) = 0$}
+        \STATE $momSink.valid \leftarrow$ false
+        \STATE $vuotiSource.push(momSource)$
         \ENDIF
         \STATE $momSink$.flussoPassante $\leftarrow$ $momSink$.flussoPassante $-f$
         \STATE $momSink \leftarrow momSink.$nextNode
-        \ENDIF
         \ENDWHILE
-        \STATE \textbf{return} $(vuotoSource,vuotoSink,$false)
+        \STATE $fMax \leftarrow fMax + f$
+        \ENDWHILE
+        \STATE \textbf{return} $fMax$
     \end{algorithmic}
 \end{algorithm}
 
-\subsection{FirstBfs}
-\begin{algorithm}
-    \caption{BFS che inizialliza tutti i nodi e che indica se devono essere esplorati da source o da sink, oltre a trovare un percorso tra questi due}
-    \begin{algorithmic}
-        \REQUIRE rete $(G,u,s,t)$
-        \ENSURE quantità di flusso inviabile,nodo intermedio tra i nodi esplorati da source e quelli esplorati da sink
 
-        \STATE $codaSource \leftarrow $ coda di nodi
-        \STATE $codaSource.$enqueue$(s)$
-        \STATE $codaSink \leftarrow$ coda di nodi
-        \STATE $codaSink.$enqueue$(t)$
-        \STATE $codaEdgeSource \leftarrow$ coda di archi
-        \STATE $codaEdgeSink \leftarrow$ coda di archi
-        \STATE $returnvalue \leftarrow 0$
-        \WHILE{$\neg codaSink.isEmpty \lor \neg codaSource.isEmpty$}
-        \IF{($\neg codaSource.isEmpty \land codaEdgeSource.isEmpty) \lor (codaSink.isEmpty \land codaEdgeSink.isEmpty$}
-        \STATE $elementSource \leftarrow codaSource.$dequeue()
-        \STATE $codaEdgeSource.$enqueue$(\delta^+(elementSource))$
+
+\subsection{DoBfs}
+\begin{algorithm}
+    \caption{DoBfs con ottimizzazione sugli ultimi livelli}
+    \begin{algorithmic}[1]
+        \REQUIRE rete $(G,u,s,t)$, $noCapsSource, noCapsSink$, cioè pile di nodi contenenti nodi non più raggiungibili attraverso il cammino trovato
+        \ENSURE valore del flusso inviabile, nodo appartenente LastSinkNodes, cioè tutti i nodi che sono intermedi che fanno da ponte tra le due ricerche.
+        \STATE $codaSource \leftarrow$ coda di nodi vuota
+        \STATE $codaSink \leftarrow$ coda di nodi vuota
+        \STATE $codaEdgeSink \leftarrow$ coda di archi vuota
+        \STATE $codaEdgeSource \leftarrow$ coda di archi vuota
+        \IF{$ \neg noCapsSource.isEmpty$}
+        \STATE $p \leftarrow $ null
+        \STATE $repaired \leftarrow $ true
+        \WHILE{$ \neg noCapsSource.isEmpty$}
+        \STATE $noCapSource \leftarrow noCapsSource.$pop()
+        \STATE GetFlow$(p,noCapSource)$
+        \STATE $p \leftarrow noCapSource$
+        \STATE Repair($noCapSource$)
+        \IF{non riesco a riparare $noCapSource$}
+        \STATE $noCapsSource.$Push$(noCapSource)$
+        \STATE $repaired \leftarrow$ false
+        \STATE \textbf{break}
         \ENDIF
-        \IF{$(\neg codaSink.isEmpty \land codaEdgeSink.isEmpty) \lor (codaSource.isEmpty \land codaEdgeSink.isEmpty)$}
-        \STATE $elementSink \leftarrow codaSink.dequeueu$
-        \STATE $codaEdgeSink.$enqueue$(\delta^-(elementSink)$
-        \ENDIF
-        \WHILE{$\neg codaEdgeSource.isEmpty \land \neg codaEdgeSink.isEmpty$}
-        \STATE $es \leftarrow codaEdgeSource.dequeue$
-        \STATE $ps \leftarrow es.previousNode$
-        \STATE $ns \leftarrow es.nextNode$
-        \IF{$elementSource = ps \land u_f(es)>0$} %inutile, ma per sicurezza inserisco 
-        \IF{$ns.inFlow \ne 0$} \COMMENT{è già stato visitato}
-        \IF{$ns.SourceSide$} \COMMENT{esplorato da source}
-        \STATE \textbf{continue}
-        \ELSIF{$returnvalue = 0$}
-        \STATE $returnvalue \leftarrow \min(ps.flussoPassane,ns.flussoPassante,u_f(es))$
-        \STATE $ns.update(ps,es)$
-        \STATE $returnNode \leftarrow ns$
-        \ENDIF
-        \ELSE
-        \STATE $ns.upate(ps,es)$
-        \STATE $codaSource.enqueue(ns)$
-        \ENDIF
-        \ENDIF
-        \algstore{firstbfs}
+        \ENDWHILE
+        \algstore{sourceInit}
     \end{algorithmic}
 \end{algorithm}
 \newpage
 \begin{algorithm}
     \begin{algorithmic}
-        \algrestore{firstbfs}\STATE $et \leftarrow codaEdgeSink.dequeue$
-        \STATE $pt \leftarrow et.previousNode$
-        \STATE $nt \leftarrow et.nextNode$
-        \IF{$elementSink = nt \land u_f(et)>0$}
-        \IF{$pt.flussoPassante \ne 0$}
-        \IF{$\neg pt.SourceSide$}
-        \STATE \textbf{continue}
-        \ELSIF{$returnvalue = 0$}
-        \STATE $returnvalue \leftarrow  \min(pt.flussoPassante,nt.flussoPassante,f(et)$
-        \STATE $nt.update(pt,et)$
-        \STATE $returnNode \leftarrow nt$
-        \ENDIF
-        \ELSE
-        \STATE $pt.update(et,nt)$
-        \STATE $codaSink.enqueue(pt)$
-        \ENDIF
-        \ENDIF
-        \ENDWHILE
-        \ENDWHILE
-        \STATE \textbf{return} ($returnvalue, returnNode)$
-    \end{algorithmic}
-\end{algorithm}
-
-\subsection{DoBfs}
-\begin{algorithm}
-    \caption{DoBfs con ottimizzaione sugli ultimi livelli}
-    \begin{algorithmic}[1]
-        \REQUIRE rete $(G,u,s,t)$, $noCapSource, noCapSink$, cioè nodi,rispettivamente della parte sorgente e della parte destinazione, che non sono più raggiungili dal percorso deciso precedentemente
-        \ENSURE valore del flusso inviabile, nodo appartenente LastSinkNodes, cioè tutti i nodi che sono intermedi che fanno da ponte tra le due ricerche.
-        \STATE $codaSource \leftarrow$ coda di nodi vuota
-        \STATE $codaSink \leftarrow$ coda di nodi vuota
-        \IF{$noCapSource \ne$ null}
-        \STATE Repair($noCapSource$
-        \IF{riesco a riparare $noCapSource$}
-        \IF{$noCapSink = $null}
+        \algrestore{sourceInit}
+        \IF{$\neg noCapsSink.isEmpty \land repaired$}
         \FORALL{$n \in $ LastSinkNodes $ | n.valid$  }
         \STATE GetFlow$(noCapSource,n)$ \COMMENT{da n cerco di retrocedere verso noCapSource, aggiornando ricorsivamente le informazioni dei nodi in modo opportuno (sopratutto per quanto riguarda n)}
-        \IF {percorso legale tra $n$ e $noCapSource$ AND  $ \forall e |e \in$ percorso tra $n$ e $noCapSource, u(e) > 0$}
-        \STATE \textbf{return} ($n$.flussoPassante,$n$)
+        \IF {GetFlow ha trovato un percorso$ \land n.flussoPassante \ne 0$}
+        \IF{$edge.reversed$}
+        \STATE \textbf{return} ($\min(n.flussoPassante,f(edge)),n$)
+        \ELSE
+        \STATE \textbf{return} ($\min(n.flussoPassante,u_f(edge)),n$)
+        \ENDIF
         \ENDIF
         \ENDFOR
-        \ELSE
-        \STATE $sourceRepaired \leftarrow$ true
         \ENDIF
-        \ENDIF
+        \IF{$\neg repaired$}
         \IF{$noCapSource = s$}
-        \STATE $coda.$enqueue($noCapSource$)
-        \ELSIF {$noCapSource \in $ LastSinkNodes}
+        \STATE $codaSource.$enqueue($noCapSource$)
+        \ELSIF {$noCapSource \in LastSinkNodes$}
         \STATE $codaSource \leftarrow$ LastSourceNodes \COMMENT{nodi collegati ai nodi di LastSinkNodes}
         \ELSE
-        \STATE $codaSource \leftarrow$ nodi esplorati da source con label = noCapSource.label-1
-        \FORALL{$n \in N(G) | $esplorati da source AND $n.label \ge noCapSource.label$}
+        \FORALL{$n \in V(G)| n.sourceSide \land n.label + 1 = noCapSource.label$}
+        \STATE $codaSource.$enqueue$(n) $
+        \ENDFOR
+        \FORALL{$n \in V(G) | n.SourceSide \land n.label \ge noCapSource.label$}
         \STATE $n.$reset()
         \ENDFOR
+        \ENDIF
         \ENDIF
         \ENDIF
         \algstore{LastLevelOptNoCapSourceInit}
@@ -195,34 +164,45 @@
 \begin{algorithm}
     \begin{algorithmic}[1]
         \algrestore{LastLevelOptNoCapSourceInit}
-        \IF{$noCapSink \ne$ null}
+        \IF{$\neg noCapsSink.isEmpty$}
+        \STATE $repaired \leftarrow$ true
+        \STATE $p \leftarrow $ null
+        \WHILE{$\neg noCapsSink.isEmpty$}
+        \STATE $noCapsSink \leftarrow noCapsSink.$pop()
+        \STATE GetFlow$(p,noCapSink)$
+        \STATE $p \leftarrow noCapSink$
         \STATE Repair($noCapSink$)
-        \IF{riesco a riparare $noCapSink$}
-        \STATE $sinkRepaired \leftarrow$ true
-        \IF{$sourceRepaired$ OR $noCapSource = $ null}
-        \FORALL{$n \in N(G) |n.$valid AND $n \in $LastSinkNodes }
-        \IF{$sourceRepaired$}
-        \IF{da n posso ricorsivamente retrocedere verso noCapSource (GetFlow)}
-        \STATE $sourceFlow \leftarrow n$.flussoPassante
-        \ELSE
-        \STATE \textbf{continue}
+        \IF{non riesco a riparare $noCapSink$}
+        \STATE noCapsSink.push$(p)$
+        \STATE $repaired \leftarrow$ false
+        \STATE \textbf{break}
         \ENDIF
+        \ENDWHILE
+
+        \IF{$repaired \land noCapsSource.isEmpty$}
+        \FORALL{$n \in LastSinkNodes | n.valid$} \COMMENT{nodo di confine valido}
+        \IF {$n.previousEdge.reversed$}
+        \STATE $sourceFlow \leftarrow \min(n.previousNode.inFlow,f(n.previousEdge)$)
         \ELSE
-        \STATE $sourceFlow \leftarrow$ $\min$($n$.previousNode.flussoPassante,$u(n.PreviousEdge)$ \COMMENT{nel caso in cui arco.reversed = true, devo controllare il flusso e non la capacità residua} )
+        \STATE $sourceFlow \leftarrow \min(n.previousNode.inFlow,u_f(n.previousEdge) $)
         \ENDIF
-        \IF{$sourceFlow > 0$ AND n può retrocedere ricorsivamente verso noCapSink(Getflow) AND $n.$flussoPassante $> 0$ }
-        \STATE \textbf{retrun} ($\min(n.$flussoPassante$, sourceFlow),n)$
-            \ENDIF
-            \ENDFOR
-            \ENDIF
-            \ENDIF
-            \IF{$noCapSink=t$}
-            \STATE $codaSink.$enqueue($noCapSink$)
-            \ELSE
-            \STATE $codaSink \leftarrow$ nodi esplorati da sink con label = noCapSink.label-1
-            \FORALL{$n \in N(G) | $ esplorati da sink AND $n.label \ge noCapSink.label$}
-            \STATE $n.$reset()
+        \STATE GetFlow$(p,n)$
+        \IF{è stato trovato un percorso tra $p$ ed $n$ $\land n.flussoPassante \ne 0 \land sourceFlow > 0$}
+        \STATE \textbf{return} $(\min(n.flussoPassante,sourceFlow),n)$
+        \ENDIF
         \ENDFOR
+        \ENDIF
+        \IF{$\neg repaired$}
+        \IF{$noCapSink=t$}
+        \STATE $codaSink.$enqueue($noCapSink$)
+        \ELSE
+        \FORALL{$n \in V(G) | n.label +1 = noCapSink.label$}
+        \STATE $codaSink.$enqueue$(n)$
+        \ENDFOR
+        \FORALL{$n \in N(G) | \neg n.sourceSide \land n.label \ge noCapSink.label$}
+        \STATE $n.$reset()
+        \ENDFOR
+        \ENDIF
         \ENDIF
         \ENDIF
         \algstore{LastLevelOptNoCapSinkInit}
@@ -231,160 +211,125 @@
 \end{algorithm}
 
 \newpage
-
 \begin{algorithm}
     \begin{algorithmic}[1]
         \algrestore{LastLevelOptNoCapSinkInit}
-        \WHILE{$\neg codaSink$.isEmpty OR $\neg codaSource.$isEmpty}
-        \IF{$\neg codaSource$.isEmpty AND ($noCapSource \ne$ null OR $\neg sourceRepaired$}
-        \STATE$ element \leftarrow codaSource$.dequeue()
-        \IF{$\neg element$.sourceSide OR $\neg element.$valid }
+        \WHILE{$\neg codaSink.isEmpty \lor \neg codaSource.isEmpty$}
+        \IF{$\neg codaSource.isEmpty \land (codaEdgeSource.isEmpty \lor (codaEdgeSink.isEmpty \land codaSink.isEmpty \land \neg noCapsSink.isEmpty))$}
+        \STATE $elementSource \leftarrow codaSource$.dequeue()
+        \IF{$\neg elementSource.sourceSide \land \neg elementSource.valid \land elementSource.flussoPassante = 0$}
         \STATE \textbf{continue}
         \ENDIF
-        \FORALL{ $edge \in element.Edges$}
-        \STATE $p \leftarrow edge$.previousNode
-        \STATE $n \leftarrow edge$.nextNode
-        \IF{$element = p $AND $u(edge)> 0$}
-        \IF{$n$.visited}
-        \IF{$n$.sourceside (esplorato da source)}
+        \FORALL{$e \in \delta(elementSource) | $ il nodo collegato potrà essere esplroato} \COMMENT{dato l'arco x, $(x.NextNode = elementSink \land x.Capacity > 0 \land (x.PreviousNode.InFlow = 0 \lor x.PreviousNode.SourceSide)) \lor (x.PreviousNode = elementSink \land x.Flow > 0 \land (x.NextNode.InFlow = 0 \lor x.NextNode.SourceSide))$}
+        \STATE $codaEdgeSource.$enqueue$(e)$
+        \ENDFOR
+        \ENDIF
+        \IF{$\neg codaSink.isEmpty \land (codaEdgeSink.isEmpty \lor (codaEdgeSource.isEmpty \land codaSource.isEmpty \land \neg noCapsSource.isEmpty))$}
+        \STATE $elementSink \leftarrow codaSink.$dequeue()
+        \IF{$\neg elementSink.sourceSide \land \neg elementSink.valid \land elementSink.flussoPassante = 0$}
         \STATE \textbf{continue}
-        \ELSE \Comment{in questo caso ho le due parti che si incontrano}
-        \STATE $f \leftarrow \min(n.flussoPassante,p.flussoPassante,u(edge))$
-        \IF{$f = 0$}
+        \ENDIF
+        \FORALL{$e \in \delta(elementSink) | $ il nodo collegato potrà essere esplorato} \COMMENT{dato l'arco $x,(x.NextNode = elementSink \land x.Capacity > 0 \land (x.PreviousNode.InFlow = 0 \lor x.PreviousNode.SourceSide)) \lor (x.PreviousNode = elementSink \land x.Flow > 0 \land (x.NextNode.InFlow = 0 \lor x.NextNode.SourceSide))$}
+        \STATE $codaEdgeSink.$enqueue(e)
+        \ENDFOR
+        \ENDIF
+        \algstore{FinishedEdgeQueueInit}
+    \end{algorithmic}
+\end{algorithm}
+\begin{algorithm}
+    \begin{algorithmic}
+        \algrestore{FinishedEdgeQueueInit}
+        \WHILE{$(\neg codaEdgeSource.isEmpty \lor noCapsSource.isEmpty) \land (\neg codaEdgeSink.isEmpty \lor noCapSink.isEmpty)$}
+        \IF{$\neg codaEdgeSource.isEmpty$}
+        \STATE $e \leftarrow codaEdgeSource.$dequeue()
+        \STATE $p \leftarrow e.previousNode$
+        \STATE $n \leftarrow e.nextNode$
+        \IF{$elementSource = p \land u_f(e) > 0$}
+        \IF{$n.flussoPassante \ne 0$}
+        \IF{$\neg n.sourceSide$}
+        \STATE $f \leftarrow \min(n.flussoPassante, p.flussoPassante, u_f(e))$
+        \IF{$ f \ne 0$}
         \STATE \textbf{continue}
         \ENDIF
         \STATE $n.$update$(p,edge)$
-        \STATE $edge.reversed \leftarrow $ false
-        \STATE LastNodesSinkSide.add(n) \COMMENT{di conseguenza inserisco tutti i nodi collegati direttamente a n che fanno parte di SourceSide in LastNodesSourceSide}
+        \STATE addLast$(n)$
+        \STATE $e.reversed \leftarrow $false
         \STATE \textbf{return} $(f,n)$
         \ENDIF
+        \ELSE
+        \STATE $n.$update$(p,edge)$
+        \STATE $e.reversed \leftarrow $false
+        \STATE $codaSource.$enqueue$(n)$
         \ENDIF
-        \IF{$\neg n.sourceSide$ AND $n \ne t$}
-        \STATE $sinkRepaired \leftarrow$ false
-        \FORALL{ $node \in N(G) |\neg node.sourceSide $ AND $node.label = (n.label - 1)$}
-        \STATE $codaSink.$enqueue($node$)
-        \ENDFOR
-        \FORALL{$node \in N(G) |\neg node.sourceSide $ AND $node.label \ge n.label$}
-        \STATE $node.$reset()
-        \ENDFOR
+        \ELSIF{$elementSource =  n \land f(e) > 0$}
+        \IF{$p.flussoPassante \ne 0$}
+        \IF{$\neg p.sourceSide$}
+        \STATE $f \leftarrow \min (p.flussoPassante,n.flussoPassante,f(e))$
+        \IF{$f = 0$}
         \STATE \textbf{continue}
         \ENDIF
-        \STATE $n.$update($p,edge$)
-        \STATE $codaSource$.enqueue($n$)
-        \algstore{finishedSourceSideCap}
+        \STATE $p.upate(n,e)$
+        \STATE addLast$(p)$
+        \STATE $e.reversed \leftarrow $ true
+        \STATE \textbf{return} $(f,p)$
+        \ENDIF
+        \ELSE
+        \STATE $p.$update$(n,e)$
+        \STATE $e.reversed \leftarrow $ true
+        \STATE $codasource.$enqueue$(p)$
+        \ENDIF
+        \ENDIF
+        \ENDIF
+        \algstore{finishedSourceExploration}
     \end{algorithmic}
 \end{algorithm}
 \newpage
 \begin{algorithm}
     \begin{algorithmic}
-        \algrestore{finishedSourceSideCap}
-        \ELSIF {$element = n $ AND $f(edge)>0$}
-        \IF{$p$.visited}
-        \IF{$p$.sourceside}
-        \STATE\textbf{continue}
+        \algrestore{finishedSourceExploration}
+        \IF{$\neg codaEdgeSink.isEmpty$}
+        \STATE $e \leftarrow codaEdgeSink.$dequeue()
+        \STATE $p \leftarrow e.previousNode$
+        \STATE $n \leftarrow e.nextNode$
+        \IF{$elementSink = n \land u_f(e)> 0$}
+        \IF{$p.flussoPassante \ne 0$}
+        \IF{$\neg p.sourceSide$}
+        \textbf{continue}
         \ELSE
-        \STATE $f \leftarrow \min (n.flussoPassante,p.flussoPassante,f(edge))$
+        \STATE $f \leftarrow \min(p.flussoPassante,n.flussoPassante,u_f(e))$
         \IF{$f = 0$}
         \STATE \textbf{continue}
         \ENDIF
-        \STATE $p.$update(n,edge)
-        \STATE $edge.reversed \leftarrow$ true
-        \STATE \textbf{return } $(f,p)$
-        \ENDIF
-        \ENDIF
-        \IF{$\neg p$.sourceSide AND $p \ne  t$}
-        \STATE $sinkRepaired \leftarrow$ false
-        \FORALL{$ node \in V(G) | \neg node.sourceNode $AND$ node.label = (p.label-1)$}
-        \STATE $codaSink$.enqueue($node$)
-        \ENDFOR
-        \FORALL{$node \in V(G) |\neg node.sourceSide $ AND $node.label \ge p.label$}
-        \STATE $node.$reset()
-        \ENDFOR
-        \STATE\textbf{continue}
-        \ENDIF
-        \STATE $p$.update$(n,edge)$
-        \STATE $edge.reversed \leftarrow$ true
-        \STATE $codaSource.$enqueue$(p)$
-        \ENDIF
-        \ENDFOR
-        \ENDIF
-        \algstore{FinishedSourcePart}
-    \end{algorithmic}
-\end{algorithm}
-\newpage
-\begin{algorithm}
-    \begin{algorithmic}
-        \algrestore{FinishedSourcePart}
-        \IF{$\neg codaSink$.isEmptyAND  ($noCapSink \ne$ null OR $\neg sinkRepaired$)}
-        \STATE $element \leftarrow codaSink.$dequeue()
-        \IF{$element.sourceSide$ OR $\neg element.valid$}
-        \STATE \textbf{continue}
-        \ENDIF
-
-        \FORALL{ $edge \in element.Edges$}
-        \STATE $p \leftarrow edge.$previousNode
-        \STATE $n \leftarrow edge$.nextNode
-        \IF{$element = n$ AND  $u(edge)> 0 $}
-        \IF{$p$.visited}
-        \IF{$\neg p.$sourceSide}
-        \STATE \textbf{continue}
-        \ELSE
-        \IF{$sourceRepaired$ AND  n può retrocedere ricorsivamente verso noCapSink(GetFlow) AND $n.$flussoPassante$ > 0$}
-        \STATE $f \leftarrow \min (n.nextNode.flussoPassante, n.flussoPassante) $
-        \STATE $f \leftarrow \min(f,n.PreviousNode.flussoPassante, u(n.nextEdge), u(n.previuosEdge))$
-        \COMMENT{qui se edge.reversed = true va considerato il flusso f e non la capacità residua u}
-        \IF{$f > 0$ }
-        \STATE \textbf{return} $f$
-        \ENDIF
-        \ENDIF
-        \STATE $f \leftarrow \min (n.flussoPassante,p.flussoPassante,u(edge))$
-        \IF{$f = 0$}
-        \STATE \textbf{continue}
-        \ENDIF
-        \STATE $n$.update$(p,edge)$
-        \STATE $edge.reversed \leftarrow $false
+        \STATE $n.$update$(p,e)$
+        \STATE $e.reversed \leftarrow$ true
+        \STATE addLast$(n)$
         \STATE \textbf{return} $(f,n)$
         \ENDIF
         \ENDIF
-        \IF{$p.$sourceSide AND $noCapSink \ne t$}
-        \STATE \textbf{continue}
-        \ENDIF
-        \STATE $p.$update$(n,edge)$
-        \STATE $edge.reversed \leftarrow$ false
+        \STATE $p.$update$(n,e)$
+        \STATE $e.reversed \leftarrow$ true
         \STATE $codaSink.$enqueue$(p)$
-        \algstore{FinishSinkElementN}
-    \end{algorithmic}
-\end{algorithm}
-\newpage
-\begin{algorithm}
-    \begin{algorithmic}
-        \algrestore{FinishSinkElementN}
-        \ELSIF{$element = p $AND $f(edge)>0$}
-        \IF{$p.$visited}
-        \IF{$\neg p.$sourceSide}
-        \STATE \textbf{continue}
+        \ELSIF{$elementSink = p \land f(e)> 0$}
+        \IF{$n.flussoPassante \ne 0$}
+        \IF{$\neg n.sourceSide$}
+        \textbf{continue}
         \ELSE
-        \IF{$sourceRepaired $ AND da p riesco a raggiungere noCapSource(GetFlow)}
-        \STATE \textbf{return} $(p.flussoPassante,p)$
-        \ENDIF
-        \STATE $f \leftarrow \min(p.flussoPassante,n.flussoPassante,f(edge))$
+        \STATE $f \leftarrow \min(p.flussoPassante,n.flussoPassante,f(e))$
         \IF{$f = 0$}
         \STATE \textbf{continue}
         \ENDIF
-        \STATE $p.$update$(n,edge)$
-        \STATE $edge.reversed \leftarrow$ true
-        \STATE \textbf{return } $(f,p)$
+        \STATE $p.$update$(n,e)$
+        \STATE $e.reversed \leftarrow$ true
+        \STATE addLast$(p)$
+        \STATE \textbf{return} $(f,p)$
         \ENDIF
         \ENDIF
-        \IF{$n.$sourceSide AND $n \ne t$}
-        \STATE \textbf{continue}
-        \ENDIF
-        \STATE $n.$update$(p,edge)$
-        \STATE $edge.reversed \leftarrow$ true
+        \STATE $n.$update$(p,e)$
+        \STATE $e.reversed \leftarrow$ true
         \STATE $codaSink.$enqueue$(n)$
         \ENDIF
-        \ENDFOR
         \ENDIF
+        \ENDWHILE
         \ENDWHILE
         \STATE \textbf{return} $(0,null)$
     \end{algorithmic}

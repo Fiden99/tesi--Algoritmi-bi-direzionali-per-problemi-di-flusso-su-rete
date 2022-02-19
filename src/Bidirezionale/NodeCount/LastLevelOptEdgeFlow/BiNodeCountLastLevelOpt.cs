@@ -290,7 +290,7 @@ namespace Bidirezionale.NodeCount.LastLevelOptEdgeFlow
                     foreach (var e in elementSink.Edges.Where(x => (x.NextNode == elementSink && x.Capacity > 0 && (!x.PreviousNode.Visited || x.PreviousNode.SourceSide)) || (x.PreviousNode == elementSink && x.Flow > 0 && (!x.NextNode.Visited || x.NextNode.SourceSide))))
                         codaEdgeSink.Enqueue(e);
                 }
-                if (codaEdgeSource.Count > 0 && noCapsSource.Count > 0)
+                if (codaEdgeSource.Count > 0)
                 {
                     var e = codaEdgeSource.Dequeue();
                     Node p = e.PreviousNode;
@@ -353,7 +353,7 @@ namespace Bidirezionale.NodeCount.LastLevelOptEdgeFlow
                         codaSource.Enqueue(p);
                     }
                 }
-                if (codaEdgeSink.Count > 0 && noCapsSink.Count > 0)
+                if (codaEdgeSink.Count > 0)
                 {
 
                     var e = codaEdgeSink.Dequeue();

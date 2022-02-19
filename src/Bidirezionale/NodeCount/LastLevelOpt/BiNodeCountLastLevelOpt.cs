@@ -6,105 +6,6 @@ namespace Bidirezionale.NodeCount.LastLevelOpt
 {
     public class BiNodeCountLastLevelOpt
     {
-        /*private static (int, Node) FirstBfs(Graph graph)
-        {
-            var s = graph.Source;
-            var t = graph.Sink;
-            var codaSource = new Queue<Node>();
-            codaSource.Enqueue(s);
-            var codaSink = new Queue<Node>();
-            codaSink.Enqueue(t);
-            var codaEdgeSource = new Queue<BiEdge>();
-            var codaEdgeSink = new Queue<BiEdge>();
-            Node elementSource = null;
-            Node elementSink = null;
-            Node returnNode = null;
-            int returnvalue = 0;
-            while (codaSink.Count > 0 || codaSource.Count > 0)
-            {
-                if ((codaSource.Count > 0 && codaEdgeSource.Count == 0) || (codaSink.Count == 0 && codaEdgeSink.Count == 0))
-                {
-                    elementSource = codaSource.Dequeue();
-                    foreach (var e in elementSource.Edges.Where(x => x.PreviousNode == elementSource))
-                        codaEdgeSource.Enqueue(e);
-                }
-                if ((codaSink.Count > 0 && codaEdgeSink.Count == 0) || (codaSource.Count == 0 && codaEdgeSource.Count == 0))
-                {
-                    elementSink = codaSink.Dequeue();
-                    foreach (var e in elementSink.Edges.Where(x => x.NextNode == elementSink))
-                        codaEdgeSink.Enqueue(e);
-                }
-                while (codaEdgeSink.Count > 0 && codaEdgeSource.Count > 0)
-                {
-                    var es = codaEdgeSource.Dequeue();
-                    Node ps = es.PreviousNode;
-                    Node ns = es.NextNode;
-#if DEBUG
-                    if (es.Capacity < 0 || es.Flow < 0)
-                        throw new InvalidOperationException("capacità o flusso negativi");
-#endif
-                    if (elementSource == ps && es.Capacity > 0)
-                    {
-                        if (ns.InFlow != 0)
-                        {
-                            if (ns.SourceSide)
-                                continue;
-                            else if (returnvalue == 0)
-                            {
-                                returnvalue = Math.Min(ps.InFlow, Math.Min(ns.InFlow, es.Capacity));
-                                ns.SetPreviousNode(ps);
-                                ns.SetPreviousEdge(es);
-                                graph.AddLast(ns);
-                                returnNode = ns;
-                            }
-                        }
-                        else
-                        {
-                            ns.SetInFlow(Math.Min(ps.InFlow, es.Capacity));
-                            graph.ChangeLabel(ns, true, ps.Label + 1);
-                            ns.SetPreviousEdge(es);
-                            ns.SetPreviousNode(ps);
-                            codaSource.Enqueue(ns);
-                        }
-                    }
-                    var et = codaEdgeSink.Dequeue();
-                    var nt = et.NextNode;
-                    var pt = et.PreviousNode;
-#if DEBUG
-                    if (et.Capacity < 0 || et.Flow < 0)
-                        throw new InvalidOperationException("capacità negativa");
-#endif
-                    if (elementSink == nt && et.Capacity > 0)
-                    {
-                        if (pt.InFlow != 0)
-                        {
-                            if (!pt.SourceSide)
-                                continue;
-                            else if (returnvalue == 0)
-                            {
-                                returnvalue = Math.Min(pt.InFlow, Math.Min(et.Capacity, nt.InFlow));
-                                nt.SetPreviousEdge(et);
-                                nt.SetPreviousNode(pt);
-                                graph.AddLast(nt);
-                                returnNode = nt;
-                            }
-                        }
-                        else
-                        {
-                            //p.SetSourceSide(false);
-                            pt.SetInFlow(Math.Min(et.Capacity, nt.InFlow));
-                            pt.SetNextEdge(et);
-                            pt.SetNextNode(nt);
-                            graph.ChangeLabel(pt, false, nt.Label + 1);
-                            pt.SetValid(true);
-                            codaSink.Enqueue(pt);
-                        }
-                    }
-                }
-            }
-            return (returnvalue, returnNode);
-        }
-        */
 
         public static bool RepairNode(Graph graph, Node node, bool borderForward)
         {
@@ -383,160 +284,161 @@ namespace Bidirezionale.NodeCount.LastLevelOpt
                     foreach (var e in elementSink.Edges.Where(x => (x.NextNode == elementSink && x.Capacity > 0 && (x.PreviousNode.InFlow == 0 || x.PreviousNode.SourceSide)) || (x.PreviousNode == elementSink && x.Flow > 0 && (x.NextNode.InFlow == 0 || x.NextNode.SourceSide))))
                         codaEdgeSink.Enqueue(e);
                 }
-                if (codaEdgeSource.Count > 0 && noCapsSource.Count > 0)
+                while ((codaEdgeSource.Count > 0 || noCapsSource.Count == 0) && (codaEdgeSink.Count > 0 || noCapsSink.Count == 0))
                 {
-                    var e = codaEdgeSource.Dequeue();
-                    Node p = e.PreviousNode;
-                    Node n = e.NextNode;
-#if DEBUG
-                    if (e.Capacity < 0 || e.Flow < 0)
-                        throw new InvalidOperationException("capacità negativa");
-#endif
-                    if (elementSource == p && e.Capacity > 0)
-                    {
-                        if (n.InFlow != 0)
-                        {
-                            if (!n.SourceSide)
-                            {
-                                int f = Math.Min(n.InFlow, Math.Min(p.InFlow, e.Capacity));
-                                if (f == 0)
-                                    continue;
-                                n.SetPreviousNode(p);
-                                n.SetPreviousEdge(e);
-                                //graph.AddLast(p);
-                                graph.AddLast(n);
-                                e.SetReversed(false);
-                                //n.SetInFlow(f);
-                                return (f, n);
-                            }
-                        }
-                        else
-                        {
-                            //n.SetSourceSide(true);
-                            n.SetInFlow(Math.Min(p.InFlow, e.Capacity));
-                            graph.ChangeLabel(n, true, p.Label + 1);
-                            n.SetPreviousNode(p);
-                            n.SetPreviousEdge(e);
-                            e.SetReversed(false);
-                            n.SetValid(true);
-                            codaSource.Enqueue(n);
-                        }
-                    }
-                    else if (elementSource == n && e.Flow > 0)
-                    {
-                        if (p.InFlow != 0)
-                        {
-                            if (!p.SourceSide)
-                            {
-                                int f = Math.Min(p.InFlow, n.InFlow);
-                                f = Math.Min(f, e.Flow);
-                                if (f == 0)
-                                    continue;
-                                p.SetPreviousNode(n);
-                                p.SetPreviousEdge(e);
-                                graph.AddLast(p);
-                                //graph.AddLast(n);
-                                e.SetReversed(true);
-                                //p.SetInFlow(f);
-                                return (f, p);
-                            }
-                        }
-                        else
-                        {
-                            p.SetInFlow(Math.Min(n.InFlow, e.Flow));
-                            graph.ChangeLabel(p, true, n.Label + 1);
-                            p.SetPreviousEdge(e);
-                            p.SetPreviousNode(n);
-                            e.SetReversed(true);
-                            p.SetValid(true);
-                            codaSource.Enqueue(p);
 
-                        }
-                    }
-                }
-                if (codaEdgeSink.Count > 0 && noCapsSink.Count > 0)
-                {
-                    var e = codaEdgeSink.Dequeue();
-                    var p = e.PreviousNode;
-                    var n = e.NextNode;
+                    if (codaEdgeSource.Count > 0)
+                    {
+                        var e = codaEdgeSource.Dequeue();
+                        Node p = e.PreviousNode;
+                        Node n = e.NextNode;
 #if DEBUG
-                    if (e.Capacity < 0 || e.Flow < 0)
-                        throw new InvalidOperationException("capacità negativa");
+                        if (e.Capacity < 0 || e.Flow < 0)
+                            throw new InvalidOperationException("capacità negativa");
 #endif
-                    if (elementSink == n && e.Capacity > 0)
-                    {
-                        if (p.InFlow != 0)
+                        if (elementSource == p && e.Capacity > 0)
                         {
-                            if (!p.SourceSide)
+                            if (n.InFlow != 0)
                             {
-                                continue;
+                                if (!n.SourceSide)
+                                {
+                                    int f = Math.Min(n.InFlow, Math.Min(p.InFlow, e.Capacity));
+                                    if (f == 0)
+                                        continue;
+                                    n.SetPreviousNode(p);
+                                    n.SetPreviousEdge(e);
+                                    //graph.AddLast(p);
+                                    graph.AddLast(n);
+                                    e.SetReversed(false);
+                                    //n.SetInFlow(f);
+                                    return (f, n);
+                                }
                             }
                             else
                             {
-                                int f = Math.Min(p.InFlow, n.InFlow);
-                                f = Math.Min(f, e.Capacity);
-                                if (f == 0)
-                                    continue;
-                                n.SetPreviousEdge(e);
+                                //n.SetSourceSide(true);
+                                n.SetInFlow(Math.Min(p.InFlow, e.Capacity));
+                                graph.ChangeLabel(n, true, p.Label + 1);
                                 n.SetPreviousNode(p);
-                                graph.AddLast(n);
-                                //graph.AddLast(p);
+                                n.SetPreviousEdge(e);
                                 e.SetReversed(false);
-                                //p.SetInFlow(f);
-                                return (f, n);
+                                n.SetValid(true);
+                                codaSource.Enqueue(n);
                             }
                         }
-                        //p.SetSourceSide(false);
-                        p.SetInFlow(Math.Min(e.Capacity, n.InFlow));
-                        p.SetNextEdge(e);
-                        p.SetNextNode(n);
-                        graph.ChangeLabel(p, false, n.Label + 1);
-                        e.SetReversed(false);
-                        p.SetValid(true);
-                        codaSink.Enqueue(p);
-                    }
-                    else if (elementSink == p && e.Flow > 0)
-                    {
-                        if (n.InFlow != 0)
-                            if (!n.SourceSide)
+                        else if (elementSource == n && e.Flow > 0)
+                        {
+                            if (p.InFlow != 0)
                             {
-                                continue;
+                                if (!p.SourceSide)
+                                {
+                                    int f = Math.Min(p.InFlow, n.InFlow);
+                                    f = Math.Min(f, e.Flow);
+                                    if (f == 0)
+                                        continue;
+                                    p.SetPreviousNode(n);
+                                    p.SetPreviousEdge(e);
+                                    graph.AddLast(p);
+                                    //graph.AddLast(n);
+                                    e.SetReversed(true);
+                                    //p.SetInFlow(f);
+                                    return (f, p);
+                                }
                             }
                             else
                             {
-                                int f = Math.Min(p.InFlow, n.InFlow);
-                                f = Math.Min(f, e.Flow);
-                                if (f == 0)
-                                    continue;
+                                p.SetInFlow(Math.Min(n.InFlow, e.Flow));
+                                graph.ChangeLabel(p, true, n.Label + 1);
                                 p.SetPreviousEdge(e);
                                 p.SetPreviousNode(n);
-                                //graph.AddLast(n);
-                                graph.AddLast(p);
                                 e.SetReversed(true);
-                                //n.SetInFlow(f);
-                                return (f, p);
+                                p.SetValid(true);
+                                codaSource.Enqueue(p);
                             }
-                        //n.SetSourceSide(false);
-                        n.SetInFlow(Math.Min(e.Flow, p.InFlow));
-                        n.SetNextEdge(e);
-                        n.SetNextNode(p);
-                        graph.ChangeLabel(n, false, p.Label + 1);
-                        e.SetReversed(true);
-                        n.SetValid(true);
-                        codaSink.Enqueue(n);
+                        }
+                    }
+                    if (codaEdgeSink.Count > 0)
+                    {
+                        var e = codaEdgeSink.Dequeue();
+                        var p = e.PreviousNode;
+                        var n = e.NextNode;
+#if DEBUG
+                        if (e.Capacity < 0 || e.Flow < 0)
+                            throw new InvalidOperationException("capacità negativa");
+#endif
+                        if (elementSink == n && e.Capacity > 0)
+                        {
+                            if (p.InFlow != 0)
+                            {
+                                if (!p.SourceSide)
+                                {
+                                    continue;
+                                }
+                                else
+                                {
+                                    int f = Math.Min(p.InFlow, n.InFlow);
+                                    f = Math.Min(f, e.Capacity);
+                                    if (f == 0)
+                                        continue;
+                                    n.SetPreviousEdge(e);
+                                    n.SetPreviousNode(p);
+                                    graph.AddLast(n);
+                                    //graph.AddLast(p);
+                                    e.SetReversed(false);
+                                    //p.SetInFlow(f);
+                                    return (f, n);
+                                }
+                            }
+                            //p.SetSourceSide(false);
+                            p.SetInFlow(Math.Min(e.Capacity, n.InFlow));
+                            p.SetNextEdge(e);
+                            p.SetNextNode(n);
+                            graph.ChangeLabel(p, false, n.Label + 1);
+                            e.SetReversed(false);
+                            p.SetValid(true);
+                            codaSink.Enqueue(p);
+                        }
+                        else if (elementSink == p && e.Flow > 0)
+                        {
+                            if (n.InFlow != 0)
+                                if (!n.SourceSide)
+                                {
+                                    continue;
+                                }
+                                else
+                                {
+                                    int f = Math.Min(p.InFlow, n.InFlow);
+                                    f = Math.Min(f, e.Flow);
+                                    if (f == 0)
+                                        continue;
+                                    p.SetPreviousEdge(e);
+                                    p.SetPreviousNode(n);
+                                    //graph.AddLast(n);
+                                    graph.AddLast(p);
+                                    e.SetReversed(true);
+                                    //n.SetInFlow(f);
+                                    return (f, p);
+                                }
+                            //n.SetSourceSide(false);
+                            n.SetInFlow(Math.Min(e.Flow, p.InFlow));
+                            n.SetNextEdge(e);
+                            n.SetNextNode(p);
+                            graph.ChangeLabel(n, false, p.Label + 1);
+                            e.SetReversed(true);
+                            n.SetValid(true);
+                            codaSink.Enqueue(n);
+                        }
                     }
 
                 }
             }
             return (0, null);
         }
-        private static (Stack<Node>, Stack<Node>, int) SendFlow(Graph graph, Node n, int f)
+        private static int SendFlow(Graph graph, Node n, int f, Stack<Node> vuotiSource, Stack<Node> vuotiSink)
         {
             var s = graph.Source;
             var t = graph.Sink;
             n.SetInFlow(n.InFlow + f);
-            Stack<Node> vuotiSource = new();
-            Stack<Node> vuotiSink = new();
             Node momsource = n;
             Node momsink = n;
             while (momsource != s)
@@ -596,7 +498,7 @@ namespace Bidirezionale.NodeCount.LastLevelOpt
                 momsink = momsink.NextNode;
 
             }
-            return (vuotiSource, vuotiSink, f);
+            return f;
         }
 
         public static int FlowFordFulkerson(Graph graph)
@@ -613,7 +515,7 @@ namespace Bidirezionale.NodeCount.LastLevelOpt
                     break;
                 vuotiSource.Clear();
                 vuotiSink.Clear();
-                (vuotiSource, vuotiSink, f) = SendFlow(graph, n, f);
+                f = SendFlow(graph, n, f, vuotiSource, vuotiSink);
                 fMax += f;
             }
             return fMax;
