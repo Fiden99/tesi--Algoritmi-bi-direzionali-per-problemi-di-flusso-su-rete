@@ -29,7 +29,7 @@ invio il flusso trovato dal percorso di queste due BFS.
 cancello le informazioni di indirizzamento all'interno di ogni nodo.
 uso l'algoritmo Shortest Augmenting Path, chiamato nel codice Dfs( e SinkDfs per la parte che da sink cerca source).
 Trovato un percorso, restituisco dove sono arrivati i nodi (stesso nodo oppure un nodo potrebbe essere arrivato a \textit{t} o \textit{s}).
-Invio il flusso e, a seconda se ci sono incontrati a metà strada o uno è arrivato a \textit{s/t}, resetto i nodi (o il nodo nel caso solo uno sia arrivato a destinazione) di partenza.
+Invio il flusso e, a seconda se ci sono incontrati a metà strada o uno è arrivato a \textit{s/t}, resetto i nodi (o il nodo nel caso solo uno sia arrivato a destinazione) di partenza e cancello le informazioni di indirizzamento presenti nella coda dei nodi esplorati.
 ripeto ciò finché i nodi che mi restituisce Dfs sono null, in tal caso so che la distanza tra s e t è maggiore al numero di nodi del grafo, quindi non sono più raggiungibili e l'algoritmo è terminato.
 
 \subsection{Dfs e SinkDfs}
@@ -39,7 +39,7 @@ Prendiamo come esempio Dfs per descriverle entrambe.
 Chiamiamo il nodo che sto cercando \textbf{startSource}
 
 Esploro i nodi uscenti dal \textbf{startSource}, se sono idonei (quindi se hanno capacità positiva e la distanza da Sink del nodo esplorato è quella di \textbf{startSource}-1)
-in tal caso aggiorno i dati di \textbf{startSource}, e nel caso il nodo esplorato  sia \textit{t} o già esplorato dalla parte di Sink, ritorno il nodo e il valore che mi sono salvato del flusso inviabile, altrimenti chiamo SinkDfs, con nodo esplorato come nuovo \textbf{startSource}.
+in tal caso aggiorno i dati di \textbf{startSource},li inserisco nella loro apposita coda, e nel caso il nodo esplorato  sia \textit{t} o già esplorato dalla parte di Sink, ritorno il nodo e il valore che mi sono salvato del flusso inviabile, altrimenti chiamo SinkDfs, con nodo esplorato come nuovo \textbf{startSource}.
 Nel caso non trovi nessun arco valido, procede con il retreat.
 
 \subsubsection{Retreat}

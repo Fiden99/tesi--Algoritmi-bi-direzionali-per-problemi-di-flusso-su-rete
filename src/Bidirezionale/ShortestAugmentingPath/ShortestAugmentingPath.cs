@@ -72,7 +72,6 @@ namespace Bidirezionale.ShortestAugmentingPath
                     m = reached;
                     reached.NextEdge.AddFlow(flow);
                     reached = reached.NextNode;
-                    m.Reset();
                 }
             }
             else if (reached is SinkNode)
@@ -82,7 +81,6 @@ namespace Bidirezionale.ShortestAugmentingPath
                     m = reached;
                     reached.PreviousEdge.AddFlow(flow);
                     reached = reached.PreviousNode;
-                    m.Reset();
                 }
             }
             else
@@ -94,14 +92,12 @@ namespace Bidirezionale.ShortestAugmentingPath
                     m = reached;
                     reached.PreviousEdge.AddFlow(flow);
                     reached = reached.PreviousNode;
-                    m.Reset();
                 }
                 while (mom is not SinkNode)
                 {
                     m = mom;
                     mom.NextEdge.AddFlow(flow);
                     mom = mom.NextNode;
-                    m.Reset();
                 }
             }
         }
@@ -112,6 +108,8 @@ namespace Bidirezionale.ShortestAugmentingPath
             Node t = graph.Sink;
             Node startSource = s;
             Node startSink = t;
+            Queue<Node> codaSource = new();
+            Queue<Node> codaSink = new();
             int fMax = BfsFromSource(s);
             SendFlow(t, fMax);
             int f = BfsFromSink(t);
@@ -122,7 +120,7 @@ namespace Bidirezionale.ShortestAugmentingPath
             int fso = int.MaxValue, fsi = int.MaxValue;
             while (f != 0 && s.SinkDistance < graph.Nodes.Count && t.SourceDistance < graph.Nodes.Count)
             {
-                (fso, fsi, startSource, startSink) = Dfs(graph, startSource, startSink, fso, fsi);
+                (fso, fsi, startSource, startSink) = Dfs(graph, startSource, startSink, fso, fsi, codaSource, codaSink);
 
                 if (startSink == startSource && startSink != null)
                 {
@@ -132,6 +130,11 @@ namespace Bidirezionale.ShortestAugmentingPath
                     fsi = int.MaxValue;
                     startSink = t;
                     startSource = s;
+                    while (codaSource.Count > 0)
+                        codaSource.Dequeue().Reset();
+                    while (codaSink.Count > 0)
+                        codaSink.Dequeue().Reset();
+
                 }
                 else if (startSink is SourceNode)
                 {
@@ -139,6 +142,8 @@ namespace Bidirezionale.ShortestAugmentingPath
                     SendFlow(startSink, f);
                     fsi = int.MaxValue;
                     startSink = t;
+                    while (codaSink.Count > 0)
+                        codaSink.Dequeue().Reset();
                 }
                 else if (startSource is SinkNode)
                 {
@@ -146,17 +151,18 @@ namespace Bidirezionale.ShortestAugmentingPath
                     SendFlow(startSource, f);
                     fso = int.MaxValue;
                     startSource = s;
+                    while (codaSource.Count > 0)
+                        codaSource.Dequeue().Reset();
                 }
                 else
                     break;
                 fMax += f;
-                //TODO valutare se è necessario fare un reset a tutti i nodi una volta trovato il percorso
             }
             return fMax;
         }
 
 
-        private static (int, int, Node, Node) Dfs(Graph graph, Node startSource, Node startSink, int sourceflow, int sinkflow)
+        private static (int, int, Node, Node) Dfs(Graph graph, Node startSource, Node startSink, int sourceflow, int sinkflow, Queue<Node> codaSource, Queue<Node> codaSink)
         {
             if (startSink == startSource)
                 return (sourceflow, sinkflow, startSource, startSink);
@@ -170,12 +176,13 @@ namespace Bidirezionale.ShortestAugmentingPath
                     {
                         sourceflow = Math.Min(sourceflow, e.Capacity);
                         //e.SetReversed(false);
+                        codaSource.Enqueue(n);
                         n.SetPrevious(e);
                         if (n is SinkNode)
                             return (sourceflow, sinkflow, n, startSink);
                         if (n.NextEdge != null)
                             return (sourceflow, sinkflow, n, n);
-                        return SinkDfs(graph, n, startSink, sourceflow, sinkflow);
+                        return SinkDfs(graph, n, startSink, sourceflow, sinkflow, codaSource, codaSink);
                     }
                 }
                 int min = int.MaxValue - 1;
@@ -184,12 +191,11 @@ namespace Bidirezionale.ShortestAugmentingPath
                         min = Math.Min(min, e.NextNode.SinkDistance);
                 startSource.SetSinkDistance(min + 1);
                 Node mom = startSource is SourceNode ? startSource : startSource.PreviousNode;
-                startSource.Reset();
-                return Dfs(graph, mom, startSink, sourceflow, sinkflow);
+                return Dfs(graph, mom, startSink, sourceflow, sinkflow, codaSource, codaSink);
             }
             return (0, 0, null, null);
         }
-        private static (int, int, Node, Node) SinkDfs(Graph graph, Node startSource, Node startSink, int sourceflow, int sinkflow)
+        private static (int, int, Node, Node) SinkDfs(Graph graph, Node startSource, Node startSink, int sourceflow, int sinkflow, Queue<Node> codaSource, Queue<Node> codaSink)
         {
             if (startSink == startSource)
                 return (sourceflow, sinkflow, startSource, startSink);
@@ -204,11 +210,12 @@ namespace Bidirezionale.ShortestAugmentingPath
                         sinkflow = Math.Min(sinkflow, e.Capacity);
                         //e.SetReversed(false);
                         p.SetNext(e);
+                        codaSink.Enqueue(p);
                         if (p is SourceNode)
                             return (sourceflow, sinkflow, startSource, p);
                         if (p.PreviousEdge != null)
                             return (sourceflow, sinkflow, p, p);
-                        return Dfs(graph, startSource, p, sourceflow, sinkflow);
+                        return Dfs(graph, startSource, p, sourceflow, sinkflow, codaSource, codaSink);
                     }
                 }
                 //retreat
@@ -224,8 +231,7 @@ namespace Bidirezionale.ShortestAugmentingPath
                     mom = startSink;
                 else
                     mom = startSink.NextNode;
-                startSink.Reset();
-                return SinkDfs(graph, startSource, mom, sourceflow, sinkflow);
+                return SinkDfs(graph, startSource, mom, sourceflow, sinkflow, codaSource, codaSink);
             }
             return (0, 0, null, null);
         }
