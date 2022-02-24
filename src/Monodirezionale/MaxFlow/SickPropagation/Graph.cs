@@ -90,8 +90,8 @@ namespace Monodirezionale.MaxFlow.SickPropagation
             if (!this.InvalidNodes.Add(node))
                 throw new ArgumentException("nodo già inserito già inserito in invalidNode");
             node.SetVisited(false);
-            node.SetPreviousNode(null);
-            node.SetPreviousEdge(null);
+            //node.SetPreviousNode(null);
+            //node.SetPreviousEdge(null);
             node.SetValid(false);
         }
 

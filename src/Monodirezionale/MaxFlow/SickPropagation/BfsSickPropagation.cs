@@ -7,7 +7,7 @@ namespace Monodirezionale.MaxFlow.SickPropagation
 {
     public class BfsSickPropagation
     {
-        private static int SickPropagation(Graph grafo, Node node, Queue<Node> coda)
+        private static void SickPropagation(Graph grafo, Node node, Queue<Node> coda)
         {
             Queue<Node> malati = new();
             malati.Enqueue(node);
@@ -29,16 +29,12 @@ namespace Monodirezionale.MaxFlow.SickPropagation
                             malati.Enqueue(p);
                     }
                 else if (m is SinkNode)
-                {
-                    var n = GetFlow(m);
-                    return n;//RecoverFlow(m);
-                }
+                    return;
                 else
                 {
                     coda.Enqueue(m);
                 }
             }
-            return 0;
         }
         private static bool Repair(Graph grafo, Node node)
         {
@@ -166,9 +162,7 @@ namespace Monodirezionale.MaxFlow.SickPropagation
                 while (malati.Count > 0)
                 {
                     var noCap = malati.Dequeue();
-                    int v = SickPropagation(grafo, noCap, coda);
-                    if (v != 0)
-                        return v;
+                    SickPropagation(grafo, noCap, coda);
                     if (first)
                         x = noCap;
                     first = false;
