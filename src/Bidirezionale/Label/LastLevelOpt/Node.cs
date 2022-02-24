@@ -31,6 +31,7 @@ namespace Bidirezionale.Label.LastLevelOpt
         }
         public (bool, bool) AddFlow(int flow)
         {
+            bool invalid = false;
             int f, c;
             if (this.Reversed == false)
             {
@@ -43,10 +44,10 @@ namespace Bidirezionale.Label.LastLevelOpt
                 c = this.Capacity + flow;
             }
             if (f < 0 || c < 0)
-                return (false, true);
+                invalid = true;
             this.SetCapacity(c);
             this.SetFlow(f);
-            return (c == 0, false);
+            return (c == 0, invalid);
         }
     }
 

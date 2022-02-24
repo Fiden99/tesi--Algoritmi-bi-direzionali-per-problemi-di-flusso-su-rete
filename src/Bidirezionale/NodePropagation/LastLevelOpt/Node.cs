@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.Net.Mail;
 
 namespace Bidirezionale.NodePropagation.LastLevelOpt
 {
@@ -33,8 +31,9 @@ namespace Bidirezionale.NodePropagation.LastLevelOpt
         }
         public (bool, bool) AddFlow(int flow)
         {
+            bool invalid = false;
             int f, c;
-            if (this.Reversed == false)
+            if (!this.Reversed)
             {
                 f = this.Flow + flow;
                 c = this.Capacity - flow;
@@ -45,10 +44,10 @@ namespace Bidirezionale.NodePropagation.LastLevelOpt
                 c = this.Capacity + flow;
             }
             if (f < 0 || c < 0)
-                return (false, true);
+                invalid = true;
             this.SetCapacity(c);
             this.SetFlow(f);
-            return (c == 0, false);
+            return (c == 0, invalid);
         }
     }
 
