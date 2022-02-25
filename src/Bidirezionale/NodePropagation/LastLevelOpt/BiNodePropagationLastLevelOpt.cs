@@ -472,7 +472,7 @@ namespace Bidirezionale.NodePropagation.LastLevelOpt
                             vuotiSink.Clear();
                             int flowError = GetFlow(t, n).InFlow;
                             Node mom = n;
-                            while (mom != momsink)
+                            while (mom != momsink.NextNode)
                             {
                                 mom.SetInFlow(mom.InFlow - flowError);
                                 mom.NextEdge.AddFlow(flowError);

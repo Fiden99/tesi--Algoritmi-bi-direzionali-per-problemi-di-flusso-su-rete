@@ -40,7 +40,7 @@
         \STATE $vuotiSource.$Clear()
         \STATE $flowError \leftarrow $GetFlow$(s,n).$flussoPassante
         \STATE $mom \leftarrow n$
-        \WHILE{$ mom \ne momsource$}
+        \WHILE{$ mom \ne momsource.previousNode$}
         \STATE $mom.$flussoPassante $\leftarrow mom.$flussoPassante - flowError
         \STATE $mom.$PreviousEdge.addFlow$(flowError)$
         \STATE $mom \leftarrow mom.$previousNode
@@ -67,7 +67,7 @@
         \STATE $vuotiSink.$Clear()
         \STATE $flowError \leftarrow $GetFlow$(t,n).$flussoPassante
         \STATE $mom \leftarrow n$
-        \WHILE{$ mom \ne momsink$}
+        \WHILE{$ mom \ne momsink.nextNode$}
         \STATE $mom.$flussoPassante $\leftarrow mom.$flussoPassante - flowError
         \STATE $mom.$nextEdge.addFlow$(flowError)$
         \STATE $mom \leftarrow mom.$nextNode
