@@ -1,11 +1,12 @@
+
 using System;
 using System.Diagnostics;
-using Bidirezionale.Label.SickPropagation;
+using Bidirezionale.NodePropagation.SickPropagation;
 using Xunit;
 
-namespace Bidirezionale.Label.Tests;
+namespace Bidirezionale.NodePropagation.Tests;
 
-public class SickPropagationTests
+public class BiNodePropagationSickPropagationTests
 {
     [Fact]
     public void TestBase()
@@ -26,7 +27,7 @@ public class SickPropagationTests
         Graph graph = new Graph(s, n2, n3, n4, n5, n6, t);
         var watch = new Stopwatch();
         watch.Start();
-        var res = BiLabelSickPropagation.FlowFordFulkerson(graph);
+        var res = BiNodePropagationSickPropagation.FlowFordFulkerson(graph);
         watch.Stop();
         Console.WriteLine($"Execution Time: {watch.ElapsedMilliseconds} ms");
         Assert.Equal(35, res);
@@ -59,7 +60,7 @@ public class SickPropagationTests
         Graph graph = new Graph(s, n1, n2, n3, n4, n5, n6, n7, n8, n9, t);
         var watch = new Stopwatch();
         watch.Start();
-        var res = BiLabelSickPropagation.FlowFordFulkerson(graph);
+        var res = BiNodePropagationSickPropagation.FlowFordFulkerson(graph);
         watch.Stop();
         Console.WriteLine($"Execution Time: {watch.ElapsedMilliseconds} ms");
         Assert.Equal(60, res);
@@ -91,7 +92,7 @@ public class SickPropagationTests
         Graph graph = new Graph(s, n1, n2, n3, n4, n5, n6, n7, n8, n9, t);
         var watch = new Stopwatch();
         watch.Start();
-        var res = BiLabelSickPropagation.FlowFordFulkerson(graph);
+        var res = BiNodePropagationSickPropagation.FlowFordFulkerson(graph);
         watch.Stop();
         Console.WriteLine($"Execution Time: {watch.ElapsedMilliseconds} ms");
         Assert.Equal(50, res);
@@ -123,7 +124,7 @@ public class SickPropagationTests
         Graph graph = new Graph(s, n1, n2, n3, n4, n5, n6, n7, n8, n9, t);
         var watch = new Stopwatch();
         watch.Start();
-        var res = BiLabelSickPropagation.FlowFordFulkerson(graph);
+        var res = BiNodePropagationSickPropagation.FlowFordFulkerson(graph);
         watch.Stop();
         Console.WriteLine($"Execution Time: {watch.ElapsedMilliseconds} ms");
         Assert.Equal(30, res);
@@ -155,7 +156,7 @@ public class SickPropagationTests
         Graph graph = new Graph(s, n1, n2, n3, n4, n5, n6, n7, n8, n9, t);
         var watch = new Stopwatch();
         watch.Start();
-        var res = BiLabelSickPropagation.FlowFordFulkerson(graph);
+        var res = BiNodePropagationSickPropagation.FlowFordFulkerson(graph);
         watch.Stop();
         Console.WriteLine($"Execution Time: {watch.ElapsedMilliseconds} ms");
         Assert.Equal(60, res);
@@ -206,7 +207,7 @@ public class SickPropagationTests
 
         var watch = new Stopwatch();
         watch.Start();
-        var res = BiLabelSickPropagation.FlowFordFulkerson(graph);
+        var res = BiNodePropagationSickPropagation.FlowFordFulkerson(graph);
         watch.Stop();
         Console.WriteLine($"Execution Time: {watch.ElapsedMilliseconds} ms");
         Assert.Equal(35, res);

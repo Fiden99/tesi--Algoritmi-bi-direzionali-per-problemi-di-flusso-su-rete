@@ -1,11 +1,12 @@
+
 using System;
 using System.Diagnostics;
-using Bidirezionale.NodePropagation.LastLevelOptEdgeFlow;
+using Bidirezionale.NodeCount.SickPropagation;
 using Xunit;
 
-namespace Bidirezionale.NodePropagation.Tests;
+namespace Bidirezionale.NodeCount.Tests;
 
-public class LastLevelOptEdgeTests
+public class BiNodeCountSickPropagationTets
 {
     [Fact]
     public void TestBase()
@@ -26,10 +27,9 @@ public class LastLevelOptEdgeTests
         Graph graph = new Graph(s, n2, n3, n4, n5, n6, t);
         var watch = new Stopwatch();
         watch.Start();
-        var res = BiNodePropagationLastLevelOpt.FlowFordFulkerson(graph);
+        var res = BiNodeCountSickPropagation.FlowFordFulkerson(graph);
         watch.Stop();
         Console.WriteLine($"Execution Time: {watch.ElapsedMilliseconds} ms");
-
         Assert.Equal(35, res);
     }
 
@@ -60,7 +60,7 @@ public class LastLevelOptEdgeTests
         Graph graph = new Graph(s, n1, n2, n3, n4, n5, n6, n7, n8, n9, t);
         var watch = new Stopwatch();
         watch.Start();
-        var res = BiNodePropagationLastLevelOpt.FlowFordFulkerson(graph);
+        var res = BiNodeCountSickPropagation.FlowFordFulkerson(graph);
         watch.Stop();
         Console.WriteLine($"Execution Time: {watch.ElapsedMilliseconds} ms");
         Assert.Equal(60, res);
@@ -92,7 +92,7 @@ public class LastLevelOptEdgeTests
         Graph graph = new Graph(s, n1, n2, n3, n4, n5, n6, n7, n8, n9, t);
         var watch = new Stopwatch();
         watch.Start();
-        var res = BiNodePropagationLastLevelOpt.FlowFordFulkerson(graph);
+        var res = BiNodeCountSickPropagation.FlowFordFulkerson(graph);
         watch.Stop();
         Console.WriteLine($"Execution Time: {watch.ElapsedMilliseconds} ms");
         Assert.Equal(50, res);
@@ -124,7 +124,7 @@ public class LastLevelOptEdgeTests
         Graph graph = new Graph(s, n1, n2, n3, n4, n5, n6, n7, n8, n9, t);
         var watch = new Stopwatch();
         watch.Start();
-        var res = BiNodePropagationLastLevelOpt.FlowFordFulkerson(graph);
+        var res = BiNodeCountSickPropagation.FlowFordFulkerson(graph);
         watch.Stop();
         Console.WriteLine($"Execution Time: {watch.ElapsedMilliseconds} ms");
         Assert.Equal(30, res);
@@ -156,7 +156,7 @@ public class LastLevelOptEdgeTests
         Graph graph = new Graph(s, n1, n2, n3, n4, n5, n6, n7, n8, n9, t);
         var watch = new Stopwatch();
         watch.Start();
-        var res = BiNodePropagationLastLevelOpt.FlowFordFulkerson(graph);
+        var res = BiNodeCountSickPropagation.FlowFordFulkerson(graph);
         watch.Stop();
         Console.WriteLine($"Execution Time: {watch.ElapsedMilliseconds} ms");
         Assert.Equal(60, res);
@@ -204,9 +204,10 @@ public class LastLevelOptEdgeTests
         t.AddEdge(n17, 100);
         n17.AddEdge(n14, 100);
         Graph graph = new Graph(s, n1, n2, n3, n4, n5, n6, n7, n8, n9, n10, n11, n12, n13, n14, n15, n16, n17, t);
+
         var watch = new Stopwatch();
         watch.Start();
-        var res = BiNodePropagationLastLevelOpt.FlowFordFulkerson(graph);
+        var res = BiNodeCountSickPropagation.FlowFordFulkerson(graph);
         watch.Stop();
         Console.WriteLine($"Execution Time: {watch.ElapsedMilliseconds} ms");
         Assert.Equal(35, res);

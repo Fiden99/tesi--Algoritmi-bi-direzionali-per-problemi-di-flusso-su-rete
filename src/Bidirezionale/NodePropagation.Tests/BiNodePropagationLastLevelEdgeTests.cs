@@ -1,11 +1,11 @@
 using System;
 using System.Diagnostics;
-using Bidirezionale.NodePropagation.NoOpt;
+using Bidirezionale.NodePropagation.LastLevelOptEdgeFlow;
 using Xunit;
 
 namespace Bidirezionale.NodePropagation.Tests;
 
-public class NoOptTests
+public class BiNodePropagationLastLevelOptEdgeTests
 {
     [Fact]
     public void TestBase()
@@ -26,9 +26,10 @@ public class NoOptTests
         Graph graph = new Graph(s, n2, n3, n4, n5, n6, t);
         var watch = new Stopwatch();
         watch.Start();
-        var res = BiNodePropagationNoOpt.FlowFordFulkerson(graph);
+        var res = BiNodePropagationLastLevelOpt.FlowFordFulkerson(graph);
         watch.Stop();
         Console.WriteLine($"Execution Time: {watch.ElapsedMilliseconds} ms");
+
         Assert.Equal(35, res);
     }
 
@@ -59,7 +60,7 @@ public class NoOptTests
         Graph graph = new Graph(s, n1, n2, n3, n4, n5, n6, n7, n8, n9, t);
         var watch = new Stopwatch();
         watch.Start();
-        var res = BiNodePropagationNoOpt.FlowFordFulkerson(graph);
+        var res = BiNodePropagationLastLevelOpt.FlowFordFulkerson(graph);
         watch.Stop();
         Console.WriteLine($"Execution Time: {watch.ElapsedMilliseconds} ms");
         Assert.Equal(60, res);
@@ -88,10 +89,10 @@ public class NoOptTests
         n2.AddEdge(n4, 10);
         n1.AddEdge((n4, 10), (n5, 10));
         s.AddEdge((n1, 30), (n2, 30), (n3, 30));
-        NoOpt.Graph graph = new NoOpt.Graph(s, n1, n2, n3, n4, n5, n6, n7, n8, n9, t);
+        Graph graph = new Graph(s, n1, n2, n3, n4, n5, n6, n7, n8, n9, t);
         var watch = new Stopwatch();
         watch.Start();
-        var res = BiNodePropagationNoOpt.FlowFordFulkerson(graph);
+        var res = BiNodePropagationLastLevelOpt.FlowFordFulkerson(graph);
         watch.Stop();
         Console.WriteLine($"Execution Time: {watch.ElapsedMilliseconds} ms");
         Assert.Equal(50, res);
@@ -120,10 +121,10 @@ public class NoOptTests
         n2.AddEdge(n5, 20);
         n1.AddEdge((n4, 20), (n6, 20));
         s.AddEdge((n1, 10), (n2, 10), (n3, 10));
-        NoOpt.Graph graph = new NoOpt.Graph(s, n1, n2, n3, n4, n5, n6, n7, n8, n9, t);
+        Graph graph = new Graph(s, n1, n2, n3, n4, n5, n6, n7, n8, n9, t);
         var watch = new Stopwatch();
         watch.Start();
-        var res = BiNodePropagationNoOpt.FlowFordFulkerson(graph);
+        var res = BiNodePropagationLastLevelOpt.FlowFordFulkerson(graph);
         watch.Stop();
         Console.WriteLine($"Execution Time: {watch.ElapsedMilliseconds} ms");
         Assert.Equal(30, res);
@@ -152,10 +153,10 @@ public class NoOptTests
         n2.AddEdge((n3, 20), (n4, 10), (n6, 10));
         n1.AddEdge((n2, 30), (n6, 40));
         s.AddEdge((n1, 50), (n4, 20));
-        NoOpt.Graph graph = new NoOpt.Graph(s, n1, n2, n3, n4, n5, n6, n7, n8, n9, t);
+        Graph graph = new Graph(s, n1, n2, n3, n4, n5, n6, n7, n8, n9, t);
         var watch = new Stopwatch();
         watch.Start();
-        var res = BiNodePropagationNoOpt.FlowFordFulkerson(graph);
+        var res = BiNodePropagationLastLevelOpt.FlowFordFulkerson(graph);
         watch.Stop();
         Console.WriteLine($"Execution Time: {watch.ElapsedMilliseconds} ms");
         Assert.Equal(60, res);
@@ -203,10 +204,9 @@ public class NoOptTests
         t.AddEdge(n17, 100);
         n17.AddEdge(n14, 100);
         Graph graph = new Graph(s, n1, n2, n3, n4, n5, n6, n7, n8, n9, n10, n11, n12, n13, n14, n15, n16, n17, t);
-
         var watch = new Stopwatch();
         watch.Start();
-        var res = BiNodePropagationNoOpt.FlowFordFulkerson(graph);
+        var res = BiNodePropagationLastLevelOpt.FlowFordFulkerson(graph);
         watch.Stop();
         Console.WriteLine($"Execution Time: {watch.ElapsedMilliseconds} ms");
         Assert.Equal(35, res);
