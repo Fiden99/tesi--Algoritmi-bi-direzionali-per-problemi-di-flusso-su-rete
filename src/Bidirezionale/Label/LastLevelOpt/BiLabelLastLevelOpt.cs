@@ -493,7 +493,7 @@ namespace Bidirezionale.Label.LastLevelOpt
                             vuotiSource.Clear();
                             int flowError = GetFlow(s, n).InFlow;
                             Node mom = n;
-                            while (mom != momsource)
+                            while (mom != momsource.PreviousNode)
                             {
                                 mom.SetInFlow(mom.InFlow - flowError);
                                 mom.PreviousEdge.AddFlow(flowError);
@@ -518,7 +518,7 @@ namespace Bidirezionale.Label.LastLevelOpt
                             vuotiSink.Clear();
                             int flowError = GetFlow(t, n).InFlow;
                             Node mom = n;
-                            while (mom != momsink)
+                            while (mom != momsink.NextNode)
                             {
                                 mom.SetInFlow(mom.InFlow - flowError);
                                 mom.NextEdge.AddFlow(flowError);
