@@ -1,0 +1,628 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{algorithm}
+%\usepackage{algorithmic}
+\usepackage{algcompatible}
+\usepackage{amsmath}
+
+\title{algoritmi bidirezionali}
+\author{Filippo Magi }
+
+\begin{document}
+
+\section{Ottimizzazione con propagazione della malattia}
+\subsection{FlowFordFulkerson}
+
+
+\begin{algorithm}[htp!]
+
+    \caption{Ricerca del flusso massimo}
+    \begin{algorithmic}[1]
+        \REQUIRE rete $(G,u,s,t)$
+        \ENSURE valore del flusso massimo
+        \STATE $vuotiSouce \leftarrow  $ pila di nodi
+        \STATE $vuotiSink \leftarrow $ pila di nodi
+        \STATE $fMax \leftarrow 0$
+        \STATE $vuotiSouce.push(s)$
+        \STATE $vuotiSink.push(t)$
+        \WHILE{TRUE}
+        \STATE $(f,n) \leftarrow$ DoBfs(G, vuotiSource,vuotiSink)
+        \IF{$f = 0$}
+        \STATE \textbf{break}
+        \ENDIF
+        \STATE $vuotiSouce.$Clear() \COMMENT{elimino il contenuto della pila, in maniera da averla vuota}
+        \STATE $vuotiSink.$Clear()
+        %TODO migliorare questo stato, spiegando meglio e in meno parole la seguente istruzione n.SetInFlow(n.InFlow + f);
+        \STATE $n$.flussoPassante $\leftarrow n.$flussoPassante + f
+        \STATE $momSource \leftarrow n$
+        \STATE $momSink \leftarrow n$
+        \WHILE{$momSource \ne s$}
+        \STATE $momSource$.previousEdge.addFlow$(f)$ \COMMENT{invio una quantità di flusso f nell'arco indicato}
+        \IF{$u_f(momSource$.previousEdge $) < 0 \lor f(momSource$.previousEdge )$ < 0$ }
+        \STATE $vuotiSource.$Clear()
+        \STATE $flowError \leftarrow $GetFlow$(s,n).$flussoPassante \COMMENT{si fa notare che il valore di flowError deve essere negativo}
+        \STATE $mom \leftarrow n$
+        \WHILE{$ mom \ne momsource.previousNode$}
+        \STATE $mom.$flussoPassante $\leftarrow mom.$flussoPassante - flowError
+        \STATE $mom.$PreviousEdge.addFlow$(flowError)$
+        \STATE $mom \leftarrow mom.$previousNode
+        \ENDWHILE
+        \STATE $vuotiSource.$push(momSource)
+        \STATE $momSource.valid \leftarrow$ false
+        \STATE $f \leftarrow f + flowError$
+        \ELSIF{$u_f(momSource$.previousEdge$) = 0$}
+        \STATE $momSource.valid \leftarrow$ false
+        \STATE $vuotiSource.push(momSource)$
+        \ENDIF
+        \STATE $momSource.$flussoPassante $\leftarrow momSource.$flussoPassante-f
+        \STATE $momSource \leftarrow momSource.$previousNode
+        \ENDWHILE
+        \algstore{finishedSourceSideSendFlow}
+    \end{algorithmic}
+\end{algorithm}
+\begin{algorithm}
+    \begin{algorithmic}
+        \algrestore{finishedSourceSideSendFlow}
+        \WHILE{ $momSink \ne t$}
+        \STATE $momSink$.nextEdge.addFlow($f$)
+        \IF{$u_f(momSink.$nextEdge)$ <0 \lor f(momSink.$nextEdge)$ <0$ }
+        \STATE $vuotiSink.$Clear()
+        \STATE $flowError \leftarrow $GetFlow$(t,n).$flussoPassante
+        \STATE $mom \leftarrow n$
+        \WHILE{$ mom \ne momsink.nextNode$}
+        \STATE $mom.$flussoPassante $\leftarrow mom.$flussoPassante - flowError
+        \STATE $mom.$nextEdge.addFlow$(flowError)$
+        \STATE $mom \leftarrow mom.$nextNode
+        \ENDWHILE
+        \STATE $mom \leftarrow n$
+        \WHILE{$ mom \ne s$}
+        \STATE $mom.$flussoPassante $\leftarrow mom.$flussoPassante - flowError
+        \STATE $mom.$PreviousEdge.addFlow$(flowError)$
+        \STATE $mom \leftarrow mom.$previousNode
+        \ENDWHILE
+        \STATE $vuotiSink.$Push(momSink)
+        \STATE $momSink.valid \leftarrow$ false
+        \STATE $f \leftarrow f + flowError$
+        \ELSIF{$u_f(momSink$.nextEdge$) = 0$}
+        \STATE $momSink.valid \leftarrow$ false
+        \STATE $vuotiSource.push(momSource)$
+        \ENDIF
+        \STATE $momSink$.flussoPassante $\leftarrow$ $momSink$.flussoPassante $-f$
+        \STATE $momSink \leftarrow momSink.$nextNode
+        \ENDWHILE
+        \STATE $fMax \leftarrow fMax + f$
+        \ENDWHILE
+        \STATE \textbf{return} $fMax$
+    \end{algorithmic}
+\end{algorithm}
+
+\subsection{DoBfs}
+
+\begin{algorithm}
+    \caption{DoBfs}
+    \begin{algorithmic}[1]
+        \REQUIRE rete $(G,u,s,t)$, pila $noCapsSource$ con i nodi non più raggiungibili dall'ultima iterazione esplorati da Source, pila $noCapsSink$, con i nodi non più raggiungibili dall'ultima iterazione esplorati da Sink
+        \ENSURE valore del flusso inviabile, nodo intermedio (o di confine) con le informazioni di indirizzamento per l'invio del flussoPassante
+        \STATE \COMMENT{per rendere delle istruzioni leggibili abbrevierò flussoPassante in fP}
+        \STATE $codaSource \leftarrow$ coda di nodi vuota
+        \STATE $codaSink \leftarrow$ coda di nodi vuota
+        \STATE $malati \leftarrow$ coda di nodi vuota
+        \STATE $sourceRepaired \leftarrow noCapsSource.isEmpty$
+        \STATE $sinkRepaired \leftarrow noCapsSink.isEmpty$
+        \STATE \COMMENT{analizzo tutti i nodi malati di source, cercando di ripararli, nel caso non riesca li inserisco nella coda di malati. Nel caso sia riuscito a ripararli tutti, cerco un percorso tra l'ultimo nodo riparato e i nodi di confine}
+        \IF{$\neg noCapsSource.isEmpty$}
+        \STATE $repaired \leftarrow true$
+        \STATE $firstNoCapSource \leftarrow $ null
+        \STATE $p \leftarrow $ null
+        \WHILE{$\neg noCapsSource.isEmpty$}
+        \STATE $noCapSource \leftarrow noCapsSource.$Pop()
+        \STATE GetFlow$(p,noCapSource)$ \COMMENT{aggiorna ricorsivamente inFlow dal nodo p fino al nodo noCapSource}
+        \STATE $p \leftarrow noCapSource$
+        \IF{ $\neg$ RepairNode$(G,noCapSource,$false$)$}
+        \STATE $malati.$enqueue$(noCapSource)$
+        \STATE $repaired \leftarrow $ false
+        \IF{$firstNoCapSource = $ null}
+        \STATE $firstNoCapSource \leftarrow noCapSource$
+        \ENDIF
+        \ENDIF
+        \ENDWHILE
+        \IF{$repaired \land sinkRepaired$}
+        \FORALL{$ n \in V(G) | n.previousEdge \ne null \land n.nextEdge \ne null \land sourceValid \land sinkValid$}
+        \STATE GetFlow$(p,n)$
+        \IF{ $p$ è raggiungile da $n \land n.flussoPassante > 0$ }
+        \IF{$n.nextEdge.reversed$}
+        \STATE \textbf{return} $(\min(n.fP,n.nextNode.fP, f(n.nextEdge)),n)$
+        \ELSE
+        \STATE \textbf{return} $(\min(n.fP,n.nextNode.fP, u_f(n.nextEdge)),n)$
+        \ENDIF
+        \ENDIF
+        \ENDFOR
+        \ENDIF
+        \algstore{halfSourceInit}
+    \end{algorithmic}
+\end{algorithm}
+\newpage
+\begin{algorithm}
+    \begin{algorithmic}
+        \algrestore{halfSourceInit}
+        \STATE \COMMENT{eseguo propagazione della malattia in source,se trova un nodo di confine e lo ripara, lo restituisco (con sinkRepaired = true ), altrimenti cerco tra i nodi di confine un nodo valido e che abbia un percorso tra s e il nodo designato}
+        \STATE $malato \leftarrow$ null
+        \WHILE{$\neg malati.isEmpty$}
+        \STATE $m \leftarrow $ SourceSickPropagation$(G, malati$.dequeue$(),codaSource$)
+        \IF{$m \ne $null $ \land malato \ne null$}
+        \STATE $malato \leftarrow m$
+        \ENDIF
+        \ENDWHILE
+        \IF{$malato \ne null \land sinkRepaired$}
+        \IF{$malato.nextEdge.reversed$}
+        \STATE \textbf{return} $(\min(f(malato.nextEdge),malato.nextNode.fP, malato.fP),malato)$
+        \ELSE
+        \STATE \textbf{return} $(\min(u_f(malato.nextEdge),malato.nextNode.fP, malato.fP),malato)$
+        \ENDIF
+        \ENDIF
+        \IF{$sinkRepaired$}
+        \FORALL{$n \in V(G) | n.sourceValid \land n.nextNode \ne null \land n.nextNode.flussoPassante > 0 \land n.previousNode \ne null \land n.nextEdge.reversed \land f(n.nextEdge) > 0$}
+        \STATE GetFlow$(s,n)$
+        \IF{ho trovato un percorso tra $s$ e $n \land n.flussoPassante > 0$}
+        \STATE \textbf{return} $(\min(n.flussoPassante,f(n.nextEdge),n.nextNode.flussoPassante),n)$
+        \ENDIF
+        \STATE $n.flussoPassante \leftarrow \min(f(n.nextEdge),n.nextNode.flussoPassante)$
+        \ENDFOR
+        \FORALL{$n \in V(G) | n.sourceValid \land n.nextNode \ne null \land n.nextNode.flussoPassante > 0 \land n.previousNode \ne null \land  \neg n.nextEdge.reversed \land u_f(n.nextEdge) > 0$}
+        \STATE GetFlow$(s,n)$
+        \IF{ho trovato un percorso tra $s$ e $n \land n.flussoPassante > 0$}
+        \STATE \textbf{return} $(\min(n.flussoPassante,f_f(n.nextEdge),n.nextNode.flussoPassante),n)$
+        \ENDIF
+        \STATE $n.flussoPassante \leftarrow \min(u_f(n.nextEdge),n.nextNode.flussoPassante)$
+        \ENDFOR
+        \ENDIF
+        \STATE $sourceRepaired \leftarrow repaired $ \COMMENT{inizializzazione coda di source}
+        \IF{$\neg repaired \land codaSource.isEmpty$}
+        \IF{$firstNoCapSource = s$}
+        \STATE $codaSource.$enqueue$(firstNoCapSource)$
+        \ELSIF{$\neg firstNoCapSource.SourceSide$}
+        \FORALL{$n \in V(G) |  n.previousNode \ne null \land n.nextNode \ne null$}
+        \STATE $codaSource.$enqueue$(n)$
+        \ENDFOR
+        \algstore{finishSourceInit}
+    \end{algorithmic}
+\end{algorithm}
+\newpage
+\begin{algorithm}
+    \begin{algorithmic}
+        \algrestore{finishSourceInit}
+        \ELSE
+        \FORALL{$n \in V(G) | n.sourceSide \land n.label = firstNoCapSource.label - 1$}
+        \STATE $codaSource.$enqueue$(n)$
+        \ENDFOR
+        \FORALL{$n \in V(G) | n.sourceside \land n.label \ge firstNoCapSource.label$}
+        \STATE $n.flussoPassante \leftarrow 0$ \COMMENT{indica che il nodo dovrà essere esplroato}
+        \ENDFOR
+        \ENDIF
+        \ENDIF
+        \ENDIF
+        \STATE \COMMENT{ \COMMENT{riparazione nodi e, nel caso riesco a ripararli tutti, invio il flusso trovato}}
+        \IF{$\neg noCapsSink.isEmpty$}
+        \STATE $repaired \leftarrow true$
+        \STATE $firstNoCapSink \leftarrow $ null
+        \STATE $p \leftarrow $ null
+        \WHILE{$\neg noCapsSink.isEmpty$}
+        \STATE $noCapSink \leftarrow noCapsSink$.Pop()
+        \STATE GetFlow$(p,noCapSink)$
+        \STATE $p \leftarrow noCapSink$
+        \IF{RepairNode$(G,noCapSink,$true)}
+        \STATE $malati.$enqueue($noCapSink$)
+        \STATE $repaired \leftarrow $ false
+        \IF{$firstNoCapSink = null $}
+        \STATE $firstNoCapSink \leftarrow noCapSink$
+        \ENDIF
+        \ENDIF
+        \ENDWHILE
+        \IF{$repaired \land sourceRepaired$}
+        \FORALL{$n \in V(G) | n.sourceValid \land n.sinkValid \land n.previousNode \ne null \land n.nextNode \ne null$}
+        \IF{$n.previousEdge.reversed$}
+        \STATE $sourceFlow \leftarrow \min(n.previousNode.fP,f(n.previousEdge))$
+        \ELSE
+        \STATE $sourceFlow \leftarrow \min(n.previousNode.fP,u_f(n.previousEdge))$
+        \ENDIF
+        \STATE GetFlow$(p,n)$
+        \IF{$p$ è raggiungibile da $n \land sourceFlow > 0 \land n.fP > 0$}
+        \STATE \textbf{ return } $(\min(n.flussoPassante,sourceFlow),n)$
+        \ENDIF
+        \ENDFOR
+        \ENDIF
+        \algstore{halfInitSink}
+    \end{algorithmic}
+\end{algorithm}
+\newpage
+\begin{algorithm}
+    \begin{algorithmic}
+        \algrestore{halfInitSink}
+        \STATE \COMMENT{propagazione della malattia, inizializzazione della coda di sink}
+        \STATE $malato \leftarrow $ null
+        \WHILE{$\neg malati.isEmpty$}
+        \STATE $mom \leftarrow $SinkSickPropagation$(G,malati.$dequeue$(),codaSink)$
+        \IF{$mom \ne null \land malato = null$}
+        \STATE $malato \leftarrow mom$
+        \ENDIF
+        \ENDWHILE
+        \IF{$malato \ne null$}
+        \IF{$malato.previousEdge.reversed$}
+        \STATE \textbf{return} $(\min(malato.fP,f(malato.previousEdge),malato.previousNode.fP),malato)$
+        \ELSE
+        \STATE \textbf{return} $(\min(malato.fP,u_f(malato.previousEdge),malato.previousNode.fP),malato)$
+        \ENDIF
+        \ENDIF
+        \FORALL{$n \in V(G) | n.previousNode \ne null \land n.nextNode \ne null \land n.sinkValid \land n.previousNode.flussoPassante > 0 \land n.previousEdge.reversed \land f(n.previousEdge)> 0$}
+        \STATE GetFlow($t,n)$
+        \IF{$t$ è raggiungibile da $n \land n.flussoPassante > 0$}
+        \STATE \textbf{return} $(\min(n.flussoPassante,f(n.previousEdge),n.previousNode.flussoPassante), n)$
+        \ENDIF
+        \ENDFOR
+        \FORALL{$n \in V(G) | n.previousNode \ne null \land n.nextNode \ne null \land n.sinkValid \land n.previousNode.flussoPassante > 0 \land \neg n.previousEdge.reversed \land u_f(n.previousEdge)> 0$}
+        \STATE GetFlow$(t,n)$
+        \IF{$t$ è raggiungibile da $n \land n.flussoPassante > 0$}
+        \STATE \textbf{return} $(\min(n.flussoPassante,u_f(n.previousEdge),n.previousNode.flussoPassante), n)$
+        \ENDIF
+        \ENDFOR
+        \STATE $sinkRepaired \leftarrow repaired$
+        \IF{$ \neg repaired \land codaSink.isEmpty$}
+        \IF{$firstNoCapSink = t$ }
+        \STATE $codaSink.$enqueue($firstNoCapSink$)
+        \ELSE
+        \FORALL{$n \in V(G) | \neg n.sourceside \land n.label = firstNoCapSink.label -1$}
+        \STATE $codaSink.$enqueue$(n)$
+        \ENDFOR
+        \FORALL{$n \in V(G) | \neg n.sourceside \land n.label \ge firstNoCapSink.label $}
+        \STATE $n.flussoPassante \leftarrow 0$
+        \ENDFOR
+        \ENDIF
+        \algstore{FinishSinkInit}
+    \end{algorithmic}
+\end{algorithm}
+\begin{algorithm}
+    \begin{algorithmic}
+        \algrestore{FinishSinkInit}
+        \ENDIF
+        \ENDIF
+        \STATE \COMMENT{esplorazione dei nodi}
+        \WHILE{$\neg codaSink.isEmpty \land \neg codaSource.isEmpty$}
+            \IF{$\neg codaSource.isEmpty \land \neg sourceRepaired$}
+                \STATE $element \leftarrow codaSource.$dequeue()
+                \IF{$\neg element.sourceSide \lor \neg element.sourceValid \lor element.flussoPassante = 0$}
+                    \STATE \textbf{continue}
+                \ENDIF
+                \FORALL{$e \in \delta(element)$}
+                    \STATE $p \leftarrow e.previousNode$
+                    \STATE $n \leftarrow e.nextNode$
+                    \IF{$element = p \land u_f(e) > 0$}
+                        \IF{$n.sourceSide \land n.flussoPassante = 0$}
+                        \STATE $e.reversed \leftarrow $ false
+                            \STATE $n.$update$(p,e)$ \COMMENT{aggiorno flussoPassante,label,indirizzamento e la validità della parte esplorata}
+                            \STATE $codaSource.$enqueue$(n)$
+                        \ELSIF{$n.flussoPassante \ne 0 \land \neg n.sourceSide \land n.sinkValid$}
+                            \STATE $f \leftarrow \min(n.flussoPassante,p.flussoPassante,u_f(e))$
+                            \IF{$f = 0$}
+                                \STATE \textbf{continue}
+                            \ENDIF
+                            \STATE $e.reversed \leftarrow false$
+                            \STATE $n.$updatePath$(p,e)$ \COMMENT{aggiorno indirizzamento, sourcevalid, inserisco il nodo indicato in LastNodesSinkSide, e i nodi a lui collegati esplorati da source in LastNodesSourceSide }
+                            \STATE \textbf{return} $(f,n)$
+                            \ELSIF{$n.flussoPassante = 0 \land \neg n.sourceSide \land sinkRepaired$}
+                            \STATE \COMMENT{nodo non valido dalla parte di sink, cerco di recuperare ripararlo, ma non essendo valido non ha una label a cui fare riferiemento}
+                            \FORALL{$edge \in \delta(n)$}
+                                \IF{$ edge.previousNode = n \land edge.nextNode.flussoPassante > 0 \land \neg edge.nextNode.sourceSide \land u_f(edge) $}
+                                \STATE $edge.reversed \leftarrow$ false
+                                    \STATE $n.$update$(edge.nextNode,edge)$
+                                    \STATE \textbf{break}
+
+
+                            \algstore{halfCapExplorationSource}
+    \end{algorithmic}
+\end{algorithm}
+\begin{algorithm}
+    \begin{algorithmic}
+                            \algrestore{halfCapExplorationSource}   
+                            \ELSIF{$edge.nextNode = n \land edge.previousNode.flussoPassante > 0 \land \neg edge.previousNode.sourceSide \land f(edge) > 0$}
+                            \STATE $edge.reversed \leftarrow$ true
+                                \STATE $n.$update$(edge.previousNode,edge)$
+                                \STATE \textbf{break}
+                            \ENDIF
+                        \ENDFOR     
+                            \IF{$n.flussoPassante > 0$}
+                                \STATE $f \leftarrow \min(n.flussoPassante,p.flussoPassante,u_f(e))$
+                                \IF{$f = 0$}
+                                    \STATE \textbf{continue}
+                                \ENDIF
+                                \STATE $e.reversed \leftarrow false$
+                                \STATE $n.$updatePath$(p,e)$ \COMMENT{aggiorno indirizzamento e sourceValid}
+                                \STATE \textbf{return} $(f,n)$
+                            \ENDIF
+                            \STATE \COMMENT{dato che non è possibile ripararlo, cerco l'ultimo nodo valido nel path che collega a t e obbligo la parte di sink a svolgere una nuova ricerca}
+                            \WHILE{$mom \ne t$}
+                                \IF{$mom.nextEdge.reversed$}
+                                    \IF{$f(mom.nextEdge) = 0$}
+                                        \STATE $malato = mom$
+                                    \ENDIF
+                                \ELSE
+                                    \IF{$u_f(mom.nextEdge) = 0$}
+                                        \STATE $malato = mom$
+                                    \ENDIF
+                                \ENDIF
+                            \ENDWHILE
+                            \STATE $sinkRepaired \leftarrow false$
+                            \FORALL{$node \in V(G) | node.label = malato.label -1$}
+                                \STATE $codaSink$.enqueue$(node)$
+                            \ENDFOR
+                            \FORALL{$node \in V(G) | node.label \ge malato.label$}
+                                \STATE $node.flussoPassante \leftarrow 0$
+                            \ENDFOR                   
+                        \ENDIF
+                    \algstore{finishSoruceCapExploration}
+                \end{algorithmic}
+            \end{algorithm}
+            \newpage
+            \begin{algorithm}
+                \begin{algorithmic}
+                    
+                    \algrestore{finishSoruceCapExploration}
+                    \STATE \COMMENT{stesse valutazione prima fatte, parte che cerca nel grafo dei residui gli archi "inversi", cioè dove riduco il flusso e aumento la capacità}
+                    \ELSIF{$element = n \land f(e) > 0$}    
+                        \IF{$p.sourceSide \land p.flussoPassante = 0$}
+                        \STATE $e.reversed \leftarrow $ true 
+                            \STATE p.$update$(n,e)
+                            \STATE $codaSource.$enqueue$(p)$
+                        \ELSIF{$p.flussoPassante \ne 0 \land \neg p.sourceSide \land p.sinkValid$}    
+                            \STATE $f \leftarrow \min(p.flussoPassante,n.flussoPassante,f(e))$
+                            \IF{$ f = 0$}
+                                \STATE \textbf{continue}
+                            \ENDIF
+                            \STATE $e.reversed \leftarrow$ true
+                            \STATE $p$.updatePath$(n,e)$
+                            \STATE \textbf{ return} $(f,p)$
+                        \ELSIF{$p.flussoPassante = 0 \land \neg p.sourceSide \land sinkRepaired$}
+                            \FORALL{$edge in \delta(p)$}
+                                \IF{$ edge.previousNode = p \land edge.nextNode.flussoPassante > 0 \land \neg edge.nextNode.sourceSide \land u_f(edge)>0$}
+                                    \STATE $edge.reversed \leftarrow $ false 
+                                    \STATE $p.$update$(edge.nextNode,edge)$
+                                    \STATE \textbf{break}
+                                \ELSIF{$edge.nextNode = p \land edge.previousNode.flussoPassante > 0 \land \neg edge.previousNode.sourceSide \land f(edge)$}
+                                    \STATE $edge.reversed \leftarrow true$
+                                    \STATE $p.$update$(edge.previousNode,edge)$
+                                    \STATE \textbf{break}
+                                \ENDIF
+                            \ENDFOR
+                            \IF{$p.flussoPassante > 0$}
+                                \STATE $e.reversed \leftarrow$ true
+                                \STATE $p.$updatePath$(n,e)$
+                                \STATE \textbf{return} $(f,p)$
+                            \ENDIF
+                            \STATE $mom \leftarrow p$
+                            \STATE $malato \leftarrow null$
+                            \algstore{HalfFlowExplorationSource}
+    \end{algorithmic}
+\end{algorithm}
+\newpage
+\begin{algorithm}
+    \begin{algorithmic}
+                            \algrestore{HalfFlowExplorationSource}
+                            \WHILE{$mom \ne t$}
+                                \IF{$mom.nextEdge.reversed$}
+                                    \IF{$f(mom.nextEdge) = 0$}
+                                        \STATE $malato \leftarrow mom$
+                                    \ENDIF
+                                \ELSE
+                                    \IF{$u_f(mom.nextEdge) = 0$}
+                                        \STATE $malato \leftarrow mom$
+                                    \ENDIF
+                                \ENDIF
+                                \STATE $mom \leftarrow mom.nextNode$
+                            \ENDWHILE
+                            \STATE $sinkRepaired \leftarrow $false
+                            \FORALL{$node \in V(G) | node.label = malato.label -1$}
+                                \STATE $codaSink.$enqueue$(node)$
+                            \ENDFOR
+                            \FORALL{$node \in V(G) | node.label \ge malato.label$}
+                                \STATE $node.flussoPassante \leftarrow 0$
+                            \ENDFOR
+                        \ENDIF
+                    \ENDIF
+                \ENDFOR
+                \ELSIF{$\neg codaSink.isEmpty \land \neg sinkRepaired$} \COMMENT{esplorazione della parte di $t$}
+                %riga 484
+                    \STATE $element \leftarrow codaSink.$dequeue()
+                    \IF{$element.sourceSide \lor \neg element.sinkValid \lor element.flussoPassante = 0$}
+                        \STATE \textbf{continue} 
+                    \ENDIF
+    
+                \algstore{FinishSourceExploration}
+            \end{algorithmic}
+        \end{algorithm}
+        \newpage
+        \begin{algorithm}
+            \begin{algorithmic}
+            \algrestore{FinishSourceExploration}
+                \FORALL{$e \in \delta(element)$}
+                    \STATE $p \leftarrow e.previosuNode$
+                    \STATE $n \leftarrow e.nextNode$
+                    \IF{$element = n \land u_f(e)>0$}
+                        \IF{$p.flussoPassante \ne 0)$}
+                            \IF{$\neg p.sourceSide \lor \neg p.sourceValid$}
+                                \STATE \textbf{continue}
+                            \ELSE
+                                \STATE $f \leftarrow \min(p.flussoPassante,n.flussoPassante,u_f(e))$
+                                \IF{$f = 0$}
+                                    \STATE \textbf{continue}
+                                \ENDIF
+                                \STATE $e.reversed \leftarrow$ false
+                                \STATE $n.$updatePath$(p,e)$
+                                \STATE \textbf{return} $(f,n)$
+                            \ENDIF
+                        \ENDIF
+                        \STATE $e.reversed \leftarrow$ false
+                        \STATE $p.$update$(p,e)$
+                        \STATE $codaSink.$enqueue$(p)$
+                    \ELSIF{$element = p \land f(e) > 0$}
+                        \IF{$n.flussoPassante \ne 0$}
+                            \IF{$\neg n.sourceSide \lor \neg n.sourceValid $}
+                                \STATE \textbf{continue}
+                            \ELSE
+                                \STATE $f \leftarrow \min(p.flussoPassante,n.flussoPassante,f(e))$
+                                \IF{$f = 0$}
+                                    \STATE \textbf{continue}
+                                \ENDIF
+                                \STATE $e.reversed \leftarrow$ false
+                                \STATE $p.$updatePath$(n,e)$
+                                \STATE \textbf{return} $(f,p)$
+                            \ENDIF
+                        \ENDIF
+                        \STATE $e.reversed \leftarrow $ true
+                        \STATE $n.$update$(p,e)$
+                        \STATE $codaSink.$enqueue$(n)$
+                    \ENDIF
+                \ENDFOR
+            \ENDIF
+        \ENDWHILE
+        \STATE \textbf{return} $(0,null)$
+    \end{algorithmic}
+\end{algorithm}
+\newpage
+\subsection{SourceSickPropagation}
+\begin{algorithm}
+    \caption {SourceSickPropagation}
+    \begin{algorithmic}
+        \REQUIRE rete $(G,u,s,t)$, nodo $malato$, coda di nodi $codaSource$
+        \ENSURE nodo "di confine" che è sourceValid, null altrimenti
+        \STATE $malati \leftarrow$ coda di nodi
+        \STATE $malati.$enqueue$(malato)$
+        \WHILE{$\neg malati.isEmpty$}
+            \STATE $m \leftarrow malati.$dequeue()
+            \IF{$m.sourceSide \lor LastNodesSinkSide.$contains$(m)$} \COMMENT{se è esplroato da source o è un nodo di confine, il nodo di confine è ottenuto da graph}
+                \STATE RepairNode$(G,m,false)$
+                \IF{non sono riuscito a riparare $m$}
+                    \FORALL{$e \in delta^+(m) | e.nextNode.PreviousEdge = e$} \COMMENT{per ogni arco che esce da m e lo ha come predecessore (o meglio, che ha l'arco considerato come arco predecessore)}
+                        \STATE $malati.$enqueue$(e.nextNode)$
+                    \ENDFOR
+                    \FORALL{$e \in delta^-(m) | e.previousNode.previousEdge = e$} \COMMENT{ per ogni arco che entra in m e ha m come nodo predecessore }
+                        \STATE $malati.$enqueue$(e.previousNode)$
+                    \ENDFOR
+                \ELSIF{$m.nextEdge \ne null \land m.nextNode.flussoPassante > 0 \land ((m.nextEdge.reversed \land f(m.nextEdge)> 0)\lor ((\neg m.nextEdge.reversed \land u_f(m.nextEdge)> 0)))$}
+                    \STATE \textbf{return } $m$
+                \ELSE
+                    \STATE $codaSource.$enqueue$(m)$
+                \ENDIF  
+            \ENDIF    
+        \ENDWHILE
+        \STATE \textbf{return} null
+    \end{algorithmic}
+\end{algorithm}
+
+\newpage
+\subsection{SinkSickPropagation}
+\begin{algorithm}
+    \caption {SinkSickPropagation}
+    \begin{algorithmic}
+        \REQUIRE rete $(G,u,s,t)$,nodo $malato$, coda di nodi $codaSink$
+        \ENSURE nodo "di confine" che è sinkValid, null altrimenti
+        \STATE $malati \leftarrow $coda di nodi
+        \STATE $malati.$enqueue$(malato)$
+        \WHILE{$\neg malati.isEmpty$}
+            \STATE $m \leftarrow malati.$dequeue()
+            \IF{$\neg m.sourceSide$}
+                \STATE RepairNode$(G,m,true)$
+                \IF{non sono riuscito a riaparare $m$}
+                    \FORALL{$e \in delta^+(m) | e.nextNode.nextEdge = e$}
+                        \STATE $malati.$enqueue$(e.nextNode)$
+                    \ENDFOR
+                    \FORALL{$e \in delta^-(m) | e.previousNode.nextEdge = e$}
+                        \STATE $malati.$enqueue$(e.previousNode)$
+                    \ENDFOR
+                \ELSIF{$m.previousEdge \ne null \land m.previousNode.flussoPassante > 0 \land ((m.previousEdge.reversed \land f(m.previousEdge) > 0)\lor(\neg m.previousEdge.reversed \land u_f(m.previousEdge)> 0))$} \COMMENT{il nodo è stato riparato e ha un predecessore valido}
+                    \STATE \textbf{return} $m$
+                \ELSE
+                    \STATE $codasink.$enqueue$(m)$
+                \ENDIF
+            \ENDIF
+        \ENDWHILE
+        \STATE \textbf{return null}
+    \end{algorithmic}
+\end{algorithm}
+\subsection{RepairNode}
+\begin{algorithm}
+    \caption{RepairNode}
+    \begin{algorithmic}
+        \REQUIRE una rete $(G,u,s,t)$, nodo da riparare $node$, booleano per comprendere, nel caso il nodo sia di confine, se riparare sul lato esplorato da source (true) o in quello esplorato da sink (false) $onlySinkExploration$
+        \ENSURE booleano che mi conferma se il nodo è stato riparato o meno
+        \IF{$node = s \lor node = t$}
+            \STATE \textbf{return} false
+        \ENDIF
+        \STATE $pe \leftarrow node.previousEdge$
+        \STATE $ne \leftarrow node.nextEdge$
+        \STATE $pn \leftarrow node.previousNode$
+        \STATE $nn \leftarrow node.nextNode$
+        \IF{$(pe\ne null \land ne \ne null \land pn.sourcevalid \land nn.sinkValid \land ((pe.reversed \land f(pe)> 0)\lor (\neg pe.reversed \land u_f(pe) > 0)) \land ((ne.reversed \land f(ne) > 0) \lor (\neg ne.reversed \land u_f(ne) > 0))) \lor (pe \ne null \land pn.sourceValid \land ((pe.reversed \land f(pe)> 0)\lor (\neg pe.reversed \land u_f(pe) > 0)) \land ne = null) \lor (ne \ne null \land nn.sinkValid \land pe = null \land ((ne.reversed \land f(ne) > 0) \lor (\neg ne.reversed \land u_f(ne) > 0)) ) $ } \COMMENT{il nodo non ha bisogno di essere riparato,viene prima anallizato il nodo di confine, poi il nodo esplorato da source e infine il nodo esplorato da sink (non di confine)}
+            \STATE \textbf{return} true
+        \ENDIF
+        \IF{$node.sourceSide$}
+            \FORALL{$e \in \delta(node)$}
+                \STATE $p \leftarrow e.previousNode$
+                \STATE $n \leftarrow e.nextNode$
+                \IF{$p.sourceSide \ne n.sourceSide$} \COMMENT{verrano anallizati per i nodi di confine con onlySinkExploration true}
+                    \STATE \textbf{continue}
+                \ENDIF
+                \IF{$node = n \land u_f(e) > 0 \land p.label = node.label-1 \land p.sourceValid \land previous.flussoPassante > 0$}
+                    \STATE $e.reversed \leftarrow $false
+                    \STATE $node.$update$(p,e)$
+                    \STATE \textbf{return} true
+                \ELSIF{$node = p \land f(e) > 0 \land n.label = node.label-1 \land n.sourceValid \land n.flussoPassante > 0$ }
+                    \STATE $e.reversed \leftarrow $true
+                    \STATE $node.$update$(n,e)$
+                    \STATE \textbf{return} true
+                \ENDIF
+            \ENDFOR
+            \algstore{finishSourceRepair}
+    \end{algorithmic}
+\end{algorithm}
+\newpage
+\begin{algorithm}
+    \begin{algorithmic}
+        \algrestore{finishSourceRepair}
+        \ELSE
+            \FORALL{$e \in \delta(node)$}
+                \STATE $p \leftarrow e.previousNode$
+                \STATE $n \leftarrow e.nextNode$
+                \IF{$p.sourceSide \ne n.sourceSide \land \neg onlySinkExploration$}
+                    \IF{$n = node \land u_f(e) > 0 \land p.sourceValid \land p.sourceSide \land p.flussoPassante > 0$}
+                        \STATE $e.reversed \leftarrow false$
+                        \STATE $node.$update$(p,e)$
+                        \STATE \textbf{return } true
+                    \ENDIF
+                    \IF{$p = node \land f(e) > 0 \land n.sourceValid \land n.sourceSide \land n.flussoPassante > 0$}
+                        \STATE $e.reversed \leftarrow true$
+                        \STATE $node.$update$(n,e)$
+                        \STATE \textbf{return } true
+                    \ENDIF
+                \ELSIF{$onlySinkExploration \land n.sourceSide = p.sourceSide$}
+                    \IF{$node = p \land u_f(e) > 0 \land n.sinkValid \land node.label = n.label + 1 \land n.flussoPassante>0$}
+                        \STATE $e.reversed \leftarrow $false
+                        \STATE $node.$update$(n,e)$
+                        \STATE \textbf{return } true
+                    \ENDIF
+                    \IF{$node = n \land f(e)> 0 \land p.sinkValid \land node.label = p.label + 1 \land p.flussoPassante > 0$}
+                        \STATE $e.reversed \leftarrow $true
+                        \STATE $node.$update$(p,e)$
+                        \STATE \textbf{return} true
+                    \ENDIF
+                \ENDIF
+            \ENDFOR
+        \ENDIF
+        \IF{$node.sourceSide \lor \neg onlySinkExploration$}
+            \STATE $node.sourceValid \leftarrow $false
+        \ELSE
+            \STATE $node.sinkValid \leftarrow$ false
+        \ENDIF
+        \STATE \textbf{return } false
+    \end{algorithmic}
+\end{algorithm}
+
+\end{document}

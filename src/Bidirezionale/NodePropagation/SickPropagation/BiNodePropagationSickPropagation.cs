@@ -6,7 +6,7 @@ namespace Bidirezionale.NodePropagation.SickPropagation
 {
     public class BiNodePropagationSickPropagation
     {
-        public static bool RepairNode(Node node, bool borderForward)
+        public static bool RepairNode(Node node, bool onlySinkExploration)
         {
             if (node is SourceNode || node is SinkNode)
                 return false;
@@ -48,7 +48,7 @@ namespace Bidirezionale.NodePropagation.SickPropagation
                 {
                     Node previous = e.PreviousNode;
                     Node next = e.NextNode;
-                    if (previous.SourceSide != next.SourceSide && !borderForward)
+                    if (previous.SourceSide != next.SourceSide && !onlySinkExploration)
                     {
                         //TODO da capire se ca bene che sia contenuto in lastNodesSourceSide o se devo considerarare altro
                         //TODO fare debugging per essere sicuro di non aver invertito next e previous
@@ -72,7 +72,7 @@ namespace Bidirezionale.NodePropagation.SickPropagation
                         }
 
                     }
-                    else if (borderForward && next.SourceSide == previous.SourceSide)
+                    else if (onlySinkExploration && next.SourceSide == previous.SourceSide)
                     {
                         if (node == previous && e.Capacity > 0 && next.SinkValid && node.Label == (next.Label + 1) && next.InFlow > 0)
                         {
@@ -96,7 +96,7 @@ namespace Bidirezionale.NodePropagation.SickPropagation
 
                 }
             }
-            if (node.SourceSide || !borderForward)
+            if (node.SourceSide || !onlySinkExploration)
                 node.SetSourceValid(false);
             else
                 node.SetSinkValid(false);
@@ -191,12 +191,11 @@ namespace Bidirezionale.NodePropagation.SickPropagation
             Queue<Node> codaSource = new();
             Queue<Node> codaSink = new();
             Queue<Node> malati = new();
-            Node noCapSource = null;
-            Node noCapSink = null;
             bool sourceRepaired = noCapsSource.Count == 0;
             bool sinkRepaired = noCapsSink.Count == 0;
             if (noCapsSource.Count > 0)
             {
+                Node noCapSource = null;
                 Node p = null;
                 bool repaired = true;
                 Node momNoCap = null;
@@ -220,22 +219,17 @@ namespace Bidirezionale.NodePropagation.SickPropagation
                 //parte di sickPropagation
                 Node malato = null;
                 while (malati.Count > 0)
-                {
-                    var m = SourceSickPropagation(graph, malati.Dequeue(), codaSource);
-                    malato ??= m; // malato = malato == null ? m : malato
-                }
-                if (malato != null)//&& (malato.NextEdge.Reversed ? malato.NextEdge.Flow : malato.NextEdge.Capacity) > 0 && malato.NextNode.InFlow > 0)
+                    malato ??= SourceSickPropagation(graph, malati.Dequeue(), codaSource);
+                if (malato != null && sinkRepaired)//&& (malato.NextEdge.Reversed ? malato.NextEdge.Flow : malato.NextEdge.Capacity) > 0 && malato.NextNode.InFlow > 0)                
                     return (Math.Min(Math.Min(malato.NextEdge.Reversed ? malato.NextEdge.Flow : malato.NextEdge.Capacity, malato.NextNode.InFlow), malato.InFlow), malato);
                 if (sinkRepaired)
-                    foreach (var n in graph.LastNodesSinkSide.Where(x => (x.SourceValid && x.NextEdge.Reversed ? x.NextEdge.Flow : x.NextEdge.Capacity) > 0 && x.NextNode.InFlow > 0))
+                    foreach (var n in graph.LastNodesSinkSide.Where(x => (x.SourceValid && x.NextEdge.Reversed ? x.NextEdge.Flow : x.NextEdge.Capacity) > 0 && x.NextNode.InFlow > 0 && x.SinkValid && x.NextNode.SinkValid))
                     {
                         //TODO capire come si può migliorare
-                        //TODO qui c'è un problema
-                        int mom = n.InFlow;
                         int f = GetFlow(graph.Source, n).InFlow;
                         if (f != 0)
                             return (Math.Min(f, Math.Min(n.NextNode.InFlow, n.NextEdge.Reversed ? n.NextEdge.Flow : n.NextEdge.Capacity)), n);
-                        n.SetInFlow(mom);
+                        n.SetInFlow(Math.Min(n.NextNode.InFlow, n.NextEdge.Reversed ? n.NextEdge.Flow : n.NextEdge.Capacity));
                     }
                 sourceRepaired = repaired;
                 // fine parte di sickpropagation
@@ -243,7 +237,7 @@ namespace Bidirezionale.NodePropagation.SickPropagation
                 {
                     if (noCapSource is SourceNode)
                     {
-                        codaSource.Enqueue(p);
+                        codaSource.Enqueue(noCapSource);
                     }
                     else if (!noCapSource.SourceSide)
                     {
@@ -260,6 +254,7 @@ namespace Bidirezionale.NodePropagation.SickPropagation
             }
             if (noCapsSink.Count > 0)
             {
+                Node noCapSink = null;
                 bool repaired = true;
                 Node p = null;
                 Node momNoCap = null;
@@ -287,22 +282,22 @@ namespace Bidirezionale.NodePropagation.SickPropagation
                 }
                 Node malato = null;
                 while (malati.Count > 0)
-                    malato ??= SickPropagationSink(malati.Dequeue(), codaSink);
+                    malato = SickPropagationSink(malati.Dequeue(), codaSink);
                 if (malato != null)
+                {
                     return (Math.Min(Math.Min(malato.InFlow, malato.PreviousEdge.Reversed ? malato.PreviousEdge.Flow : malato.PreviousEdge.Capacity), malato.PreviousNode.InFlow), malato);
+                }
                 foreach (var n in graph.LastNodesSinkSide.Where(x => x.SinkValid && (x.PreviousEdge.Reversed ? x.PreviousEdge.Flow : x.PreviousEdge.Capacity) > 0 && x.PreviousNode.InFlow > 0))
                 {
-                    int mom = n.InFlow;
                     int f = GetFlow(graph.Sink, n).InFlow;
                     if (f != 0)
                         return (Math.Min(Math.Min(f, n.PreviousEdge.Reversed ? n.PreviousEdge.Flow : n.PreviousEdge.Capacity), n.PreviousNode.InFlow), n);
-                    n.SetInFlow(mom);
                 }
                 sinkRepaired = repaired;
                 if (!repaired && codaSink.Count == 0)
                     if (noCapSink is SinkNode)
                     {
-                        codaSink.Enqueue(p);
+                        codaSink.Enqueue(noCapSink);
                     }
                     else
                     {
@@ -379,7 +374,7 @@ namespace Bidirezionale.NodePropagation.SickPropagation
                                     }
                                 if (n.InFlow > 0)
                                 {
-                                    int f = Math.Min(n.InFlow, Math.Min(p.InFlow, e.Reversed ? e.Flow : e.Capacity));
+                                    int f = Math.Min(n.InFlow, Math.Min(p.InFlow, e.Capacity));
                                     if (f == 0)
                                         continue;
                                     n.SetSourceValid(true);
@@ -388,7 +383,7 @@ namespace Bidirezionale.NodePropagation.SickPropagation
                                     //graph.AddLast(p);
                                     graph.AddLast(n);
                                     e.SetReversed(false);
-                                    n.SetInFlow(f);
+                                    //n.SetInFlow(f);
                                     return (f, n);
                                 }
                                 Node mom = n;
@@ -459,13 +454,14 @@ namespace Bidirezionale.NodePropagation.SickPropagation
                                 if (p.InFlow > 0)
                                 {
                                     int f = Math.Min(p.InFlow, n.InFlow);
-                                    f = Math.Min(f, e.Reversed ? e.Flow : e.Capacity);
+                                    f = Math.Min(f, e.Flow);
                                     p.SetPreviousNode(n);
                                     p.SetPreviousEdge(e);
+                                    p.SetSourceValid(true);
                                     graph.AddLast(p);
                                     //graph.AddLast(n);
                                     e.SetReversed(true);
-                                    p.SetInFlow(f);
+                                    //p.SetInFlow(f);
                                     return (f, p);
                                 }
                                 Node mom = p;
@@ -480,7 +476,6 @@ namespace Bidirezionale.NodePropagation.SickPropagation
                                 foreach (var node in graph.LabeledNodeSinkSide[malato.Label - 1])
                                     codaSink.Enqueue(node);
                                 graph.ResetSinkSide(malato.Label);
-
                             }
                         }
                     }
@@ -515,9 +510,10 @@ namespace Bidirezionale.NodePropagation.SickPropagation
                                     n.SetPreviousEdge(e);
                                     n.SetPreviousNode(p);
                                     graph.AddLast(n);
+
                                     //graph.AddLast(p);
                                     e.SetReversed(false);
-                                    n.SetSinkValid(true);
+                                    n.SetSourceValid(true);
                                     //p.SetInFlow(f);
                                     return (f, n);
                                 }
@@ -534,7 +530,7 @@ namespace Bidirezionale.NodePropagation.SickPropagation
                         else if (element == p && e.Flow > 0)
                         {
                             if (n.InFlow != 0)
-                                if (!n.SourceSide || !p.SourceValid)
+                                if (!n.SourceSide || !n.SourceValid)
                                 {
                                     continue;
                                 }
@@ -549,7 +545,7 @@ namespace Bidirezionale.NodePropagation.SickPropagation
                                     //graph.AddLast(n);
                                     graph.AddLast(p);
                                     e.SetReversed(true);
-                                    p.SetSinkValid(true);
+                                    p.SetSourceValid(true);
                                     //n.SetInFlow(f);
                                     return (f, p);
                                 }
@@ -586,7 +582,7 @@ namespace Bidirezionale.NodePropagation.SickPropagation
                             else if (e.PreviousNode == m && e == e.NextNode.NextEdge)
                                 malati.Enqueue(e.NextNode);
                     }
-                    else if (m.PreviousEdge != null && (m.PreviousEdge.Reversed ? m.PreviousEdge.Flow : m.PreviousEdge.Capacity) > 0 && m.PreviousNode.InFlow > 0)
+                    else if (m.PreviousEdge != null && (m.PreviousEdge.Reversed ? m.PreviousEdge.Flow : m.PreviousEdge.Capacity) > 0 && m.PreviousNode.InFlow > 0 && m.PreviousNode.SourceValid)
                         return m;
                     else
                         codaSink.Enqueue(m);
@@ -611,7 +607,7 @@ namespace Bidirezionale.NodePropagation.SickPropagation
                             else if (e.NextNode == m && e == e.PreviousNode.PreviousEdge)
                                 malati.Enqueue(e.PreviousNode);
                     }
-                    else if (m.NextEdge != null && (m.NextEdge.Reversed ? m.NextEdge.Flow : m.NextEdge.Capacity) > 0 && m.NextNode.InFlow > 0)
+                    else if (m.NextEdge != null && (m.NextEdge.Reversed ? m.NextEdge.Flow : m.NextEdge.Capacity) > 0 && m.NextNode.InFlow > 0 && m.SinkValid)
                         return m;
                     else if (m.SourceSide)
                         codaSource.Enqueue(m);
@@ -649,7 +645,7 @@ namespace Bidirezionale.NodePropagation.SickPropagation
                             vuotiSource.Clear();
                             int flowError = GetFlow(s, n).InFlow;
                             Node mom = n;
-                            while (mom != momsource)
+                            while (mom != momsource.PreviousNode)
                             {
                                 mom.SetInFlow(mom.InFlow - flowError);
                                 mom.PreviousEdge.AddFlow(flowError);
@@ -674,7 +670,7 @@ namespace Bidirezionale.NodePropagation.SickPropagation
                             vuotiSink.Clear();
                             int flowError = GetFlow(t, n).InFlow;
                             Node mom = n;
-                            while (mom != momsink)
+                            while (mom != momsink.NextNode)
                             {
                                 mom.SetInFlow(mom.InFlow - flowError);
                                 mom.NextEdge.AddFlow(flowError);

@@ -79,18 +79,6 @@ namespace Bidirezionale.NodePropagation.SickPropagation
             this.SourceValid = true;
             this.SinkValid = true;
         }
-        public Node(string name, bool sourceSide)
-        {
-            this.Name = name;
-            this.InFlow = 0;
-            this.Label = 0;
-            this.Edges = new();
-            this.PreviousNode = null;
-            this.NextNode = null;
-            this.PreviousEdge = null;
-            this.NextEdge = null;
-            this.SourceSide = sourceSide;
-        }
         public void AddEdge(Node node, int cap)
         {
             var e = new BiEdge(this, node, cap);
@@ -110,20 +98,6 @@ namespace Bidirezionale.NodePropagation.SickPropagation
         public void SetPreviousEdge(BiEdge e) => this.PreviousEdge = e;
         public void SetNextEdge(BiEdge e) => this.NextEdge = e;
 
-        public static (bool, bool) AddFlow(Node n, int flow)
-        {
-            n.SetInFlow(n.InFlow - flow);
-            if (n.NextEdge is not null && n.PreviousEdge is not null)
-            {
-
-                var x = n.NextEdge.AddFlow(flow);
-                var y = n.PreviousEdge.AddFlow(flow);
-
-                return (x.Item1 & y.Item1, y.Item2 | x.Item2);
-            }
-            else
-                return ((n.NextEdge is not null) ? n.NextEdge : n.PreviousEdge).AddFlow(flow);
-        }
         public virtual void Reset()
         {
             this.SetInFlow(0);
