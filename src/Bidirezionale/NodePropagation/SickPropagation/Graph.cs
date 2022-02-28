@@ -39,8 +39,13 @@ namespace Bidirezionale.NodePropagation.SickPropagation
         }
         public Graph(int x)
         {
-            this.LabeledNodeSourceSide = new(x);
+            this.LabeledNodeSourceSide = new();
+            this.LabeledNodeSourceSide.Add(new (x));
             this.LabeledNodeSinkSide = new();
+            this.LabeledNodeSinkSide.Add(new ());
+            this.LastNodesSinkSide = new();
+            this.LastNodesSourceSide = new();
+
         }
         public void AddNode(Node n, bool sink)
         {
