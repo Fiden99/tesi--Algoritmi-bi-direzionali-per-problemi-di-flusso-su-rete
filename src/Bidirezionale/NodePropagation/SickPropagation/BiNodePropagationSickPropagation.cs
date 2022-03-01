@@ -510,7 +510,6 @@ namespace Bidirezionale.NodePropagation.SickPropagation
                                     n.SetPreviousEdge(e);
                                     n.SetPreviousNode(p);
                                     graph.AddLast(n);
-
                                     //graph.AddLast(p);
                                     e.SetReversed(false);
                                     n.SetSourceValid(true);
@@ -530,7 +529,7 @@ namespace Bidirezionale.NodePropagation.SickPropagation
                         else if (element == p && e.Flow > 0)
                         {
                             if (n.InFlow != 0)
-                                if (!n.SourceSide || !n.SourceValid)
+                                if (!n.SourceSide || !p.SourceValid)
                                 {
                                     continue;
                                 }
