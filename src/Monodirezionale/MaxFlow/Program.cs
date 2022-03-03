@@ -33,8 +33,6 @@ namespace MaxFlow
                 grafoLLO = new(int.Parse(str[2]));
                 grafoSAP = new(int.Parse(str[2]));
                 grafoSP = new(int.Parse(str[2]));
-
-
                 for (int i = 3; i < Int64.Parse(str[2]); i++)
                 {
                     grafoNoOpt.AddNode(new NoOptNode(i.ToString()));
@@ -105,7 +103,7 @@ namespace MaxFlow
 
         public static void Main()
         {
-            var (graphNN, graphLLO, graphSAP, graphSP) = Read(System.IO.File.ReadAllLines(@"C:\Users\Filippo\Desktop\tesi\src\dataset\adhead.n6c10.max.bbk.max"));
+            var (graphNN, graphLLO, graphSAP, graphSP) = Read(System.IO.File.ReadAllLines(@"../../dataset/adhead.n6c10.max.bbk.max"));
             Performance(graphNN, graphLLO, graphSAP, graphSP);
         }
         public static void Main(int args)
@@ -115,13 +113,13 @@ namespace MaxFlow
             SAPGraph graphSAP;
             SPGraph graphSP;
             if (args == 1)
-                (graphNN, graphLLO, graphSAP, graphSP) = Read(System.IO.File.ReadAllLines(@"C:\Users\Filippo\Desktop\tesi\src\dataset\adhead.n6c10.max.bbk.max"));
+                (graphNN, graphLLO, graphSAP, graphSP) = Read(System.IO.File.ReadAllLines(@"../../dataset/adhead.n6c10.max.bbk.max"));
             else if (args == 2)
-                (graphNN, graphLLO, graphSAP, graphSP) = Read(System.IO.File.ReadAllLines(@"C:\Users\Filippo\Desktop\tesi\src\dataset\adhead.n26c10.max.bbk.max"));
+                (graphNN, graphLLO, graphSAP, graphSP) = Read(System.IO.File.ReadAllLines(@"../../dataset/adhead.n26c10.max.bbk.max"));
             else if (args == 3)
-                (graphNN, graphLLO, graphSAP, graphSP) = Read(System.IO.File.ReadAllLines(@"C:\Users\Filippo\Desktop\tesi\src\dataset\adhead.n6c100.max.bbk.max"));
+                (graphNN, graphLLO, graphSAP, graphSP) = Read(System.IO.File.ReadAllLines(@"../../dataset/adhead.n6c100.max.bbk.max"));
             else if (args == 4)
-                (graphNN, graphLLO, graphSAP, graphSP) = Read(System.IO.File.ReadAllLines(@"C:\Users\Filippo\Desktop\tesi\src\dataset\adhead.n26c100.max.bbk.max"));
+                (graphNN, graphLLO, graphSAP, graphSP) = Read(System.IO.File.ReadAllLines(@"../../dataset/adhead.n26c100.max.bbk.max"));
             else 
                 return;
             Performance(graphNN, graphLLO, graphSAP, graphSP);

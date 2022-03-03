@@ -113,7 +113,7 @@ namespace Bidirezionale.NodeCount
 
         public static void Main()
         {
-            var (graphNN, graphLLO, grafoEF, graphSP) = Read(System.IO.File.ReadAllLines(@"C:\Users\Filippo\Desktop\tesi\src\dataset\adhead.n6c10.max.bbk.max"));
+            var (graphNN, graphLLO, grafoEF, graphSP) = Read(System.IO.File.ReadAllLines(@"../../dataset/adhead.n6c10.max.bbk.max"));
             Performance(graphNN, graphLLO, grafoEF, graphSP);
         }
         public static void Main(int args)
@@ -123,13 +123,13 @@ namespace Bidirezionale.NodeCount
             EFGraph graphEF;
             SPGraph graphSP;
             if (args == 1)
-                (graphNN, graphLLO, graphEF, graphSP) = Read(System.IO.File.ReadAllLines(@"C:\Users\Filippo\Desktop\tesi\src\dataset\adhead.n6c10.max.bbk.max"));
+                (graphNN, graphLLO, graphEF, graphSP) = Read(System.IO.File.ReadAllLines(@"../../dataset/adhead.n6c10.max.bbk.max"));
             else if (args == 2)
-                (graphNN, graphLLO, graphEF, graphSP) = Read(System.IO.File.ReadAllLines(@"C:\Users\Filippo\Desktop\tesi\src\dataset\adhead.n26c10.max.bbk.max"));
+                (graphNN, graphLLO, graphEF, graphSP) = Read(System.IO.File.ReadAllLines(@"../../dataset/adhead.n26c10.max.bbk.max"));
             else if (args == 3)
-                (graphNN, graphLLO, graphEF, graphSP) = Read(System.IO.File.ReadAllLines(@"C:\Users\Filippo\Desktop\tesi\src\dataset\adhead.n6c100.max.bbk.max"));
+                (graphNN, graphLLO, graphEF, graphSP) = Read(System.IO.File.ReadAllLines(@"../../dataset/adhead.n6c100.max.bbk.max"));
             else if (args == 4)
-                (graphNN, graphLLO, graphEF, graphSP) = Read(System.IO.File.ReadAllLines(@"C:\Users\Filippo\Desktop\tesi\src\dataset\adhead.n26c100.max.bbk.max"));
+                (graphNN, graphLLO, graphEF, graphSP) = Read(System.IO.File.ReadAllLines(@"../../dataset/adhead.n26c100.max.bbk.max"));
             else
                 return;
             Performance(graphNN, graphLLO, graphEF, graphSP);
