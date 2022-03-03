@@ -14,6 +14,12 @@ namespace Bidirezionale.Label.NoOpt
             this.SinkNodes = new();
 
         }
+        public Graph(int cardinality)
+        {
+            this.SourceNodes = new(cardinality);
+            this.SinkNodes = new();
+
+        }
         public Graph(params Node[] nodes)
         {
             this.SourceNodes = new();
@@ -27,6 +33,13 @@ namespace Bidirezionale.Label.NoOpt
         public void AddNode(Node n)
         {
             if (n is SinkNode)
+                this.SinkNodes.Add(n);
+            else
+                this.SourceNodes.Add(n);
+        }
+        public void AddNode(Node n, bool sourceSide)
+        {
+            if (!sourceSide)
                 this.SinkNodes.Add(n);
             else
                 this.SourceNodes.Add(n);
