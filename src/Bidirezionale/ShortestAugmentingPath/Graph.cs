@@ -8,6 +8,7 @@ namespace Bidirezionale.ShortestAugmentingPath
         public HashSet<Node> Nodes { get; private set; }
         public Graph() => this.Nodes = new();
         public Graph(params Node[] nodes) => this.Nodes = new(nodes);
+        public Graph(int cardinality) => this.Nodes = new(cardinality);
         public void AddNode(Node n) => this.Nodes.Add(n);
         public void AddNode(params Node[] nodes)
         {

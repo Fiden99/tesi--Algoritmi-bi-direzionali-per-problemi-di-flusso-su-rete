@@ -23,10 +23,23 @@ namespace Bidirezionale.NodePropagation.NoOpt
                 else
                     this.SourceNodes.Add(n);
         }
+
+        public Graph(int cardinality)
+        {
+            this.SourceNodes = new(cardinality);
+            this.SinkNodes = new();
+        }
         public void AddNode(Node n)
         {
             if (n is SinkNode)
                 this.SinkNodes.Add(n);
+            else
+                this.SourceNodes.Add(n);
+        }
+        public void AddNode(Node n, bool sourceSide)
+        {
+            if (sourceSide)
+                this.SourceNodes.Add(n);
             else
                 this.SinkNodes.Add(n);
         }

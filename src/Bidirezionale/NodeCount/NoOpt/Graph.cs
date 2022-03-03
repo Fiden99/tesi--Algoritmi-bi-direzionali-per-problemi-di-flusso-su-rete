@@ -13,6 +13,12 @@ namespace Bidirezionale.NodeCount.NoOpt
             this.SourceNodes = new();
             this.SinkNodes = new();
         }
+        public Graph(int cardinality)
+        {
+            this.SourceNodes = new(cardinality);
+            this.SinkNodes = new();
+        }
+        
         public Graph(params Node[] nodes)
         {
             this.SourceNodes = new();
@@ -29,6 +35,13 @@ namespace Bidirezionale.NodeCount.NoOpt
                 this.SinkNodes.Add(n);
             else
                 this.SourceNodes.Add(n);
+        }
+        public void AddNode(Node n,bool sourceSide)
+        {
+            if (sourceSide)
+                this.SourceNodes.Add(n);
+            else
+                this.SinkNodes.Add(n);
         }
         public Node Sink => this.SinkNodes.Single(x => x is SinkNode);
         public Node Source => this.SourceNodes.Single(x => x is SourceNode);

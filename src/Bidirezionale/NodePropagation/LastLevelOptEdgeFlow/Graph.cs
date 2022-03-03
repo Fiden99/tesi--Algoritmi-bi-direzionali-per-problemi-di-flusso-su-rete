@@ -21,6 +21,16 @@ namespace Bidirezionale.NodePropagation.LastLevelOptEdgeFlow
             this.LabeledNodeSinkSide.Add(new());
             this.LastNodesSinkSide = new();
         }
+        public Graph(int cardinality)
+        {
+            this.LabeledNodeSourceSide = new();
+            this.LabeledNodeSourceSide.Add(new(cardinality));
+            this.LastNodesSourceSide = new();
+            this.LabeledNodeSinkSide = new();
+            this.LabeledNodeSinkSide.Add(new());
+            this.LastNodesSinkSide = new();
+        }
+
         public Graph(params Node[] nodes)
         {
             this.LabeledNodeSourceSide = new();
@@ -40,6 +50,13 @@ namespace Bidirezionale.NodePropagation.LastLevelOptEdgeFlow
         public void AddNode(Node n)
         {
             if (n.SourceSide)
+                this.LabeledNodeSourceSide[0].Add(n);
+            else
+                this.LabeledNodeSinkSide[0].Add(n);
+        }
+        public void AddNode(Node n,bool sourceSide)
+        {
+            if (sourceSide)
                 this.LabeledNodeSourceSide[0].Add(n);
             else
                 this.LabeledNodeSinkSide[0].Add(n);

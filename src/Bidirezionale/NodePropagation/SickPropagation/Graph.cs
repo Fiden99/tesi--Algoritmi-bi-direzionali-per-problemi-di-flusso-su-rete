@@ -47,12 +47,12 @@ namespace Bidirezionale.NodePropagation.SickPropagation
             this.LastNodesSourceSide = new();
 
         }
-        public void AddNode(Node n, bool sink)
+        public void AddNode(Node n, bool sourceSide)
         {
-            if (sink)
-                this.LabeledNodeSinkSide[0].Add(n);
-            else
+            if (sourceSide)
                 this.LabeledNodeSourceSide[0].Add(n);
+            else
+                this.LabeledNodeSinkSide[0].Add(n);
         }
         public void AddNode(Node n)
         {
