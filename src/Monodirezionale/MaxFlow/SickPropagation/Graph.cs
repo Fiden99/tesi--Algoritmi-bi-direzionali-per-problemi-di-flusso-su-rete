@@ -16,6 +16,14 @@ namespace Monodirezionale.MaxFlow.SickPropagation
             this.LabeledNodes.Add(new HashSet<Node>());
             this.InvalidNodes = new HashSet<Node>();
         }
+
+        public Graph(int cardinality)
+        {
+            this.LabeledNodes = new List<HashSet<Node>>();
+            this.LabeledNodes.Add(new HashSet<Node>(cardinality));
+            this.InvalidNodes = new HashSet<Node>();
+        }
+
         public Graph(Node node)
         {
             this.LabeledNodes = new List<HashSet<Node>>();

@@ -20,6 +20,10 @@ namespace Monodirezionale.MaxFlow.NoOpt
         {
             this.Nodes = new HashSet<Node>(nodes);
         }
+        public Graph(int x)
+        {
+            this.Nodes = new(x);
+        }
 
         public void AddNode(Node node)
         {

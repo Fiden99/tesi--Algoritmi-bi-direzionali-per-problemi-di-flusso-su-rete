@@ -11,6 +11,10 @@ namespace Monodirezionale.MaxFlow.ShortestAugmentingPath
         {
             this.Nodes = new HashSet<Node>();
         }
+        public Graph(int cardNodes)
+        {
+            this.Nodes = new(cardNodes);
+        }
         public Graph(params Node[] nodes)
         {
             this.Nodes = new HashSet<Node>(nodes);

@@ -23,6 +23,13 @@ namespace Monodirezionale.MaxFlow.LastLevelOpt
             this.InvalidNodes = new HashSet<Node>();
 
         }
+        public Graph(int cardNode)
+        {
+            this.LabeledNode = new List<HashSet<Node>>();
+            this.LabeledNode.Add(new (cardNode));
+            this.InvalidNodes = new HashSet<Node>();
+
+        }
         public Graph(params Node[] nodes)
         {
             this.LabeledNode = new List<HashSet<Node>>();
