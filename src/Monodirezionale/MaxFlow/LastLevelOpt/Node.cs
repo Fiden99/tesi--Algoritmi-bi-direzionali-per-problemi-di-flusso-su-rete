@@ -41,7 +41,7 @@ namespace Monodirezionale.MaxFlow.LastLevelOpt
         public bool Valid { get; private set; }
         public int Label { get; private set; }
         public string Name { get; private set; }
-        public int InFlow { get; protected set; }
+        public bool Visited { get; protected set; }
         public List<BiEdge> Edges { get; private set; }
         public Node PreviousNode { get; private set; }
         public BiEdge PreviousEdge { get; private set; }
@@ -50,7 +50,7 @@ namespace Monodirezionale.MaxFlow.LastLevelOpt
         {
             this.Name = name;
             this.Edges = new List<BiEdge>();
-            this.InFlow = 0;
+            this.Visited = false;
             this.PreviousNode = null;
             this.Label = 0;
             this.Valid = true;
@@ -77,10 +77,7 @@ namespace Monodirezionale.MaxFlow.LastLevelOpt
             this.Edges.AddRange(edges);
         }
 
-        public void SetInFlow(int f)
-        {
-            this.InFlow = f;
-        }
+        public void SetVisited(bool visited) => this.Visited = visited;
 
         public void SetPreviousNode(Node n)
         {
@@ -124,7 +121,6 @@ namespace Monodirezionale.MaxFlow.LastLevelOpt
 #endif
             edge.SetCapacity(c);
             edge.SetFlow(f);
-            this.SetInFlow(this.InFlow - flow);
             return c == 0;
 
         }

@@ -5,7 +5,7 @@ namespace Monodirezionale.MaxFlow.LastLevelOpt
     {
         public SourceNode(string name) : base(name)
         {
-            this.InFlow = int.MaxValue;
+            this.Visited = true;
         }
         /*
                 public override void addEdge(Node node, int cap)

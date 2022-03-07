@@ -26,7 +26,7 @@ namespace Monodirezionale.MaxFlow.LastLevelOpt
         public Graph(int cardNode)
         {
             this.LabeledNode = new List<HashSet<Node>>();
-            this.LabeledNode.Add(new (cardNode));
+            this.LabeledNode.Add(new(cardNode));
             this.InvalidNodes = new HashSet<Node>();
 
         }
@@ -61,7 +61,7 @@ namespace Monodirezionale.MaxFlow.LastLevelOpt
                 foreach (Node n in LabeledNode[i])
                 {
                     if (n is not SourceNode)
-                        n.SetInFlow(0);
+                        n.SetVisited(false);
                     n.SetPreviousNode(null);
                     //this.ChangeLabel(n, 0);
                 }
@@ -70,7 +70,7 @@ namespace Monodirezionale.MaxFlow.LastLevelOpt
         public static void ResetLabel(Node n)
         {
             n.SetPreviousNode(null);
-            n.SetInFlow(0);
+            n.SetVisited(false);
             //this.ChangeLabel(n, 0);
 
         }
