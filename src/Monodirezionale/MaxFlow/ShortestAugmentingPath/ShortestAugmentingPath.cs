@@ -51,52 +51,59 @@ namespace Monodirezionale.MaxFlow.ShortestAugmentingPath
             }
             return f;
         }
-        public static int Dfs(Graph graph, Node start, int f, Queue<Node> esplorati)
+        public static int Dfs(Graph graph, Node node, Queue<Node> esplorati)
         {
-            if (start.Distance < graph.Nodes.Count)
+            Stack<(Node, int)> pila = new();
+            pila.Push((node, int.MaxValue));
+            while (pila.Count > 0)
             {
-                foreach (var e in start.Edges)
+                bool advanced = false;
+                var x = pila.Pop();
+                var start = x.Item1;
+                var f = x.Item2;
+                if (start.Distance < graph.Nodes.Count)
                 {
-                    Node n = e.NextNode;
-                    Node p = e.PreviousNode;
-                    if (start == p && n.Distance == (p.Distance - 1) && e.Capacity > 0)
+                    //Advance
+                    foreach (var e in start.Edges)
                     {
-                        f = Math.Min(f, e.Capacity);
-                        n.SetPrevious(e);
-                        esplorati.Enqueue(n);
-                        if (n is SinkNode)
-                            return f;
-                        return Dfs(graph, n, f, esplorati);
+                        Node n = e.NextNode;
+                        Node p = e.PreviousNode;
+                        if (start == p && n.Distance == (p.Distance - 1) && e.Capacity > 0)
+                        {
+                            f = Math.Min(f, e.Capacity);
+                            n.SetPrevious(e);
+                            esplorati.Enqueue(n);
+                            if (n is SinkNode)
+                                return f;
+                            //return Dfs(graph,n,f,esplorati);
+                            pila.Push((n, f));
+                            advanced = true;
+                            break;
+                        }
                     }
-                    /*else if (start == n && p.Distance == (n.Distance - 1) && e.Flow > 0)
+                    //retreat
+                    if (!advanced)
                     {
-                        f = Math.Min(f, e.Flow);
-                        e.SetReversed(true);
-                        p.SetPrevious(e);
-                        if (p is SinkNode)
-                            return f;
-                        return Dfs(graph, p, f);
+                        int min = int.MaxValue - 1;
+                        foreach (var e in start.Edges)
+                        {
+                            if (start == e.PreviousNode && e.Capacity > 0)
+                                min = Math.Min(min, e.NextNode.Distance);
+                        }
+                        Node mom;
+                        if (start is SourceNode)
+                            mom = start;
+                        else
+                            mom = start.PreviousNode;
+                        start.SetDistance(min + 1);
+                        pila.Push((mom, f));
+                        //return Dfs(graph,mom,f,esplorati);
                     }
-                    */
                 }
-                int min = int.MaxValue - 1;
-                foreach (var e in start.Edges)
-                {
-                    //if (start == e.NextNode && e.Flow > 0)
-                    //  min = Math.Min(min, e.PreviousNode.Distance);
-                    if (start == e.PreviousNode && e.Capacity > 0)
-                        min = Math.Min(min, e.NextNode.Distance);
-                }
-                Node mom;
-                if (start is SourceNode)
-                    mom = start;
                 else
-                    mom = start.PreviousNode;
-                start.SetDistance(min + 1);
-                return Dfs(graph, mom, f, esplorati);
+                    return 0;
             }
             return 0;
-
         }
         public static void PrintGraph(Graph grafo)
         {
@@ -124,16 +131,14 @@ namespace Monodirezionale.MaxFlow.ShortestAugmentingPath
 
             while (s.Distance < graph.Nodes.Count)
             {
-                int f = Dfs(graph, s, int.MaxValue, esplorati);
+                int f = Dfs(graph, s, esplorati);
                 fMax += f;
                 if (f == 0)
                     break;
+                //augment
                 SendFlow(f, t);
                 while (esplorati.Count > 0)
-                {
-                    var n = esplorati.Dequeue();
-                    n.Reset();
-                }
+                    esplorati.Dequeue().Reset();
             }
             //PrintGraph(graph);
             return fMax;
