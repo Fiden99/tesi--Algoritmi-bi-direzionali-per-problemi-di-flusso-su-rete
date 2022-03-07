@@ -17,10 +17,11 @@ namespace Monodirezionale.MaxFlow.NoOpt
                 foreach (MonoEdge e in element.Next)
                 {
                     Node n = e.NextNode;
+#if DEBUG
                     if (e.Capacity < 0)
                         throw new InvalidOperationException("capacità negativa");
-
-                    else if (n.InFlow == 0 && ((e.Capacity > 0 && e is not ReversedMonoEdge) || (e.Flow > 0 && e is ReversedMonoEdge)))
+#endif
+                    if (n.InFlow == 0 && ((e.Capacity > 0 && e is not ReversedMonoEdge) || (e.Flow > 0 && e is ReversedMonoEdge)))
                     {
                         n.SetPreviousNode(element);
                         n.InitLabel(element.Label + 1);

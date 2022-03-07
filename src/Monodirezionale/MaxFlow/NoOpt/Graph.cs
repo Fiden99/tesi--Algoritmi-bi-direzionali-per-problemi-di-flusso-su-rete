@@ -39,7 +39,7 @@ namespace Monodirezionale.MaxFlow.NoOpt
             {
                 if (x is not SourceNode)
                     x.SetInFlow(0);
-                x.InitLabel(0);
+                //x.InitLabel(0);
                 x.SetPreviousNode(null);
             }
         }

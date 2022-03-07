@@ -20,7 +20,7 @@ namespace MaxFlow
 {
     public class Program
     {
-        private static (NoOptGraph,LLOGraph,SAPGraph,SPGraph) Read(string[] stringhe)
+        private static (NoOptGraph, LLOGraph, SAPGraph, SPGraph) Read(string[] stringhe)
         {
             NoOptGraph grafoNoOpt;
             LLOGraph grafoLLO;
@@ -42,7 +42,7 @@ namespace MaxFlow
                 }
             }
             else
-                return (null,null,null,null);
+                return (null, null, null, null);
             var s = stringhe[2].Split(" ");
             if (string.Equals(s[0], "n"))
                 if (string.Equals(s[2], "s"))
@@ -98,7 +98,7 @@ namespace MaxFlow
                     fSAP.AddEdge(tSAP, int.Parse(x[3]));
                 }
             }
-            return (grafoNoOpt,grafoLLO,grafoSAP,grafoSP);
+            return (grafoNoOpt, grafoLLO, grafoSAP, grafoSP);
         }
 
         public static void Main()
@@ -120,14 +120,14 @@ namespace MaxFlow
                 (graphNN, graphLLO, graphSAP, graphSP) = Read(System.IO.File.ReadAllLines(@"../../dataset/adhead.n6c100.max.bbk.max"));
             else if (args == 4)
                 (graphNN, graphLLO, graphSAP, graphSP) = Read(System.IO.File.ReadAllLines(@"../../dataset/adhead.n26c100.max.bbk.max"));
-            else 
+            else
                 return;
             Performance(graphNN, graphLLO, graphSAP, graphSP);
 
         }
 
 
-        public static void Performance(NoOptGraph graphNN,LLOGraph graphLLO, SAPGraph graphSAP,SPGraph graphSP)
+        public static void Performance(NoOptGraph graphNN, LLOGraph graphLLO, SAPGraph graphSAP, SPGraph graphSP)
         {
             if (graphNN is null || graphLLO is null || graphSAP is null || graphSP is null)
                 throw new InvalidOperationException("graph = null");
