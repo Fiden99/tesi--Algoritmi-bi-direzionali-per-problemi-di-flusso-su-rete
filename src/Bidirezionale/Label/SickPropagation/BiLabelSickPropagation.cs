@@ -146,10 +146,8 @@ namespace Bidirezionale.Label.SickPropagation
                 noCapSource = momNoCap;
                 if (repaired && sinkRepaired)
                     foreach (var n in graph.LastNodesSinkSide.Where(x => x.SourceValid && x.SinkValid))
-                    {
                         if (Reachable(graph.Source, n) && Reachable(graph.Sink, n))
                             return n;
-                    }
                 //parte di sickPropagation
                 Node malato = null;
                 while (malati.Count > 0)
@@ -573,7 +571,6 @@ namespace Bidirezionale.Label.SickPropagation
 
             }
             return fMax;
-
         }
 
         private static int GetFlow(Node n, Node s, Node t)

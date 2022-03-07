@@ -234,7 +234,6 @@ namespace Bidirezionale.Label.LastLevelOptEdgeFlow
                                 return n;
                             }
                             else if (!n.Visited && n.SourceSide)
-                            //n.SetSourceSide(true);
                             {
                                 n.SetVisited(true);
                                 graph.ChangeLabel(n, true, p.Label + 1);
@@ -352,9 +351,6 @@ namespace Bidirezionale.Label.LastLevelOptEdgeFlow
 
         public static int GetFlow(Node n)
         {
-#if DEBUG
-            Node mom = n;
-#endif
             if (n == null)
                 return 0;
             int source = int.MaxValue;
