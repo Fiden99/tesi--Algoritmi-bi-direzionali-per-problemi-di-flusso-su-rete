@@ -19,7 +19,7 @@ namespace Bidirezionale.NodePropagation.LastLevelOptEdgeFlow
                     if (previous.SourceSide != next.SourceSide)
                         continue;
                     //TODO controllare se è corretto il calcolo della label
-                    if (node == next && e.Capacity > 0 && previous.Label == (node.Label - 1) && previous.Valid)
+                    if (node == next && e.Capacity > 0 && previous.Label == (node.Label - 1) && previous.Valid && previous.Visited && previous.SourceSide)
                     {
                         //grafo.ChangeLabel(node, true, node.Label);
                         node.SetPreviousNode(previous);
@@ -29,7 +29,7 @@ namespace Bidirezionale.NodePropagation.LastLevelOptEdgeFlow
                         node.SetValid(true);
                         return true;
                     }
-                    if (node == previous && e.Flow > 0 && next.Label == (node.Label - 1) && next.Valid)
+                    if (node == previous && e.Flow > 0 && next.Label == (node.Label - 1) && next.Valid && next.Visited && next.SourceSide)
                     {
                         //grafo.ChangeLabel(node, true, node.Label);
                         node.SetPreviousNode(next);
@@ -52,7 +52,7 @@ namespace Bidirezionale.NodePropagation.LastLevelOptEdgeFlow
                     {
                         //TODO da capire se ca bene che sia contenuto in lastNodesSourceSide o se devo considerarare altro
                         //TODO fare debugging per essere sicuro di non aver invertito next e previous
-                        if (next == node && e.Capacity > 0 && previous.Valid && graph.LastNodesSourceSide.Contains(previous))
+                        if (next == node && e.Capacity > 0 && previous.Valid && graph.LastNodesSourceSide.Contains(previous) && previous.Visited)
                         {
                             node.SetPreviousEdge(e);
                             node.SetPreviousNode(previous);
@@ -61,7 +61,7 @@ namespace Bidirezionale.NodePropagation.LastLevelOptEdgeFlow
                             node.SetValid(true);
                             return true;
                         }
-                        if (previous == node && e.Flow > 0 && next.Valid && graph.LastNodesSourceSide.Contains(next))
+                        if (previous == node && e.Flow > 0 && next.Valid && graph.LastNodesSourceSide.Contains(next) && next.Visited)
                         {
                             node.SetPreviousEdge(e);
                             node.SetPreviousNode(next);
@@ -73,7 +73,7 @@ namespace Bidirezionale.NodePropagation.LastLevelOptEdgeFlow
                     }
                     else if (borderForward)
                     {
-                        if (node == previous && e.Capacity > 0 && next.Valid && node.Label == (next.Label + 1))
+                        if (node == previous && e.Capacity > 0 && next.Valid && node.Label == (next.Label + 1) && next.Visited && !next.SourceSide)
                         {
                             node.SetNextEdge(e);
                             node.SetNextNode(next);
@@ -82,7 +82,7 @@ namespace Bidirezionale.NodePropagation.LastLevelOptEdgeFlow
                             node.SetValid(true);
                             return true;
                         }
-                        if (node == next && e.Flow > 0 && previous.Valid && node.Label == (previous.Label + 1))
+                        if (node == next && e.Flow > 0 && previous.Valid && node.Label == (previous.Label + 1) && previous.Visited && !previous.SourceSide)
                         {
                             node.SetNextEdge(e);
                             node.SetNextNode(previous);
@@ -103,24 +103,28 @@ namespace Bidirezionale.NodePropagation.LastLevelOptEdgeFlow
                 return true;
             if (target.SourceSide)
             {
-                while (target.Label < n.Label || !n.SourceSide)
+                while (target.Label <= n.Label || !n.SourceSide)
                 {
                     if (!n.Valid)
-                        return false;
+                        break;
                     n = n.PreviousNode;
                     if (n == target)
                         return true;
+                    else if (n is null)
+                        break;
                 }
             }
             else
             {
-                while (target.Label < n.Label)
+                while (target.Label <= n.Label)
                 {
                     if (!n.Valid)
-                        return false;
+                        break;
                     n = n.NextNode;
                     if (n == target)
                         return true;
+                    else if (n is null)
+                        break;
                 }
             }
             return false;
@@ -129,7 +133,6 @@ namespace Bidirezionale.NodePropagation.LastLevelOptEdgeFlow
         {
             Queue<Node> codaSource = new();
             Queue<Node> codaSink = new();
-            Queue<Node> buffer = new();
             Node noCapSource = null;
             Node noCapSink = null;
             if (noCapsSource.Count > 0)
@@ -139,7 +142,7 @@ namespace Bidirezionale.NodePropagation.LastLevelOptEdgeFlow
                 {
                     noCapSource = noCapsSource.Pop();
                     if (!RepairNode(graph, noCapSource, false))
-                    {// sere per confermare che ho riparato tutti i nodi
+                    {// serve per confermare che ho riparato tutti i nodi
                         noCapsSource.Push(noCapSource);
                         repaired = false;
                         break;
@@ -147,7 +150,7 @@ namespace Bidirezionale.NodePropagation.LastLevelOptEdgeFlow
                 }
                 if (repaired && noCapsSink.Count == 0)
                     foreach (var n in graph.LastNodesSinkSide.Where(x => x.Valid))
-                        if (Reached(noCapSource, n))
+                        if (Reached(graph.Source, n))
                             return n;
                 if (!repaired)
                 {
@@ -185,7 +188,7 @@ namespace Bidirezionale.NodePropagation.LastLevelOptEdgeFlow
                 {
                     foreach (var n in graph.LastNodesSinkSide.Where(x => x.Valid))
                     {
-                        if (Reached(noCapSink, n))
+                        if (Reached(graph.Sink, n))
                             return n;
                     }
                 }
@@ -201,45 +204,36 @@ namespace Bidirezionale.NodePropagation.LastLevelOptEdgeFlow
                         graph.ResetSinkSide(noCapSink.Label);
                     }
             }
-
-#if DEBUG
-            if (noCapSink == null && noCapSource == null)
-                throw new InvalidOperationException("non ho nessun arco senza capacità residua");
-#endif
             while (codaSink.Count > 0 || codaSource.Count > 0)
             {
                 if (codaSource.Count > 0 && noCapsSource.Count > 0)
                 {
                     var element = codaSource.Dequeue();
-                    if (!element.SourceSide || !element.Visited)
+                    if (!element.SourceSide || !element.Visited || !element.Valid)
                         continue;
-                    if (element.Valid)
-                        foreach (var e in element.Edges)
-                        {
-                            Node p = e.PreviousNode;
-                            Node n = e.NextNode;
+                    foreach (var e in element.Edges)
+                    {
+                        Node p = e.PreviousNode;
+                        Node n = e.NextNode;
 #if DEBUG
-                            if (e.Capacity < 0 || e.Flow < 0)
-                                throw new InvalidOperationException("capacità negativa");
+                        if (e.Capacity < 0 || e.Flow < 0)
+                            throw new InvalidOperationException("capacità negativa");
 #endif
-                            if (element == p && e.Capacity > 0)
+                        if (element == p && e.Capacity > 0)
+                        {
+                            if (n.Visited && !n.SourceSide)
                             {
-                                if (n.Visited)
-                                    if (n.SourceSide)
-                                        continue;
-                                    //TODO capire cosa devo fare nel caso SourceSide sia falso, ma inflow = 0 (cioè non valido)
-                                    else
-                                    {
-                                        n.SetVisited(true);
-                                        n.SetPreviousNode(element);
-                                        n.SetPreviousEdge(e);
-                                        //graph.AddLast(p);
-                                        graph.AddLast(n);
-                                        e.SetReversed(false);
-                                        //n.SetInFlow(f);
-                                        return n;
-                                    }
-                                //n.SetSourceSide(true);
+                                n.SetVisited(true);
+                                n.SetPreviousNode(element);
+                                n.SetPreviousEdge(e);
+                                //graph.AddLast(p);
+                                graph.AddLast(n);
+                                e.SetReversed(false);
+                                //n.SetInFlow(f);
+                                return n;
+                            }
+                            else if (!n.Visited && n.SourceSide)
+                            {
                                 n.SetVisited(true);
                                 graph.ChangeLabel(n, true, p.Label + 1);
                                 n.SetPreviousNode(p);
@@ -248,25 +242,22 @@ namespace Bidirezionale.NodePropagation.LastLevelOptEdgeFlow
                                 n.SetValid(true);
                                 codaSource.Enqueue(n);
                             }
-                            else if (element == n && e.Flow > 0)
+                        }
+                        else if (element == n && e.Flow > 0)
+                        {
+                            if (p.Visited && !p.SourceSide)
                             {
-                                if (p.Visited)
-                                    if (p.SourceSide)
-                                    {
-                                        continue;
-                                    }
-                                    else
-                                    {
-                                        p.SetVisited(true);
-                                        p.SetPreviousNode(n);
-                                        p.SetPreviousEdge(e);
-                                        graph.AddLast(p);
-                                        //graph.AddLast(n);
-                                        e.SetReversed(true);
-                                        //p.SetInFlow(f);
-                                        return p;
-                                    }
-                                //p.SetSourceSide(true);
+                                p.SetVisited(true);
+                                p.SetPreviousNode(n);
+                                p.SetPreviousEdge(e);
+                                graph.AddLast(p);
+                                //graph.AddLast(n);
+                                e.SetReversed(true);
+                                //p.SetInFlow(f);
+                                return p;
+                            }
+                            else if (p.SourceSide && !p.Visited)
+                            {
                                 p.SetVisited(true);
                                 graph.ChangeLabel(p, true, n.Label + 1);
                                 p.SetPreviousEdge(e);
@@ -276,79 +267,79 @@ namespace Bidirezionale.NodePropagation.LastLevelOptEdgeFlow
                                 codaSource.Enqueue(p);
                             }
                         }
+                    }
                 }
                 if (codaSink.Count > 0 && noCapsSink.Count > 0)
                 {
                     var element = codaSink.Dequeue();
-                    if (element.SourceSide || !element.Visited)
-                        continue;//TODO valutare se deve essere un continue o un break
-                    if (element.Valid)
-                        foreach (var e in element.Edges)
-                        {
-                            var p = e.PreviousNode;
-                            var n = e.NextNode;
+                    if (element.SourceSide || !element.Visited || !element.Valid)
+                        continue;
+                    foreach (var e in element.Edges)
+                    {
+                        var p = e.PreviousNode;
+                        var n = e.NextNode;
 #if DEBUG
-                            if (e.Capacity < 0 || e.Flow < 0)
-                                throw new InvalidOperationException("capacità negativa");
+                        if (e.Capacity < 0 || e.Flow < 0)
+                            throw new InvalidOperationException("capacità negativa");
 #endif
-                            if (element == n && e.Capacity > 0)
+                        if (element == n && e.Capacity > 0)
+                        {
+                            if (p.Visited)
                             {
-                                if (p.Visited)
+                                if (!p.SourceSide)
                                 {
-                                    if (!p.SourceSide)
-                                    {
-                                        continue;
-                                    }
-                                    else
-                                    {
-                                        n.SetVisited(true);
-                                        n.SetPreviousEdge(e);
-                                        n.SetPreviousNode(p);
-                                        graph.AddLast(n);
-                                        //graph.AddLast(p);
-                                        e.SetReversed(false);
-                                        //p.SetInFlow(f);
-                                        return n;
-                                    }
+                                    continue;
                                 }
-                                //p.SetSourceSide(false);
-                                p.SetVisited(true);
-                                p.SetNextEdge(e);
-                                p.SetNextNode(n);
-                                graph.ChangeLabel(p, false, n.Label + 1);
-                                e.SetReversed(false);
-                                p.SetValid(true);
-                                codaSink.Enqueue(p);
+                                else
+                                {
+                                    n.SetVisited(true);
+                                    n.SetPreviousEdge(e);
+                                    n.SetPreviousNode(p);
+                                    graph.AddLast(n);
+                                    //graph.AddLast(p);
+                                    e.SetReversed(false);
+                                    //p.SetInFlow(f);
+                                    return n;
+                                }
                             }
-                            else if (element == p && e.Flow > 0)
-                            {
-                                if (n.Visited)
-                                    if (!n.SourceSide)
-                                    {
-                                        continue;
-                                    }
-                                    else
-                                    {
-                                        //TODO capire come fare in caso getflow ritorni null                                        
-                                        p.SetVisited(true);
-                                        p.SetPreviousEdge(e);
-                                        p.SetPreviousNode(n);
-                                        //graph.AddLast(n);
-                                        graph.AddLast(p);
-                                        e.SetReversed(true);
-                                        //n.SetInFlow(f);
-                                        return p;
-                                    }
-                                //n.SetSourceSide(false);
-                                n.SetVisited(true);
-                                n.SetNextEdge(e);
-                                n.SetNextNode(p);
-                                graph.ChangeLabel(n, false, p.Label + 1);
-                                e.SetReversed(true);
-                                n.SetValid(true);
-                                codaSink.Enqueue(n);
-                            }
+                            //p.SetSourceSide(false);
+                            p.SetVisited(true);
+                            p.SetNextEdge(e);
+                            p.SetNextNode(n);
+                            graph.ChangeLabel(p, false, n.Label + 1);
+                            e.SetReversed(false);
+                            p.SetValid(true);
+                            codaSink.Enqueue(p);
                         }
+                        else if (element == p && e.Flow > 0)
+                        {
+                            if (n.Visited)
+                                if (!n.SourceSide)
+                                {
+                                    continue;
+                                }
+                                else
+                                {
+                                    //TODO capire come fare in caso getflow ritorni null                                        
+                                    p.SetVisited(true);
+                                    p.SetPreviousEdge(e);
+                                    p.SetPreviousNode(n);
+                                    //graph.AddLast(n);
+                                    graph.AddLast(p);
+                                    e.SetReversed(true);
+                                    //n.SetInFlow(f);
+                                    return p;
+                                }
+                            //n.SetSourceSide(false);
+                            n.SetVisited(true);
+                            n.SetNextEdge(e);
+                            n.SetNextNode(p);
+                            graph.ChangeLabel(n, false, p.Label + 1);
+                            e.SetReversed(true);
+                            n.SetValid(true);
+                            codaSink.Enqueue(n);
+                        }
+                    }
 
                 }
             }
@@ -390,7 +381,6 @@ namespace Bidirezionale.NodePropagation.LastLevelOptEdgeFlow
             int fMax = 0;
             while (true)
             {
-
                 var n = DoBfs(graph, vuotiSource, vuotiSink);
                 if (n == null)
                     return fMax;

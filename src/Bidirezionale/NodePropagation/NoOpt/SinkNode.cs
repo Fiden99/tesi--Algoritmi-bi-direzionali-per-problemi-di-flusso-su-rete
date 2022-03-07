@@ -5,7 +5,7 @@ namespace Bidirezionale.NodePropagation.NoOpt
         public SinkNode(string name) : base(name)
         {
             this.Label = int.MaxValue;
-            this.InFlow = int.MaxValue;
+            this.Visited = true;
             this.SourceSide = false;
         }
 

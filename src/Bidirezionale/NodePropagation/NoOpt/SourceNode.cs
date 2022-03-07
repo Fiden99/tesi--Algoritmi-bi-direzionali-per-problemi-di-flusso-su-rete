@@ -4,7 +4,7 @@ namespace Bidirezionale.NodePropagation.NoOpt
     {
         public SourceNode(string name) : base(name)
         {
-            this.InFlow = int.MaxValue;
+            this.Visited = true;
         }
 
         public override void Reset()

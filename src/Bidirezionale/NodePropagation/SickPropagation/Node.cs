@@ -29,9 +29,8 @@ namespace Bidirezionale.NodePropagation.SickPropagation
         {
             this.Reversed = reversed;
         }
-        public (bool, bool) AddFlow(int flow)
+        public bool AddFlow(int flow)
         {
-            bool invalid = false;
             int f, c;
             if (!this.Reversed)
             {
@@ -44,17 +43,17 @@ namespace Bidirezionale.NodePropagation.SickPropagation
                 c = this.Capacity + flow;
             }
             if (f < 0 || c < 0)
-                invalid = true;
-            this.SetCapacity(c);
-            this.SetFlow(f);
-            return (c == 0, invalid);
+                this.SetCapacity(c);
+            this.Flow = f;
+            this.Capacity = c;
+            return c == 0;
         }
     }
 
 
     public class Node
     {
-        public int InFlow { get; protected set; }
+        public bool Visited { get; protected set; }
         public int Label { get; protected set; }
         public List<BiEdge> Edges { get; private set; }
         public string Name { get; private set; }
@@ -68,7 +67,7 @@ namespace Bidirezionale.NodePropagation.SickPropagation
         public Node(string name)
         {
             this.Name = name;
-            this.InFlow = 0;
+            this.Visited = false;
             this.Label = 0;
             this.Edges = new();
             this.PreviousNode = null;
@@ -92,7 +91,7 @@ namespace Bidirezionale.NodePropagation.SickPropagation
                 this.AddEdge(x.Item1, x.Item2);
         }
         public void SetLabel(int label) => this.Label = label;
-        public void SetInFlow(int f) => this.InFlow = f;
+        public void SetVisited(bool visited) => this.Visited = visited;
         public void SetPreviousNode(Node n) => this.PreviousNode = n;
         public void SetNextNode(Node n) => this.NextNode = n;
         public void SetPreviousEdge(BiEdge e) => this.PreviousEdge = e;
@@ -100,7 +99,7 @@ namespace Bidirezionale.NodePropagation.SickPropagation
 
         public virtual void Reset()
         {
-            this.SetInFlow(0);
+            this.Visited = false;
             /* this.SetPreviousEdge(null);
             this.SetPreviousNode(null);
             this.SetNextEdge(null);

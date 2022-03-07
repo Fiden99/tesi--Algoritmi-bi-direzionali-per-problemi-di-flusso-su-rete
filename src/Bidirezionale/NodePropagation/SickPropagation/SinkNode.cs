@@ -5,7 +5,7 @@ namespace Bidirezionale.NodePropagation.SickPropagation
         public SinkNode(string name) : base(name)
         {
             this.SourceSide = false;
-            this.InFlow = int.MaxValue;
+            this.Visited = true;
         }
         public override void Reset() { }
     }
