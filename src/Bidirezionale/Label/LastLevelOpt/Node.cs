@@ -47,7 +47,7 @@ namespace Bidirezionale.Label.LastLevelOpt
                 invalid = true;
             this.SetCapacity(c);
             this.SetFlow(f);
-            return (c == 0, invalid);
+            return (c == 0 | f == 0, invalid);
         }
     }
 
