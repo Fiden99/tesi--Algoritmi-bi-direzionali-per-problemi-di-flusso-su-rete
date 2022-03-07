@@ -55,7 +55,7 @@ namespace Bidirezionale.NodeCount.SickPropagation
             else
                 this.LabeledNodeSinkSide[0].Add(n);
         }
-        public void AddNode(Node n,bool sourceSide)
+        public void AddNode(Node n, bool sourceSide)
         {
             if (sourceSide)
                 this.LabeledNodeSourceSide[0].Add(n);
@@ -69,16 +69,6 @@ namespace Bidirezionale.NodeCount.SickPropagation
         }
         public Node Sink => this.LabeledNodeSinkSide[0].Single(x => x is SinkNode);
         public Node Source => this.LabeledNodeSourceSide[0].Single(x => x is SourceNode);
-        public static void Reset(Node node)
-        {
-            /*if (node is not SourceNode && node is not SinkNode)
-                node.SetInFlow(0);
-                        node.SetPreviousEdge(null);
-                        node.SetPreviousNode(null);
-                        node.SetNextEdge(null);
-                        node.SetNextNode(null); */
-            node.Reset();
-        }
         public void RemoveLastNode(Node n)
         {
 #if DEBUG
@@ -102,13 +92,13 @@ namespace Bidirezionale.NodeCount.SickPropagation
         {
             for (; label < this.LabeledNodeSourceSide.Count; label++)
                 foreach (var n in this.LabeledNodeSourceSide[label])
-                    Reset(n);
+                    n.Reset();
         }
         public void ResetSinkSide(int label)
         {
             for (; label < this.LabeledNodeSinkSide.Count; label++)
                 foreach (var n in this.LabeledNodeSinkSide[label])
-                    Reset(n);
+                    n.Reset();
         }
         public void ChangeLabel(Node n, bool sourceSide, int label)
         {

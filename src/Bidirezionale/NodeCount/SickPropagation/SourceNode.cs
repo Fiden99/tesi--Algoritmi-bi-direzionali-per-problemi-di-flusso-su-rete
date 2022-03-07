@@ -5,7 +5,7 @@ namespace Bidirezionale.NodeCount.SickPropagation
         public SourceNode(string name) : base(name)
         {
             this.SourceSide = true;
-            this.InFlow = int.MaxValue;
+            this.Visited = true;
         }
         public override void Reset() { }
     }
