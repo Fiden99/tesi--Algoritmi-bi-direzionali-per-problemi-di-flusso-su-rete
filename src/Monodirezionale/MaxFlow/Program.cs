@@ -14,8 +14,6 @@ using SAPNode = Monodirezionale.MaxFlow.ShortestAugmentingPath.Node;
 using SPGraph = Monodirezionale.MaxFlow.SickPropagation.Graph;
 using SPNode = Monodirezionale.MaxFlow.SickPropagation.Node;
 
-
-
 namespace MaxFlow
 {
     public class Program

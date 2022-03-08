@@ -1,23 +1,30 @@
+PC dove sono avvenuti i test : Asus X580VD
+Componentistica : CPU i7-7700HQ 2.80GHz, 16GB RAM, scheda grafica (non dovrebbe essere stata usata) GTX 1050
 Seed iniziale = 42
 Valore massimo di archi uscenti da un nodo = 1000
-Monodirezionali
+
+Risultati per implementazione monodirezionale
 Graph created,n = 10000, m = 4519146
 NoOpt Execution Time: 47962 ms
 Last Level Opt Execution Time: 5819 ms
 Sick Propagation Execution Time: 2018 ms
 Shortest Augmenting Path Execution Time: 3767861 ms
-Label --> propongo i nodi con stessa label (discorso particolare per SickPropagation)
+
+Risultati implementazione Bidirezionale,divisa per "euristica" di esplorazione : 
+Label --> esploro i nodi con stessa label (discorso particolare per SickPropagation)
 Graph created,n = 10000, m = 4519146
 Bidirectional Label NoOpt Execution Time: 47044 ms
-Bidirectional Label Sick Propagation Execution Time: 2418 ms
 Bidirectional Label Last Level Opt Execution Time: 5692 ms
+Bidirectional Label Sick Propagation Execution Time: 2418 ms
+
 NodePropagation --> esploro tutti i nodi adiacenti al nodo che sto esplorando
 Graph created,n = 10000, m = 4519146
 Bidirectional NodePropagation NoOpt Execution Time: 18302 ms
-Bidirectional NodePropagation Sick Propagation Execution Time: 3310 ms
 Bidirectional NodePropagation Last Level Opt Execution Time: 7136 ms
+Bidirectional NodePropagation Sick Propagation Execution Time: 3310 ms
+
 NodeCount --> esploro un nodo alla volta
 Graph created,n = 10000, m = 4519146
 Bidirectional NodeCount NoOpt Execution Time: 17492 ms
-Bidirectional NodeCount Sick Propagation Execution Time: 2847 ms
 Bidirectional NodeCount Last Level Opt Execution Time: 6578 ms
+Bidirectional NodeCount Sick Propagation Execution Time: 2847 ms
