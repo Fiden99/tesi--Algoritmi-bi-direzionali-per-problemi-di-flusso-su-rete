@@ -23,7 +23,7 @@ namespace Bidirezionale.NodePropagation.Tests
             //seed usati : 42,          valore out : 80521, 
             //Random rnd1 = new();
             //int rand = rnd1.Next();
-            Random random = new(78946516);
+            Random random = new(42);
             //Console.WriteLine(rand);
             NOGraph grafoNO = new(cardNodes);
             SPGraph grafoSP = new(cardNodes);
