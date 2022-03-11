@@ -413,7 +413,6 @@ namespace Bidirezionale.NodePropagation.LastLevelOptEdgeFlow
                         n.SetValid(false);
                     }
                     n = n.PreviousNode;
-
                 }
                 while (mom != t)
                 {
