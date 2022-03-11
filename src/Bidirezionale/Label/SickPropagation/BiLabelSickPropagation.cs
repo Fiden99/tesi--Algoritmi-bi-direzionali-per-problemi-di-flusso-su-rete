@@ -232,7 +232,7 @@ namespace Bidirezionale.Label.SickPropagation
             // ricerca normale del flusso
             while (codaSink.Count > 0 || codaSource.Count > 0)
             {
-                while (codaSource.Count > 0 && !sourceRepaired)
+                while (codaSource.Count > 0)// && !sourceRepaired)
                 {
                     var element = codaSource.Dequeue();
                     if (!element.SourceSide || !element.SourceValid || !element.Visited)
@@ -398,7 +398,7 @@ namespace Bidirezionale.Label.SickPropagation
                     }
                 }
                 (codaMom, codaSource) = (codaSource, codaMom);
-                while (codaSink.Count > 0 && !sinkRepaired)
+                while (codaSink.Count > 0)// && !sinkRepaired)
                 {
                     var element = codaSink.Dequeue();
                     if (element.SourceSide || !element.SinkValid || !element.Visited)

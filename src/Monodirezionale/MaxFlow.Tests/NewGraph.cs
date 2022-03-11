@@ -138,41 +138,41 @@ namespace MaxFlow.Tests
             Console.WriteLine("Graph created");
             var watch = new Stopwatch();
             watch.Start();
-            var res = BfsNoOpt.FlowFordFulkerson(graph);
+            //var res = BfsNoOpt.FlowFordFulkerson(graph);
             //var res = BfsLastLevelOpt.FlowFordFulkerson(graph);
-            //var res= BfsSickPropagation.FlowFordFulkerson(graph);
+            var res = BfsSickPropagation.FlowFordFulkerson(graph);
             //var res = ShortestAugmentingPath.FlowFordFulkerson(graph);
             watch.Stop();
             Console.WriteLine($"Execution Time: {watch.ElapsedMilliseconds} ms");
             Assert.Equal(69985, res);
         }
 
-        private static NOGraph CreateOneGraph(int cardNodes)
+        private static SPGraph CreateOneGraph(int cardNodes)
         {
             //seed usati : 42,          valore out : 80521, 
             Random rand = new();
             int rnd = rand.Next();
             Random random = new(42);
             Console.WriteLine("seed = " + rnd);
-            NOGraph grafo = new(cardNodes);
+            SPGraph grafo = new(cardNodes);
 
-            List<NONode> nodes = new(cardNodes);
+            List<SPNode> nodes = new(cardNodes);
 
-            NONode s = new Monodirezionale.MaxFlow.NoOpt.SourceNode("0");
+            //NONode s = new Monodirezionale.MaxFlow.NoOpt.SourceNode("0");
             //LLONode s = new Monodirezionale.MaxFlow.LastLevelOpt.SourceNode("0");
-            //SPNode s = new Monodirezionale.MaxFlow.SickPropagation.SourceNode("0");
+            SPNode s = new Monodirezionale.MaxFlow.SickPropagation.SourceNode("0");
             //SAPNode s = new Monodirezionale.MaxFlow.ShortestAugmentingPath.SourceNode("0");
             grafo.AddNode(s);
             nodes.Add(s);
             for (int i = 1; i < cardNodes; i++)
             {
-                NONode n = new(i.ToString());
+                SPNode n = new(i.ToString());
                 grafo.AddNode(n);
                 nodes.Add(n);
             }
-            var t = new Monodirezionale.MaxFlow.NoOpt.SinkNode(cardNodes.ToString());
+            //var t = new Monodirezionale.MaxFlow.NoOpt.SinkNode(cardNodes.ToString());
             //var t = new Monodirezionale.MaxFlow.LastLevelOpt.SinkNode(cardNodes.ToString());
-            //var t = new Monodirezionale.MaxFlow.SickPropagation.SinkNode(cardNodes.ToString());
+            var t = new Monodirezionale.MaxFlow.SickPropagation.SinkNode(cardNodes.ToString());
             //var t = new Monodirezionale.MaxFlow.ShortestAugmentingPath.SinkNode(cardNodes.ToString());
             grafo.AddNode(t);
             nodes.Add(t);
@@ -187,7 +187,7 @@ namespace MaxFlow.Tests
                     var cap = random.Next(0, 10000);
                     if (cap > 0)
                     {
-                        n.AddNext(nodes[x], cap);
+                        n.AddEdge(nodes[x], cap);
                     }
                 }
             }

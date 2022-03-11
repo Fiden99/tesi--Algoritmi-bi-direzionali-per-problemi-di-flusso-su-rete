@@ -157,15 +157,12 @@ namespace Monodirezionale.MaxFlow.SickPropagation
                 }
                 if (repaired)
                     return GetFlow(t);
-                bool first = true;
                 Node x = null;
                 while (malati.Count > 0)
                 {
                     var noCap = malati.Dequeue();
                     SickPropagation(grafo, noCap, coda);
-                    if (first)
-                        x = noCap;
-                    first = false;
+                    x ??= noCap;
                 }
                 if (t.Valid)
                     return GetFlow(t);
@@ -191,7 +188,7 @@ namespace Monodirezionale.MaxFlow.SickPropagation
                     var p = edge.PreviousNode;
                     if ((n.Visited && p.Visited) || !element.Valid)
                         continue;
-                    else if (p == element && edge.Capacity > 0 && (n.Label >= p.Label || fromSource || n.Valid == false))
+                    else if (p == element && edge.Capacity > 0 && (n.Label > p.Label || fromSource || n.Valid == false))
                     {
                         n.SetPreviousNode(p);
                         n.SetPreviousEdge(edge);
@@ -208,7 +205,7 @@ namespace Monodirezionale.MaxFlow.SickPropagation
                         else
                             coda.Enqueue(n);
                     }
-                    else if (n == element && edge.Flow > 0 && (p.Label >= n.Label || fromSource || p.Valid == false))
+                    else if (n == element && edge.Flow > 0 && (p.Label > n.Label || fromSource || p.Valid == false))
                     {
                         p.SetPreviousNode(n);
                         p.SetPreviousEdge(edge);

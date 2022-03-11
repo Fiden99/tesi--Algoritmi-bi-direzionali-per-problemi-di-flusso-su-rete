@@ -99,10 +99,6 @@ namespace Bidirezionale.NodePropagation.NoOpt
         public void SetNextNode(Node n) => this.NextNode = n;
         public void SetPreviousEdge(BiEdge e) => this.PreviousEdge = e;
         public void SetNextEdge(BiEdge e) => this.NextEdge = e;
-
-        public virtual void Reset()
-        {
-            this.Visited = false;
-        }
+        public virtual void Reset() => this.SetVisited(false);
     }
 }

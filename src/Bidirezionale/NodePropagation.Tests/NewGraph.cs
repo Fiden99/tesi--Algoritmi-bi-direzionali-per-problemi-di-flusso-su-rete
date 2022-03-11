@@ -129,36 +129,37 @@ namespace Bidirezionale.NodePropagation.Tests
             watch.Start();
             //var res = BiNodePropagationNoOpt.FlowFordFulkerson(grafo);
             //var res = LastLevelOpt.BiNodePropagationLastLevelOpt.FlowFordFulkerson(grafo);
-            var res = LastLevelOptEdgeFlow.BiNodePropagationLastLevelOpt.FlowFordFulkerson(grafo);
-            //var res = BiNodePropagationSickPropagation.FlowFordFulkerson(grafo);
+            //var res = LastLevelOptEdgeFlow.BiNodePropagationLastLevelOpt.FlowFordFulkerson(grafo);
+            var res = BiNodePropagationSickPropagation.FlowFordFulkerson(grafo);
             watch.Stop();
+            Console.WriteLine($"Execution Time: {watch.ElapsedMilliseconds} ms");
             Assert.Equal(69985, res);
         }
-        private static EFGraph CreateOneGraph(int cardNodes)
+        private static SPGraph CreateOneGraph(int cardNodes)
         {
             {
                 //seed usati : 42,          valore out : 80521, 
                 Random random = new(42);
-                EFGraph grafo = new(cardNodes);
+                SPGraph grafo = new(cardNodes);
 
-                List<EFNode> nodes = new(cardNodes);
+                List<SPNode> nodes = new(cardNodes);
 
                 //var s = new NoOpt.SourceNode("0");
                 //var s = new LastLevelOpt.SourceNode("0");
-                //var s = new SickPropagation.SourceNode("0");
-                var s = new LastLevelOptEdgeFlow.SourceNode("0");
+                var s = new SickPropagation.SourceNode("0");
+                //var s = new LastLevelOptEdgeFlow.SourceNode("0");
                 grafo.AddNode(s);
                 nodes.Add(s);
                 for (int i = 1; i < cardNodes; i++)
                 {
-                    EFNode n = new(i.ToString());
+                    SPNode n = new(i.ToString());
                     grafo.AddNode(n);
                     nodes.Add(n);
                 }
                 //var t = new NoOpt.SinkNode(cardNodes.ToString());
                 //var t = new LastLevelOpt.SinkNode(cardNodes.ToString());
-                //var t = new SickPropagation.SinkNode(cardNodes.ToString());
-                var t = new LastLevelOptEdgeFlow.SinkNode(cardNodes.ToString());
+                var t = new SickPropagation.SinkNode(cardNodes.ToString());
+                //var t = new LastLevelOptEdgeFlow.SinkNode(cardNodes.ToString());
                 grafo.AddNode(t);
                 nodes.Add(t);
 
