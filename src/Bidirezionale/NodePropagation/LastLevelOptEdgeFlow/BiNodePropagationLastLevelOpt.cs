@@ -149,7 +149,7 @@ namespace Bidirezionale.NodePropagation.LastLevelOptEdgeFlow
                     }
                 }
                 if (repaired && noCapsSink.Count == 0)
-                    foreach (var n in graph.LastNodesSinkSide.Where(x => x.Valid))
+                    foreach (var n in graph.LastNodesSinkSide.Where(x => x.Valid && x.Visited))
                         if (Reached(graph.Source, n))
                             return n;
                 if (!repaired)
@@ -186,7 +186,7 @@ namespace Bidirezionale.NodePropagation.LastLevelOptEdgeFlow
                 }
                 if (repaired && noCapsSource.Count == 0)
                 {
-                    foreach (var n in graph.LastNodesSinkSide.Where(x => x.Valid))
+                    foreach (var n in graph.LastNodesSinkSide.Where(x => x.Valid && x.Visited))
                     {
                         if (Reached(graph.Sink, n))
                             return n;
