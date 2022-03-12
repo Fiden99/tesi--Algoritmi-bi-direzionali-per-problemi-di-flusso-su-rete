@@ -28,3 +28,7 @@ Graph created,n = 10000, m = 4519146
 Bidirectional NodeCount NoOpt Execution Time: 17492 ms
 Bidirectional NodeCount Last Level Opt Execution Time: 6578 ms
 Bidirectional NodeCount Sick Propagation Execution Time: 2847 ms
+
+Shortest Augmenting Path
+Graph created, number of nodes = 10000, number of arcs = 4519146
+Bidirectional NodePropagation Last Level Opt Execution Time: 825 ms
