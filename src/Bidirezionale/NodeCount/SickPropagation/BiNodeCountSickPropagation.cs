@@ -20,7 +20,7 @@ namespace Bidirezionale.NodeCount.SickPropagation
                     Node next = e.NextNode;
                     if (previous.SourceSide != next.SourceSide)
                         continue;
-                    if (node == next && e.Capacity > 0 && previous.Label == (node.Label - 1) && previous.SourceValid && previous.Visited)
+                    if (node == next && e.Capacity > 0 && previous.Label == (node.Label - 1) && previous.SourceValid && previous.Visited && previous.PreviousNode != node)
                     {
                         //grafo.ChangeLabel(node, true, node.Label);
                         node.SetPreviousNode(previous);
@@ -30,7 +30,7 @@ namespace Bidirezionale.NodeCount.SickPropagation
                         node.SetSourceValid(true);
                         return true;
                     }
-                    if (node == previous && e.Flow > 0 && next.Label == (node.Label - 1) && next.SourceValid && next.Visited)
+                    if (node == previous && e.Flow > 0 && next.Label == (node.Label - 1) && next.SourceValid && next.Visited && next.PreviousNode != node)
                     {
                         //grafo.ChangeLabel(node, true, node.Label);
                         node.SetPreviousNode(next);
@@ -74,7 +74,7 @@ namespace Bidirezionale.NodeCount.SickPropagation
                     }
                     else if (onlySinkExploration && next.SourceSide == previous.SourceSide)
                     {
-                        if (node == previous && e.Capacity > 0 && next.SinkValid && node.Label == (next.Label + 1) && next.Visited)
+                        if (node == previous && e.Capacity > 0 && next.SinkValid && node.Label == (next.Label + 1) && next.Visited && next.NextNode != node)
                         {
                             node.SetNextEdge(e);
                             node.SetNextNode(next);
@@ -83,7 +83,7 @@ namespace Bidirezionale.NodeCount.SickPropagation
                             node.SetSinkValid(true);
                             return true;
                         }
-                        if (node == next && e.Flow > 0 && previous.SinkValid && node.Label == (previous.Label + 1) && previous.Visited)
+                        if (node == next && e.Flow > 0 && previous.SinkValid && node.Label == (previous.Label + 1) && previous.Visited && previous.NextNode != node)
                         {
                             node.SetNextEdge(e);
                             node.SetNextNode(previous);

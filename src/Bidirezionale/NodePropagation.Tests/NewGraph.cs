@@ -23,7 +23,7 @@ namespace Bidirezionale.NodePropagation.Tests
             //seed usati : 42,          valore out : 80521, 
             //Random rnd1 = new();
             //int rand = rnd1.Next();
-            Random random = new(42);
+            Random random = new(1779933806);
             //Console.WriteLine(rand);
             NOGraph grafoNO = new(cardNodes);
             SPGraph grafoSP = new(cardNodes);
@@ -104,20 +104,20 @@ namespace Bidirezionale.NodePropagation.Tests
                         Console.WriteLine($"Last Level Opt Execution Time: {watch.ElapsedMilliseconds} ms");
              */
             watch.Restart();
-            var res2 = BiNodePropagationSickPropagation.FlowFordFulkerson(graphSP);
-            watch.Stop();
-            Console.WriteLine($"Bidirectional NodePropagation Sick Propagation Execution Time: {watch.ElapsedMilliseconds} ms");
-
-            watch.Restart();
-            var res3 = LastLevelOptEdgeFlow.BiNodePropagationLastLevelOpt.FlowFordFulkerson(graphEF);
+            var res2 = LastLevelOptEdgeFlow.BiNodePropagationLastLevelOpt.FlowFordFulkerson(graphEF);
             watch.Stop();
             Console.WriteLine($"Bidirectional NodePropagation Last Level Opt Execution Time: {watch.ElapsedMilliseconds} ms");
+
+            watch.Restart();
+            var res3 = BiNodePropagationSickPropagation.FlowFordFulkerson(graphSP);
+            watch.Stop();
+            Console.WriteLine($"Bidirectional NodePropagation Sick Propagation Execution Time: {watch.ElapsedMilliseconds} ms");
 
             if (res1 != res2)
                 throw new InvalidOperationException("r2 != r1");
             if (res2 != res3)
                 throw new InvalidOperationException("r2 != r3");
-            Assert.Equal(69985, res1);
+            Assert.Equal(39083, res1);
         }
         [Fact]
         public void TestOneNewGraph()
@@ -133,13 +133,13 @@ namespace Bidirezionale.NodePropagation.Tests
             var res = BiNodePropagationSickPropagation.FlowFordFulkerson(grafo);
             watch.Stop();
             Console.WriteLine($"Execution Time: {watch.ElapsedMilliseconds} ms");
-            Assert.Equal(69985, res);
+            Assert.Equal(39083, res);
         }
         private static SPGraph CreateOneGraph(int cardNodes)
         {
             {
                 //seed usati : 42,          valore out : 80521, 
-                Random random = new(42);
+                Random random = new(1779933806);
                 SPGraph grafo = new(cardNodes);
 
                 List<SPNode> nodes = new(cardNodes);

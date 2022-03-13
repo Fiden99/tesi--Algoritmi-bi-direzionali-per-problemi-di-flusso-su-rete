@@ -13,20 +13,20 @@ namespace ShortestAugmetingPath.Tests
         {
             int numNodes = 10000;
             var (numArcs, graph) = CreateGraph(numNodes);
-            Console.WriteLine("Graph created, number of nodes = " + numNodes + ", number of arcs = " + numArcs);
+            Console.WriteLine("Graph created, number of nodes = " + numNodes + 1 + ", number of arcs = " + numArcs);
             Stopwatch watch = new();
             watch.Start();
             var res = ShortestAugmentingPath.FlowFordFulkerson(graph);
             watch.Stop();
-            Console.WriteLine($"Bidirectional NodePropagation Last Level Opt Execution Time: {watch.ElapsedMilliseconds} ms");
+            Console.WriteLine($"Bidirectional Shortest Augmenting Path Execution Time: {watch.ElapsedMilliseconds} ms");
 
-            Assert.Equal(69985, res);
+            Assert.Equal(39083, res);
 
         }
         private static (int, Graph) CreateGraph(int cardNodes)
         {
             //seed usati : 42,          valore out : 80521, 
-            Random random = new(42);
+            Random random = new(1779933806);
             Graph grafo = new(cardNodes);
             int cardArcs = 0;
             List<Node> nodes = new(cardNodes);

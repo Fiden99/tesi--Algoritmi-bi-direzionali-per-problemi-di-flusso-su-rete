@@ -23,7 +23,7 @@ namespace Bidirezionale.NodeCount.Tests
             //seed usati : 42,          valore out : 80521, 
             //Random rnd1 = new();
             //int rand = rnd1.Next();
-            Random random = new(42);
+            Random random = new(1779933806);
             //Console.WriteLine(rand);
             NOGraph grafoNO = new(cardNodes);
             SPGraph grafoSP = new(cardNodes);
@@ -117,7 +117,7 @@ namespace Bidirezionale.NodeCount.Tests
                 throw new InvalidOperationException("r2 != r1");
             if (res2 != res3)
                 throw new InvalidOperationException("r2 != r3");
-            Assert.Equal(69985, res1);
+            Assert.Equal(39083, res1);
         }
         [Fact]
         public void TestOneNewGraph()
