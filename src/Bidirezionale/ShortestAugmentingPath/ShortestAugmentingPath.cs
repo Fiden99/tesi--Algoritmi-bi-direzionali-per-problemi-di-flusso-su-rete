@@ -64,12 +64,10 @@ namespace Bidirezionale.ShortestAugmentingPath
         }
         public static void SendFlow(Node reached, int flow)
         {
-            Node m;
             if (reached is SourceNode)
             {
                 while (reached is not SinkNode)
                 {
-                    m = reached;
                     reached.NextEdge.AddFlow(flow);
                     reached = reached.NextNode;
                 }
@@ -78,7 +76,6 @@ namespace Bidirezionale.ShortestAugmentingPath
             {
                 while (reached is not SourceNode)
                 {
-                    m = reached;
                     reached.PreviousEdge.AddFlow(flow);
                     reached = reached.PreviousNode;
                 }
@@ -89,13 +86,11 @@ namespace Bidirezionale.ShortestAugmentingPath
                 reached.NextEdge.AddFlow(flow);
                 while (reached is not SourceNode)
                 {
-                    m = reached;
                     reached.PreviousEdge.AddFlow(flow);
                     reached = reached.PreviousNode;
                 }
                 while (mom is not SinkNode)
                 {
-                    m = mom;
                     mom.NextEdge.AddFlow(flow);
                     mom = mom.NextNode;
                 }

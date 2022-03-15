@@ -147,21 +147,21 @@ namespace Bidirezionale.Label.Tests
             //var res = LastLevelOptEdgeFlow.BiLabelLastLevelOpt.FlowFordFulkerson(grafo);
             var res = BiLabelSickPropagation.FlowFordFulkerson(grafo);
             watch.Stop();
-            Assert.Equal(39083, res);
+            Assert.Equal(27929, res);
         }
         private static SPGraph CreateOneGraph(int cardNodes)
         {
             {
                 //seed usati : 42,          valore out : 80521, 
-                Random random = new(1779933806);
+                Random random = new(1598168404);
                 SPGraph grafo = new(cardNodes);
 
                 List<SPNode> nodes = new(cardNodes);
 
                 //var s = new NoOpt.SourceNode("0");
                 //var s = new LastLevelOpt.SourceNode("0");
-                var s = new SickPropagation.SourceNode("0");
                 //var s = new LastLevelOptEdgeFlow.SourceNode("0");
+                var s = new SickPropagation.SourceNode("0");
                 grafo.AddNode(s);
                 nodes.Add(s);
                 for (int i = 1; i < cardNodes; i++)
@@ -172,8 +172,8 @@ namespace Bidirezionale.Label.Tests
                 }
                 //var t = new NoOpt.SinkNode(cardNodes.ToString());
                 //var t = new LastLevelOpt.SinkNode(cardNodes.ToString());
-                var t = new SickPropagation.SinkNode(cardNodes.ToString());
                 //var t = new LastLevelOptEdgeFlow.SinkNode(cardNodes.ToString());
+                var t = new SickPropagation.SinkNode(cardNodes.ToString());
                 grafo.AddNode(t);
                 nodes.Add(t);
 

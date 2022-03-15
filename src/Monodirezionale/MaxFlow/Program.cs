@@ -1,4 +1,4 @@
-using System;
+/* using System;
 using System.Diagnostics;
 using System.Linq;
 using Monodirezionale.MaxFlow.LastLevelOpt;
@@ -104,8 +104,9 @@ namespace MaxFlow
             var (graphNN, graphLLO, graphSAP, graphSP) = Read(System.IO.File.ReadAllLines(@"../../dataset/adhead.n6c10.max.bbk.max"));
             Performance(graphNN, graphLLO, graphSAP, graphSP);
         }
-        public static void Main(int args)
+        static void Main(string[] x)
         {
+            var args = int.Parse(x[0]);
             NoOptGraph graphNN;
             LLOGraph graphLLO;
             SAPGraph graphSAP;
@@ -158,3 +159,4 @@ namespace MaxFlow
         }
     }
 }
+ */

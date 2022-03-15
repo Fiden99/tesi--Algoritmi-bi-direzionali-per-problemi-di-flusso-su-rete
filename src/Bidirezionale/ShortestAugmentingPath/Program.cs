@@ -1,4 +1,4 @@
-using System;
+/* using System;
 using System.Diagnostics;
 using System.Linq;
 
@@ -54,7 +54,7 @@ namespace Bidirezionale.ShortestAugmentingPath
             }
             return grafo;
         }
-        /*         public static void Main()
+                 public static void Main()
                 {
                     var grafo = Read(System.IO.File.ReadAllLines(@"../../dataset/adhead.n6c10.max.bbk.max"));
                     if (grafo == null)
@@ -67,7 +67,6 @@ namespace Bidirezionale.ShortestAugmentingPath
                     Console.WriteLine($"Shortest augmenting path Execution Time: {watch.ElapsedMilliseconds} ms");
                     Console.WriteLine("send flow = " + res);
                 }
-         */
         public static void Main(int args)
         {
             Graph grafo;
@@ -92,4 +91,4 @@ namespace Bidirezionale.ShortestAugmentingPath
             Console.WriteLine("send flow = " + res);
         }
     }
-}
+} */

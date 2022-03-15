@@ -51,7 +51,7 @@ namespace Bidirezionale.Label.NoOpt
                                     //n.SetInFlow(f);
                                     return n;
                                 }
-                            n.SetSourceSide(true);
+                            graph.ChangeSide(n, true);
                             n.SetVisited(true);
                             n.SetLabel(p.Label + 1);
                             n.SetPreviousNode(p);
@@ -72,7 +72,7 @@ namespace Bidirezionale.Label.NoOpt
                                     //p.SetInFlow(f);
                                     return p;
                                 }
-                            p.SetSourceSide(true);
+                            graph.ChangeSide(p, true);
                             p.SetVisited(true);
                             p.SetLabel(n.Label + 1);
                             p.SetPreviousEdge(e);
@@ -99,7 +99,7 @@ namespace Bidirezionale.Label.NoOpt
                         if (element == n && e.Capacity > 0)
                         {
                             if (p.Visited)
-                                if (!n.SourceSide)
+                                if (!p.SourceSide)
                                     continue;
                                 else
                                 {
@@ -109,7 +109,7 @@ namespace Bidirezionale.Label.NoOpt
                                     //p.SetInFlow(f);
                                     return n;
                                 }
-                            p.SetSourceSide(false);
+                            graph.ChangeSide(p, false);
                             p.SetVisited(true);
                             p.SetNextEdge(e);
                             p.SetNextNode(n);
@@ -130,7 +130,7 @@ namespace Bidirezionale.Label.NoOpt
                                     //n.SetInFlow(f);
                                     return p;
                                 }
-                            n.SetSourceSide(false);
+                            graph.ChangeSide(n, false);
                             n.SetVisited(true);
                             n.SetNextEdge(e);
                             n.SetNextNode(p);

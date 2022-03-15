@@ -32,3 +32,15 @@ Bidirectional NodeCount Sick Propagation Execution Time: 2847 ms
 Shortest Augmenting Path
 Graph created, number of nodes = 10000, number of arcs = 4519146
 Bidirectional NodePropagation Last Level Opt Execution Time: 825 ms
+
+
+
+
+
+
+
+seed 1864285781
+41130
+
+algoritmo SAP, mentre lo usavo
+3941830 ms

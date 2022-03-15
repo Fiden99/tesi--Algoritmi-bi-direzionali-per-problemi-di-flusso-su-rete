@@ -150,7 +150,7 @@ namespace Bidirezionale.Label.LastLevelOptEdgeFlow
                     }
                 }
                 if (repaired && noCapsSink.Count == 0)
-                    foreach (var n in graph.LastNodesSinkSide.Where(x => x.Valid))
+                    foreach (var n in graph.LastNodesSinkSide.Where(x => x.Valid && x.Visited))
                         if (Reached(graph.Source, n))
                             return n;
                 if (!repaired)
@@ -187,7 +187,7 @@ namespace Bidirezionale.Label.LastLevelOptEdgeFlow
                 }
                 if (repaired && noCapsSource.Count == 0)
                 {
-                    foreach (var n in graph.LastNodesSinkSide.Where(x => x.Valid))
+                    foreach (var n in graph.LastNodesSinkSide.Where(x => x.Valid && x.Visited))
                     {
                         if (Reached(graph.Sink, n))
                             return n;
@@ -205,14 +205,14 @@ namespace Bidirezionale.Label.LastLevelOptEdgeFlow
                         graph.ResetSinkSide(noCapSink.Label);
                     }
             }
-            bool needSink = false;
+            bool needsink = false;
             do
             {
-                if (needSink)
+                if (needsink)
                 {
-                    needSink = true;
                     graph.ResetSinkSide(0);
                     codaSink.Enqueue(graph.Sink);
+                    needsink = false;
                 }
                 while (codaSink.Count > 0 || codaSource.Count > 0)
                 {
@@ -253,8 +253,7 @@ namespace Bidirezionale.Label.LastLevelOptEdgeFlow
                                     buffer.Enqueue(n);
                                 }
                                 else if (!n.SourceSide && !n.Visited && noCapsSink.Count == 0 && codaSink.Count == 0)
-                                    needSink = true;
-
+                                    needsink = true;
                             }
                             else if (element == n && e.Flow > 0)
                             {
@@ -280,13 +279,12 @@ namespace Bidirezionale.Label.LastLevelOptEdgeFlow
                                     buffer.Enqueue(p);
                                 }
                                 else if (!p.SourceSide && !p.Visited && noCapsSink.Count == 0 && codaSink.Count == 0)
-                                    needSink = true;
-
+                                    needsink = true;
                             }
                         }
                     }
-                    (buffer, codaSource) = (codaSource, buffer);
-                    while (codaSink.Count > 0)//&& noCapsSink.Count > 0)
+                    (codaSource, buffer) = (buffer, codaSource);
+                    while (codaSink.Count > 0)// && noCapsSink.Count > 0)
                     {
                         var element = codaSink.Dequeue();
                         if (element.SourceSide || !element.Visited || !element.Valid)
@@ -359,9 +357,9 @@ namespace Bidirezionale.Label.LastLevelOptEdgeFlow
                         }
 
                     }
-                    (buffer, codaSink) = (codaSink, buffer);
+                    (codaSink, buffer) = (buffer, codaSink);
                 }
-            } while (needSink);
+            } while (needsink);
             return null;
         }
 
@@ -418,7 +416,6 @@ namespace Bidirezionale.Label.LastLevelOptEdgeFlow
                         n.SetValid(false);
                     }
                     n = n.PreviousNode;
-
                 }
                 while (mom != t)
                 {

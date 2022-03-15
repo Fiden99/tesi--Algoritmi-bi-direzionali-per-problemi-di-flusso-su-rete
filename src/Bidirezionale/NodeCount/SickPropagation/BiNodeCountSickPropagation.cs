@@ -154,19 +154,23 @@ namespace Bidirezionale.NodeCount.SickPropagation
                             return n;
                 //parte di sickPropagation
                 Node malato = null;
+                int min = int.MaxValue;
                 while (malati.Count > 0)
-                    malato ??= SourceSickPropagation(graph, malati.Dequeue(), codaSource);
+                {
+                    var x = SourceSickPropagation(graph, malati.Dequeue());
+                    if (malato == null)
+                        malato = x.Item1;
+                    min = Math.Min(x.Item2, min);
+                }
                 if (malato != null && sinkRepaired)//&& (malato.NextEdge.Reversed ? malato.NextEdge.Flow : malato.NextEdge.Capacity) > 0 && malato.NextNode.Visited)                
                     return malato;
                 if (sinkRepaired)
                     foreach (var n in graph.LastNodesSinkSide.Where(x => (x.SourceValid && x.NextEdge.Reversed ? x.NextEdge.Flow : x.NextEdge.Capacity) > 0 && x.NextNode.Visited && x.SinkValid && x.NextNode.SinkValid))
-                    {
                         if (Reachable(graph.Source, n))
                             return n;
-                    }
                 sourceRepaired = repaired;
                 // fine parte di sickpropagation
-                if (!repaired && codaSource.Count == 0)
+                if (!repaired)// && codaSource.Count == 0)
                 {
                     if (noCapSource is SourceNode)
                     {
@@ -177,11 +181,17 @@ namespace Bidirezionale.NodeCount.SickPropagation
                         foreach (var n in graph.LastNodesSourceSide)
                             codaSource.Enqueue(n);
                     }
-                    else
+                    else if (min == int.MaxValue)
                     {
                         foreach (var n in graph.LabeledNodeSourceSide[noCapSource.Label - 1])
                             codaSource.Enqueue(n);
                         graph.ResetSourceSide(noCapSource.Label);
+                    }
+                    else
+                    {
+                        foreach (var n in graph.LabeledNodeSourceSide[min])
+                            codaSource.Enqueue(n);
+                        graph.ResetSourceSide(min + 1);
                     }
                 }
             }
@@ -211,8 +221,14 @@ namespace Bidirezionale.NodeCount.SickPropagation
                     }
                 }
                 Node malato = null;
+                int min = int.MaxValue;
                 while (malati.Count > 0)
-                    malato ??= SickPropagationSink(malati.Dequeue(), codaSink);
+                {
+                    var x = SickPropagationSink(malati.Dequeue());
+                    if (malato == null)
+                        malato = x.Item1;
+                    min = Math.Min(min, x.Item2);
+                }
                 if (malato != null)
                     return malato;
                 foreach (var n in graph.LastNodesSinkSide.Where(x => x.SinkValid && (x.PreviousEdge.Reversed ? x.PreviousEdge.Flow : x.PreviousEdge.Capacity) > 0 && x.PreviousNode.Visited && x.SourceValid))
@@ -221,18 +237,26 @@ namespace Bidirezionale.NodeCount.SickPropagation
                         return n;
                 }
                 sinkRepaired = repaired;
-                if (!repaired && codaSink.Count == 0)
+                if (!repaired)// && codaSink.Count == 0)
                     if (noCapSink is SinkNode)
                     {
                         codaSink.Enqueue(noCapSink);
                     }
-                    else
+                    else if (min == int.MaxValue)
                     {
                         foreach (var n in graph.LabeledNodeSinkSide[noCapSink.Label - 1])
                             codaSink.Enqueue(n);
                         graph.ResetSinkSide(noCapSink.Label);
                     }
+                    else
+                    {
+                        foreach (var n in graph.LabeledNodeSinkSide[min])
+                            codaSink.Enqueue(n);
+                        graph.ResetSinkSide(min + 1);
+
+                    }
             }
+
             bool needSink = false;
             do
             {
@@ -399,8 +423,9 @@ namespace Bidirezionale.NodeCount.SickPropagation
             return null;
         }
 
-        private static Node SickPropagationSink(Node node, Queue<Node> codaSink)
+        private static (Node, int) SickPropagationSink(Node node)
         {
+            int min = int.MaxValue;
             Queue<Node> malati = new();
             malati.Enqueue(node);
             while (malati.Count > 0)
@@ -417,16 +442,17 @@ namespace Bidirezionale.NodeCount.SickPropagation
                                 malati.Enqueue(e.NextNode);
                     }
                     else if (m.PreviousEdge != null && (m.PreviousEdge.Reversed ? m.PreviousEdge.Flow : m.PreviousEdge.Capacity) > 0 && m.PreviousNode.Visited && m.PreviousNode.SourceValid)
-                        return m;
+                        return (m, min);
                     else
-                        codaSink.Enqueue(m);
+                        min = Math.Min(min, m.Label);
                 }
             }
-            return null;
+            return (null, min);
         }
 
-        private static Node SourceSickPropagation(Graph graph, Node node, Queue<Node> codaSource)
+        private static (Node, int) SourceSickPropagation(Graph graph, Node node)
         {
+            int min = int.MaxValue;
             Queue<Node> malati = new();
             malati.Enqueue(node);
             while (malati.Count > 0)
@@ -442,14 +468,12 @@ namespace Bidirezionale.NodeCount.SickPropagation
                                 malati.Enqueue(e.PreviousNode);
                     }
                     else if (m.NextEdge != null && (m.NextEdge.Reversed ? m.NextEdge.Flow : m.NextEdge.Capacity) > 0 && m.NextNode.Visited && m.SinkValid)
-                        return m;
+                        return (m, min);
                     else if (m.SourceSide)
-                        codaSource.Enqueue(m);
+                        min = Math.Min(min, m.Label);
             }
-            return null;
-
+            return (null, min);
         }
-
         public static int FlowFordFulkerson(Graph graph)
         {
             Node s = graph.Source;
@@ -466,7 +490,15 @@ namespace Bidirezionale.NodeCount.SickPropagation
                     break;
                 int f = GetFlow(n, s, t);
                 if (f == 0)
-                    break;
+                {
+                    vuotiSource.Clear();
+                    vuotiSink.Clear();
+                    vuotiSource.Push(s);
+                    vuotiSink.Push(t);
+                    graph.ResetSourceSide(0);
+                    graph.ResetSinkSide(0);
+                    continue;
+                }
                 vuotiSource.Clear();
                 vuotiSink.Clear();
                 Node momsource = n;

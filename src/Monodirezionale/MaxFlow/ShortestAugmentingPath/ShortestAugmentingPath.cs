@@ -84,7 +84,7 @@ namespace Monodirezionale.MaxFlow.ShortestAugmentingPath
                     //retreat
                     if (!advanced)
                     {
-                        int min = int.MaxValue - 1;
+                        int min = int.MaxValue - graph.Nodes.Count;
                         foreach (var e in start.Edges)
                         {
                             if (start == e.PreviousNode && e.Capacity > 0)

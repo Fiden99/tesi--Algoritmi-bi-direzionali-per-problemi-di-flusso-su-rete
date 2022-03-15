@@ -103,15 +103,16 @@ namespace Bidirezionale.NodeCount.Tests
                         watch.Stop();
                         Console.WriteLine($"Last Level Opt Execution Time: {watch.ElapsedMilliseconds} ms");
              */
-            watch.Restart();
-            var res2 = BiNodeCountSickPropagation.FlowFordFulkerson(graphSP);
-            watch.Stop();
-            Console.WriteLine($"Bidirectional NodeCount Sick Propagation Execution Time: {watch.ElapsedMilliseconds} ms");
 
             watch.Restart();
-            var res3 = LastLevelOptEdgeFlow.BiNodeCountLastLevelOpt.FlowFordFulkerson(graphEF);
+            var res2 = LastLevelOptEdgeFlow.BiNodeCountLastLevelOpt.FlowFordFulkerson(graphEF);
             watch.Stop();
             Console.WriteLine($"Bidirectional NodeCount Last Level Opt Execution Time: {watch.ElapsedMilliseconds} ms");
+
+            watch.Restart();
+            var res3 = BiNodeCountSickPropagation.FlowFordFulkerson(graphSP);
+            watch.Stop();
+            Console.WriteLine($"Bidirectional NodeCount Sick Propagation Execution Time: {watch.ElapsedMilliseconds} ms");
 
             if (res1 != res2)
                 throw new InvalidOperationException("r2 != r1");
@@ -132,13 +133,13 @@ namespace Bidirezionale.NodeCount.Tests
             //var res = LastLevelOptEdgeFlow.BiNodeCountLastLevelOpt.FlowFordFulkerson(grafo);
             var res = BiNodeCountSickPropagation.FlowFordFulkerson(grafo);
             watch.Stop();
-            Assert.Equal(69985, res);
+            Assert.Equal(39083, res);
         }
         private static SPGraph CreateOneGraph(int cardNodes)
         {
             {
                 //seed usati : 42,          valore out : 80521, 
-                Random random = new(42);
+                Random random = new(1779933806);
                 SPGraph grafo = new(cardNodes);
 
                 List<SPNode> nodes = new(cardNodes);

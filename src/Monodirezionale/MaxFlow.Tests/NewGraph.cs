@@ -24,7 +24,7 @@ namespace MaxFlow.Tests
             //seed usati : 42,          valore out : 80521, 
             //Random rnd1 = new();
             //int rand = rnd1.Next();
-            Random random = new(42);
+            Random random = new(1779933806);
             //Console.WriteLine(rand);
             NOGraph grafoNO = new(cardNodes);
             LLOGraph grafoLLO = new(cardNodes);
@@ -126,10 +126,9 @@ namespace MaxFlow.Tests
             var res4 = ShortestAugmentingPath.FlowFordFulkerson(graphSAP);
             watch.Stop();
             Console.WriteLine($"Shortest Augmenting Path Execution Time: {watch.ElapsedMilliseconds} ms");
-
             if (res1 != res2 || res2 != res3 || res3 != res4)
                 throw new InvalidOperationException("valori diversi");
-            Assert.Equal(69985, res1);
+            Assert.Equal(39083, res1);
         }
         [Fact]
         public void TestOneNewGraph()
@@ -140,40 +139,41 @@ namespace MaxFlow.Tests
             watch.Start();
             //var res = BfsNoOpt.FlowFordFulkerson(graph);
             //var res = BfsLastLevelOpt.FlowFordFulkerson(graph);
-            var res = BfsSickPropagation.FlowFordFulkerson(graph);
-            //var res = ShortestAugmentingPath.FlowFordFulkerson(graph);
+            //var res = BfsSickPropagation.FlowFordFulkerson(graph);
+            var res = ShortestAugmentingPath.FlowFordFulkerson(graph);
             watch.Stop();
             Console.WriteLine($"Execution Time: {watch.ElapsedMilliseconds} ms");
-            Assert.Equal(69985, res);
+            Assert.Equal(39083, res);
         }
 
-        private static SPGraph CreateOneGraph(int cardNodes)
+        private static SAPGraph CreateOneGraph(int cardNodes)
         {
             //seed usati : 42,          valore out : 80521, 
             Random rand = new();
             int rnd = rand.Next();
-            Random random = new(42);
+            Random random = new(rnd);
+            Console.WriteLine(rnd);
             Console.WriteLine("seed = " + rnd);
-            SPGraph grafo = new(cardNodes);
+            SAPGraph grafo = new(cardNodes);
 
-            List<SPNode> nodes = new(cardNodes);
+            List<SAPNode> nodes = new(cardNodes);
 
             //NONode s = new Monodirezionale.MaxFlow.NoOpt.SourceNode("0");
             //LLONode s = new Monodirezionale.MaxFlow.LastLevelOpt.SourceNode("0");
-            SPNode s = new Monodirezionale.MaxFlow.SickPropagation.SourceNode("0");
-            //SAPNode s = new Monodirezionale.MaxFlow.ShortestAugmentingPath.SourceNode("0");
+            //SPNode s = new Monodirezionale.MaxFlow.SickPropagation.SourceNode("0");
+            SAPNode s = new Monodirezionale.MaxFlow.ShortestAugmentingPath.SourceNode("0");
             grafo.AddNode(s);
             nodes.Add(s);
             for (int i = 1; i < cardNodes; i++)
             {
-                SPNode n = new(i.ToString());
+                SAPNode n = new(i.ToString());
                 grafo.AddNode(n);
                 nodes.Add(n);
             }
             //var t = new Monodirezionale.MaxFlow.NoOpt.SinkNode(cardNodes.ToString());
             //var t = new Monodirezionale.MaxFlow.LastLevelOpt.SinkNode(cardNodes.ToString());
-            var t = new Monodirezionale.MaxFlow.SickPropagation.SinkNode(cardNodes.ToString());
-            //var t = new Monodirezionale.MaxFlow.ShortestAugmentingPath.SinkNode(cardNodes.ToString());
+            //var t = new Monodirezionale.MaxFlow.SickPropagation.SinkNode(cardNodes.ToString());
+            var t = new Monodirezionale.MaxFlow.ShortestAugmentingPath.SinkNode(cardNodes.ToString());
             grafo.AddNode(t);
             nodes.Add(t);
 
