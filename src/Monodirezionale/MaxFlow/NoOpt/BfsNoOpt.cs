@@ -8,7 +8,7 @@ namespace Monodirezionale.MaxFlow.NoOpt
     {
         public static void DoBfs(Graph grafo)
         {
-            grafo.ResetLabel();
+            grafo.Reset();
             var coda = new Queue<Node>();
             coda.Enqueue(grafo.Source);
             while (coda.Count > 0)

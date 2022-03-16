@@ -33,7 +33,7 @@ namespace Monodirezionale.MaxFlow.NoOpt
         public Node Source => Nodes.Single(x => x is SourceNode);
         public Node Sink => Nodes.Single(x => x is SinkNode);
 
-        public void ResetLabel()
+        public void Reset()
         {
             foreach (Node x in this.Nodes)
             {
