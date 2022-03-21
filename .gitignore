@@ -14,9 +14,6 @@
 *.user
 *.userosscache
 *.sln.docstates
-#temp, for removing pdf and tex file
-*.pdf
-*.tex
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
